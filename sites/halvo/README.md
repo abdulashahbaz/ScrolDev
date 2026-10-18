@@ -41,4 +41,4 @@ npm run format     # Prettier
 
 ## Deploy
 
-Vercel: import the repo, set **Root Directory** to `sites/halvo`, and use `git diff HEAD^ HEAD --quiet -- .` as the Ignored Build Step. Optionally set `NEXT_PUBLIC_SITE_URL` to the production URL. Without it, Vercel's production URL is used for canonical links and the social card.
+Vercel: import the repo and set **Root Directory** to `sites/halvo`. Nothing else to configure: `vercel.json` already makes Vercel skip rebuilds when nothing in this folder changed. Optionally set `NEXT_PUBLIC_SITE_URL` to the production URL. Without it, Vercel's production URL is used for canonical links and the social card.
