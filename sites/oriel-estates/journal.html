@@ -34,6 +34,7 @@
     </nav>
     <div class="header__right">
       <span class="header__clock" data-clock="Europe/Madrid">Palma <time>--:--</time></span>
+      <button class="saved-btn" type="button" data-saved-open aria-controls="saved" aria-expanded="false"><span class="roll"><span>Shortlist</span><span aria-hidden="true">Shortlist</span></span><span class="saved-count tabular" data-saved-count>0</span></button>
       <a class="btn" href="contact.html" data-magnetic="0.25"><span class="roll"><span>Private enquiry</span><span aria-hidden="true">Private enquiry</span></span></a>
       <button class="burger" type="button" aria-expanded="false" aria-controls="menu"><span></span><span></span><span class="sr">Menu</span></button>
     </div>
@@ -63,6 +64,18 @@
       </div>
     </div>
   </div>
+  <aside class="saved" id="saved" aria-hidden="true" aria-labelledby="saved-title">
+    <div class="saved__veil" data-saved-close></div>
+    <div class="saved__panel" role="dialog" aria-modal="true" aria-labelledby="saved-title">
+      <div class="saved__head">
+        <h2 id="saved-title" class="display">Shortlist</h2>
+        <button class="icon-btn" type="button" data-saved-close aria-label="Close shortlist"><svg viewBox="0 0 16 16"><path d="M2 2l12 12M14 2L2 14" fill="none" stroke="currentColor" stroke-width="1.2"/></svg></button>
+      </div>
+      <ul class="saved__list" data-saved-list></ul>
+      <p class="saved__empty" data-saved-empty>Nothing saved yet. Use <b>+</b> on any residence to keep it here.</p>
+      <a class="btn btn--solid saved__cta" href="contact.html" data-saved-cta><span class="roll"><span>Enquire about these</span><span aria-hidden="true">Enquire about these</span></span></a>
+    </div>
+  </aside>
   <!-- chrome:end -->
 
   <main id="main">

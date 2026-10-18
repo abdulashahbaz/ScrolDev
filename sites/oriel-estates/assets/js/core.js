@@ -1,6 +1,8 @@
 // Shared behaviour for every page: smooth scroll, header, cursor, menu,
 // page transitions and the scroll-driven reveal vocabulary.
 
+import { residences } from "./data.js";
+
 const { gsap, ScrollTrigger, SplitText, Flip, CustomEase } = window;
 gsap.registerPlugin(ScrollTrigger, SplitText, Flip, CustomEase);
 CustomEase.create("oriel", "0.16, 1, 0.3, 1");
@@ -165,6 +167,79 @@ function initMenu() {
   window.__closeMenu = () => open && set(false);
 }
 
+// ---------------------------------------------------------------- shortlist
+
+const SAVED_KEY = "oriel:shortlist";
+let saved = [];
+try {
+  saved = JSON.parse(localStorage.getItem(SAVED_KEY) || "[]").filter((id) => residences.some((r) => r.id === id));
+} catch { /* storage blocked: the shortlist lives for this page only */ }
+
+export const plusIcon = `<svg viewBox="0 0 14 14" aria-hidden="true"><path d="M7 1v12M1 7h12" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>`;
+export const isSaved = (id) => saved.includes(id);
+
+function syncSaved() {
+  $$("[data-saved-count]").forEach((el) => {
+    el.textContent = saved.length;
+    el.classList.toggle("has", saved.length > 0);
+  });
+  $$("[data-save]").forEach((b) => {
+    const on = isSaved(b.dataset.save);
+    b.setAttribute("aria-pressed", String(on));
+    b.setAttribute("aria-label", `${on ? "Remove" : "Save"} ${b.dataset.name} ${on ? "from" : "to"} shortlist`);
+  });
+  const panel = $("#saved");
+  if (!panel) return;
+  $("[data-saved-list]", panel).innerHTML = saved.map((id) => {
+    const r = residences.find((x) => x.id === id);
+    return `<li class="saved__item">
+      <a href="residence.html?id=${r.id}" tabindex="-1" aria-hidden="true"><img src="assets/img/${r.cover}-800.webp" alt=""></a>
+      <div><strong><a href="residence.html?id=${r.id}">${r.name}</a></strong><span>${r.city} · ${r.price}</span></div>
+      <button type="button" data-unsave="${r.id}" aria-label="Remove ${r.name}">Remove</button>
+    </li>`;
+  }).join("");
+  panel.classList.toggle("has-items", saved.length > 0);
+  $("[data-saved-cta]", panel).href = "contact.html?about=" + saved.join(",");
+}
+
+function toggleSaved(id) {
+  saved = isSaved(id) ? saved.filter((x) => x !== id) : [...saved, id];
+  try { localStorage.setItem(SAVED_KEY, JSON.stringify(saved)); } catch { /* storage blocked */ }
+  syncSaved();
+}
+
+function initSaved() {
+  const panel = $("#saved");
+  const openers = $$("[data-saved-open]");
+  let open = false;
+  const set = (v) => {
+    open = v;
+    panel.classList.toggle("is-open", v);
+    panel.setAttribute("aria-hidden", String(!v));
+    openers.forEach((b) => b.setAttribute("aria-expanded", String(v)));
+    lockScroll(v);
+    if (v) setTimeout(() => $(".saved__head .icon-btn", panel)?.focus(), 50);
+    else openers[0]?.focus({ preventScroll: true });
+  };
+  if (panel) {
+    openers.forEach((b) => b.addEventListener("click", () => set(!open)));
+    $$("[data-saved-close]", panel).forEach((b) => b.addEventListener("click", () => set(false)));
+    document.addEventListener("keydown", (e) => e.key === "Escape" && open && set(false));
+    panel.addEventListener("click", (e) => {
+      const b = e.target.closest("[data-unsave]");
+      if (b) toggleSaved(b.dataset.unsave);
+    });
+  }
+  document.addEventListener("click", (e) => {
+    const b = e.target.closest("[data-save]");
+    if (!b) return;
+    e.preventDefault();
+    toggleSaved(b.dataset.save);
+    if (!reduced) gsap.fromTo($$("[data-saved-count]"), { scale: 1.6 }, { scale: 1, duration: 0.7, ease: "elastic.out(1, 0.4)" });
+  });
+  syncSaved();
+}
+
 // ---------------------------------------------------------------- page transitions
 
 function initTransitions() {
@@ -282,6 +357,25 @@ function initReveals() {
     const o = { v: 0 };
     el.textContent = fmt(0);
     gsap.to(o, { v: end, duration: 2.2, ease: "power3.out", scrollTrigger: { trigger: el, start: "top 90%", once: true }, onUpdate: () => (el.textContent = fmt(o.v)) });
+  });
+}
+
+// images lean into fast scrolling, then settle
+function initSkew() {
+  if (reduced || !fine) return;
+  const els = $$(".card__img, .post__img, .gallery__item");
+  if (!els.length) return;
+  const proxy = { skew: 0 };
+  const set = gsap.quickSetter(els, "skewY", "deg");
+  const clamp = gsap.utils.clamp(-4, 4);
+  ScrollTrigger.create({
+    onUpdate: (self) => {
+      const v = clamp(self.getVelocity() / -400);
+      if (Math.abs(v) > Math.abs(proxy.skew)) {
+        proxy.skew = v;
+        gsap.to(proxy, { skew: 0, duration: 0.8, ease: "power3", overwrite: true, onUpdate: () => set(proxy.skew) });
+      }
+    },
   });
 }
 
@@ -453,6 +547,7 @@ export async function boot(pageInit, prepare) {
   window.__oriel = true;
   prepare?.();
   markNav();
+  initSaved();
   initScroll();
   initTransitions();
   initMenu();
@@ -467,6 +562,7 @@ export async function boot(pageInit, prepare) {
   initClocks();
   initFooter();
   if (pageInit) await pageInit();
+  initSkew();
   ScrollTrigger.refresh();
   window.addEventListener("load", () => ScrollTrigger.refresh());
 }

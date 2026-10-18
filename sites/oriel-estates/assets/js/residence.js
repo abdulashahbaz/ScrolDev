@@ -1,4 +1,4 @@
-import { boot, gsap, ScrollTrigger, SplitText, reduced, $, $$, dragScroll, lockScroll } from "./core.js";
+import { boot, gsap, ScrollTrigger, SplitText, reduced, $, $$, dragScroll, lockScroll, plusIcon } from "./core.js";
 import { residences, img, src, srcset, planFor } from "./data.js";
 
 const params = new URLSearchParams(location.search);
@@ -34,15 +34,18 @@ function mapSvg() {
     const ph = rnd() * 6.28;
     for (let a = 0; a <= 64; a++) {
       const t = (a / 64) * Math.PI * 2;
-      const wob = 1 + 0.16 * Math.sin(t * 3 + ph) + 0.08 * Math.sin(t * 5 + ph * 2) + 0.05 * Math.sin(t * 9 + k);
+      const wob = 1 + 0.12 * Math.sin(t * 2 + ph) + 0.06 * Math.sin(t * 3 + ph * 2) + 0.025 * Math.sin(t * 5 + k * 0.7);
       pts.push(`${(400 + Math.cos(t) * rad * wob * 1.25).toFixed(1)},${(300 + Math.sin(t) * rad * wob).toFixed(1)}`);
     }
     paths += `<polyline points="${pts.join(" ")}" fill="none" stroke="rgba(236,230,220,${k % 5 === 0 ? 0.28 : 0.11})" stroke-width="${k % 5 === 0 ? 1.2 : 0.8}"/>`;
   }
   const road = () => {
-    let d = `M${-20} ${100 + rnd() * 400}`;
-    for (let x = 80; x <= 900; x += 120) d += ` Q${x - 60} ${100 + rnd() * 400} ${x} ${100 + rnd() * 400}`;
-    return `<path d="${d}" fill="none" stroke="rgba(236,230,220,0.35)" stroke-width="1.4" stroke-dasharray="1 0"/>`;
+    const base = 120 + rnd() * 360;
+    const tilt = (rnd() - 0.5) * 0.5;
+    const y = (x) => base + tilt * x + Math.sin(x / 140 + base) * 26;
+    let d = `M-20 ${y(-20).toFixed(1)}`;
+    for (let x = 20; x <= 840; x += 40) d += ` L${x} ${y(x).toFixed(1)}`;
+    return `<path d="${d}" fill="none" stroke="rgba(236,230,220,0.32)" stroke-width="1.6" stroke-linejoin="round"/>`;
   };
   const water = coastal
     ? `<path d="M0 ${430 + rnd() * 40} C 200 ${380 + rnd() * 60}, 420 ${470 + rnd() * 40}, 800 ${400 + rnd() * 40} L800 600 L0 600Z" fill="rgba(120,150,170,0.14)"/>`
@@ -93,7 +96,10 @@ function render() {
         <div class="r-hero__side" data-hero-side>
           <span class="eyebrow">${price ? "Guide price" : "Offered privately"}</span>
           <span class="r-hero__price">${r.price}</span>
-          <a class="btn" href="#enquire" data-magnetic="0.25" style="margin-top:18px"><span class="roll"><span>Arrange a viewing</span><span aria-hidden="true">Arrange a viewing</span></span>${arrow}</a>
+          <div style="display:flex;gap:10px;justify-content:inherit;margin-top:18px">
+            <a class="btn" href="#enquire" data-magnetic="0.25"><span class="roll"><span>Arrange a viewing</span><span aria-hidden="true">Arrange a viewing</span></span>${arrow}</a>
+            <button class="save save--inline" type="button" data-save="${r.id}" data-name="${r.name}" aria-pressed="false">${plusIcon}</button>
+          </div>
         </div>
       </div>
     </section>
@@ -107,7 +113,7 @@ function render() {
       <div class="fact"><dt>Architect</dt><dd style="font-size:clamp(1rem,1.3vw,1.3rem);line-height:1.25">${r.architect}</dd></div>
     </dl>
 
-    <section class="section story" data-header="bone" aria-label="About the residence">
+    <section class="section story wrap" data-header="bone" aria-label="About the residence">
       <p class="eyebrow"><b>(01)</b>&nbsp;&nbsp;The residence</p>
       <p class="lead story__lead" data-split>${r.lead}</p>
       <div class="story__cols" data-reveal>
@@ -128,7 +134,7 @@ function render() {
       <div class="gallery__track" data-drag data-cursor="Drag">
         ${r.images.map((im, j) => `
           <figure class="gallery__item">
-            <button type="button" data-open="${j}" aria-label="Open image ${j + 1}: ${im.cap}">
+            <button type="button" data-open="${j}" data-cursor="Open" aria-label="Open image ${j + 1}: ${im.cap}">
               <img src="${src(im.src)}" srcset="${srcset(im.src)}" sizes="(max-width: 820px) 90vw, 70vw" alt="${im.cap}" loading="lazy" decoding="async" draggable="false">
             </button>
             <figcaption>${pad(j + 1)} — ${im.cap}</figcaption>

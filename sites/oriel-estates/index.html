@@ -52,6 +52,7 @@
     </nav>
     <div class="header__right">
       <span class="header__clock" data-clock="Europe/Madrid">Palma <time>--:--</time></span>
+      <button class="saved-btn" type="button" data-saved-open aria-controls="saved" aria-expanded="false"><span class="roll"><span>Shortlist</span><span aria-hidden="true">Shortlist</span></span><span class="saved-count tabular" data-saved-count>0</span></button>
       <a class="btn" href="contact.html" data-magnetic="0.25"><span class="roll"><span>Private enquiry</span><span aria-hidden="true">Private enquiry</span></span></a>
       <button class="burger" type="button" aria-expanded="false" aria-controls="menu"><span></span><span></span><span class="sr">Menu</span></button>
     </div>
@@ -81,6 +82,18 @@
       </div>
     </div>
   </div>
+  <aside class="saved" id="saved" aria-hidden="true" aria-labelledby="saved-title">
+    <div class="saved__veil" data-saved-close></div>
+    <div class="saved__panel" role="dialog" aria-modal="true" aria-labelledby="saved-title">
+      <div class="saved__head">
+        <h2 id="saved-title" class="display">Shortlist</h2>
+        <button class="icon-btn" type="button" data-saved-close aria-label="Close shortlist"><svg viewBox="0 0 16 16"><path d="M2 2l12 12M14 2L2 14" fill="none" stroke="currentColor" stroke-width="1.2"/></svg></button>
+      </div>
+      <ul class="saved__list" data-saved-list></ul>
+      <p class="saved__empty" data-saved-empty>Nothing saved yet. Use <b>+</b> on any residence to keep it here.</p>
+      <a class="btn btn--solid saved__cta" href="contact.html" data-saved-cta><span class="roll"><span>Enquire about these</span><span aria-hidden="true">Enquire about these</span></span></a>
+    </div>
+  </aside>
   <!-- chrome:end -->
 
   <main id="main">
@@ -144,7 +157,7 @@
         </div>
         <ul class="strip__list">
           <li class="strip__item is-active"><a href="residence.html?id=the-monolith" data-cursor="View"><img src="assets/img/monolith-portrait-800.webp" srcset="assets/img/monolith-portrait-800.webp 800w, assets/img/monolith-portrait-1400.webp 1400w" sizes="50vw" alt="The Monolith" loading="lazy"><span class="strip__no">01</span><div class="strip__meta"><div><h3>The Monolith</h3><p>Palm Desert, California</p></div><span class="strip__price">$14.5M</span></div></a></li>
-          <li class="strip__item"><a href="residence.html?id=casa-solenne" data-cursor="View"><img src="assets/img/solenne-pool-800.webp" srcset="assets/img/solenne-pool-800.webp 800w, assets/img/solenne-pool-1400.webp 1400w" sizes="50vw" alt="Casa Solenne" loading="lazy"><span class="strip__no">02</span><div class="strip__meta"><div><h3>Casa Solenne</h3><p>Mallorca, Spain</p></div><span class="strip__price">€18.9M</span></div></a></li>
+          <li class="strip__item"><a href="residence.html?id=casa-solenne" data-cursor="View"><img src="assets/img/solenne-exterior-800.webp" srcset="assets/img/solenne-exterior-800.webp 800w, assets/img/solenne-exterior-1400.webp 1400w" sizes="50vw" alt="Casa Solenne" loading="lazy"><span class="strip__no">02</span><div class="strip__meta"><div><h3>Casa Solenne</h3><p>Mallorca, Spain</p></div><span class="strip__price">€18.9M</span></div></a></li>
           <li class="strip__item"><a href="residence.html?id=atrium-house" data-cursor="View"><img src="assets/img/atrium-lounge-800.webp" srcset="assets/img/atrium-lounge-800.webp 800w, assets/img/atrium-lounge-1400.webp 1400w" sizes="50vw" alt="Atrium House" loading="lazy"><span class="strip__no">03</span><div class="strip__meta"><div><h3>Atrium House</h3><p>Kyoto, Japan</p></div><span class="strip__price">¥2.35B</span></div></a></li>
           <li class="strip__item"><a href="residence.html?id=villa-ardesia" data-cursor="View"><img src="assets/img/ardesia-steps-800.webp" srcset="assets/img/ardesia-steps-800.webp 800w, assets/img/ardesia-steps-1400.webp 1400w" sizes="50vw" alt="Villa Ardesia" loading="lazy"><span class="strip__no">04</span><div class="strip__meta"><div><h3>Villa Ardesia</h3><p>Ibiza, Spain</p></div><span class="strip__price">€11.25M</span></div></a></li>
           <li class="strip__item"><a href="residence.html?id=penthouse-47" data-cursor="View"><img src="assets/img/penthouse-night-800.webp" srcset="assets/img/penthouse-night-800.webp 800w, assets/img/penthouse-night-1400.webp 1400w" sizes="50vw" alt="Penthouse Forty-Seven" loading="lazy"><span class="strip__no">05</span><div class="strip__meta"><div><h3>Forty-Seven</h3><p>New York, USA</p></div><span class="strip__price">$32M</span></div></a></li>

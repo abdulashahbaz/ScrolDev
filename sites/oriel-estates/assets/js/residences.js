@@ -1,4 +1,4 @@
-import { boot, gsap, Flip, ScrollTrigger, reduced, fine, $, $$ } from "./core.js";
+import { boot, gsap, Flip, ScrollTrigger, reduced, fine, $, $$, plusIcon } from "./core.js";
 import { residences, img } from "./data.js";
 
 const pad = (n) => String(n).padStart(2, "0");
@@ -10,11 +10,14 @@ function render() {
     const alt = r.images[1];
     return `
       <article class="card" data-region="${r.region}" data-usd="${r.usd}" data-built="${r.year}" data-order="${i}" data-img="${`assets/img/${r.cover}-800.webp`}">
-        <a class="card__img" href="residence.html?id=${r.id}" data-cursor="View" aria-label="${r.name}, ${r.city}">
-          ${img(r.cover, `${r.name}, ${r.city}`, "(max-width: 820px) 100vw, 50vw")}
-          ${alt ? img(alt.src, "", "(max-width: 820px) 100vw, 50vw", 'class="alt"') : ""}
-          ${statusChip(r.status)}
-        </a>
+        <div class="card__media">
+          <a class="card__img" href="residence.html?id=${r.id}" data-cursor="View" aria-label="${r.name}, ${r.city}">
+            ${img(r.cover, `${r.name}, ${r.city}`, "(max-width: 820px) 100vw, 50vw")}
+            ${alt ? img(alt.src, "", "(max-width: 820px) 100vw, 50vw", 'class="alt"') : ""}
+            ${statusChip(r.status)}
+          </a>
+          <button class="save" type="button" data-save="${r.id}" data-name="${r.name}" aria-pressed="false">${plusIcon}</button>
+        </div>
         <div class="card__body">
           <span class="card__no tabular">${pad(i + 1)}</span>
           <h2 class="card__name"><a href="residence.html?id=${r.id}">${r.name}</a></h2>
