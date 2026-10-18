@@ -1,0 +1,10 @@
+/** An apricot sun rising behind a snow peak. */
+export function Logo({ size = 30 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 32 32" aria-hidden="true" focusable="false">
+      <circle cx="16" cy="16" r="15" fill="#f0a052" />
+      <path d="M3.5 24 13 11.5l3.2 4 3.3-4.5L28.5 24a15 15 0 0 1-25 0Z" fill="#1a1612" />
+      <path d="M13 11.5 9.6 16l2.2-.9 1.9 1.6 1.3-1.2ZM19.5 11l-2 2.8 1.6-.5 1.6 1.4 1-1Z" fill="#f5eee2" />
+    </svg>
+  );
+}
