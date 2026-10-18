@@ -1,0 +1,13 @@
+{
+  "name": "fonds",
+  "client": "",
+  "category": "Fashion · Archive label",
+  "summary": "A scroll-driven drop page for an archive fashion label: the cursor scrubs the hero film frame by frame, then a black gallery rises over it and ten looks scale in and out as you scroll.",
+  "type": "concept",
+  "year": 2026,
+  "url": "",
+  "cover": "cover.jpg",
+  "stack": ["React", "TypeScript", "Vite", "Tailwind CSS", "GSAP", "Motion"],
+  "featured": true,
+  "draft": false
+}
