@@ -1,0 +1,13 @@
+{
+  "name": "Halvo",
+  "client": "",
+  "category": "SaaS · AI operations",
+  "summary": "A complete marketing site for an AI-agents platform: animated product UI, pricing with an ROI calculator, customer stories, changelog, blog and 27 static pages.",
+  "type": "concept",
+  "year": 2026,
+  "url": "",
+  "cover": "cover.jpg",
+  "stack": ["Next.js", "TypeScript", "Tailwind CSS", "Motion"],
+  "featured": true,
+  "draft": false
+}
