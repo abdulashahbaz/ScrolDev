@@ -1,0 +1,171 @@
+/* The valley scene. Colours come from custom properties set on .scene
+   (see lib/palette.ts); geometry comes from lib/terrain.ts. */
+
+.scene {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  isolation: isolate;
+  container-type: size;
+  background: var(--sky-low);
+}
+
+.scene-sky {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, var(--sky-top) 0%, var(--sky-mid) 48%, var(--sky-low) 74%, var(--sky-low) 100%);
+}
+
+.scene-sun {
+  position: absolute;
+  left: calc(var(--sun-x) * 1%);
+  top: calc(var(--sun-y) * 1%);
+  width: 52cqmin;
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    var(--sun) 0 6.5%,
+    color-mix(in srgb, var(--sun) 60%, transparent) 8.5%,
+    color-mix(in srgb, var(--sun) 24%, transparent) 22%,
+    color-mix(in srgb, var(--sun) 8%, transparent) 42%,
+    transparent 68%
+  );
+  opacity: var(--sun-o);
+  pointer-events: none;
+}
+
+.scene-moon {
+  position: absolute;
+  left: 78%;
+  top: 14%;
+  width: 4.8cqmin;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 38%, #fffdf6, #f1ead8 62%, #e2d9c3);
+  box-shadow:
+    0 0 28px 4px rgb(255 248 230 / 0.45),
+    0 0 120px 40px rgb(170 190 255 / 0.18);
+  opacity: var(--moon-o);
+  pointer-events: none;
+}
+
+.scene-layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  transform: translate3d(calc(var(--mx, 0) * var(--d, 0) * -60px), calc(var(--my, 0) * var(--d, 0) * -24px), 0);
+  pointer-events: none;
+  user-select: none;
+}
+
+.scene-back {
+  position: absolute;
+  inset: 0;
+}
+
+/* On screens narrower than the 16:10 artwork the scene is cropped to its
+   centre, which would hide the gorge walls. Pull each wall in just enough
+   that its inner edge frames the bottom of the view; on wider screens this
+   resolves to 0. */
+.scene-cliff-left {
+  translate: max(0px, 40cqh - 38cqw) 0;
+}
+
+.scene-cliff-right {
+  translate: min(0px, 38cqw - 40cqh) 0;
+}
+
+.scene-stars {
+  fill: #fff;
+  opacity: var(--stars);
+}
+
+.twinkle {
+  animation: twinkle 3.6s ease-in-out infinite;
+}
+
+@keyframes twinkle {
+  50% {
+    opacity: 0.15;
+  }
+}
+
+.mist {
+  transform-box: view-box;
+  animation: drift 46s ease-in-out infinite alternate;
+}
+
+.mist-fast {
+  animation-duration: 28s;
+  animation-direction: alternate-reverse;
+}
+
+.mist-o {
+  opacity: var(--mist-o);
+}
+
+@keyframes drift {
+  from {
+    transform: translateX(-60px);
+  }
+  to {
+    transform: translateX(60px);
+  }
+}
+
+.shimmer {
+  animation: shimmer 5.4s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0%,
+  100% {
+    opacity: 0.25;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.window-glow {
+  opacity: var(--window-glow);
+}
+
+.window-halo {
+  opacity: calc(var(--window-glow) * 0.45);
+}
+
+/* Fills and strokes, one per palette colour. */
+.f-snow-lit { fill: var(--snow-lit); }
+.f-snow-shade { fill: var(--snow-shade); }
+.f-rock-lit { fill: var(--rock-lit); }
+.f-rock-shade { fill: var(--rock-shade); }
+.s-rock-shade { stroke: var(--rock-shade); }
+.f-cones-lit { fill: var(--cones-lit); }
+.f-cones-shade { fill: var(--cones-shade); }
+.f-mid { fill: var(--mid); }
+.f-mid-shade { fill: var(--mid-shade); }
+.f-fort { fill: var(--fort); }
+.f-window { fill: var(--window); }
+.f-haze { fill: var(--haze); }
+.f-shimmer { fill: var(--shimmer); }
+.f-poplar { fill: var(--poplar); }
+.f-poplar-shade { fill: var(--poplar-shade); }
+.f-orchard { fill: var(--orchard); }
+.f-field { fill: var(--field); }
+.f-bridge { fill: var(--bridge); }
+.s-bridge { stroke: var(--bridge); }
+.s-cable { stroke: var(--cable); }
+.s-cliff-rim { stroke: var(--cliff-rim); }
+
+@media (prefers-reduced-motion: reduce) {
+  .twinkle,
+  .mist,
+  .shimmer {
+    animation: none;
+  }
+}

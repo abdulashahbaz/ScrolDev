@@ -1,0 +1,12 @@
+{
+  "name": "Apricot & Ice",
+  "category": "Travel & tourism",
+  "summary": "A cinematic travel site for small-group journeys in Hunza. One scroll carries the valley from dawn to night, with every layer of the scene drawn in code.",
+  "type": "concept",
+  "year": 2026,
+  "url": "",
+  "cover": "cover.jpg",
+  "stack": ["Next.js", "TypeScript", "Tailwind CSS", "SVG"],
+  "featured": true,
+  "draft": false
+}
