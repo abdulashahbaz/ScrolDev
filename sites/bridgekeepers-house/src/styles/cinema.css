@@ -1,0 +1,715 @@
+/* Home page scroll story. Layer geometry and timing follow the layered
+   Mostar scene this site is built on; components/home/cinema.tsx writes the
+   custom properties declared on .stage below. */
+
+.cinema-scroll {
+  position: relative;
+  height: calc(100vh + 3700px);
+  background: var(--night);
+}
+
+.stage {
+  --mx: 0;
+  --my: 0;
+  --back-opacity: 1;
+  --back-x: 0px;
+  --back-y: 0px;
+  --back-scale: 0.76;
+  --four-y: 10vh;
+  --four-scale: 0.78;
+  --bazaar-y: 20vh;
+  --blur-px: 0px;
+  --back-brightness: 1;
+  --bazaar-blur-px: 0px;
+  --bazaar-brightness: 1;
+  --bazaar-saturation: 1;
+  --shade-z: 0;
+  --shade-top-alpha: 0;
+  --shade-mid-alpha: 0;
+  --shade-bottom-alpha: 0;
+  --blur-tint: 22, 92, 98;
+  --title-y: 0px;
+  --title-scale: 1;
+  --title-opacity: 1;
+  --bridge-x: -50%;
+  --bridge-y: 0px;
+  --bridge-bottom: 5vh;
+  --bridge-width: 67.2vw;
+  --bridge-scale: 1.02;
+  --split-left-x: -50%;
+  --split-right-x: -50%;
+  --split-y: 0px;
+  --split-scale: 1;
+  --frame2-opacity: 0;
+  --frame2-x: -50%;
+  --frame2-y: -50%;
+  --frame2-scale: 1.06;
+  --intro-copy-y: 0px;
+  --intro-copy-opacity: 1;
+  --panel2-opacity: 0;
+  --panel2-y: calc(-50% + 58px);
+  --panel3-opacity: 0;
+  --panel3-y: calc(-50% + 58px);
+  --sights-controls-opacity: 0;
+  --sights-enter-x: 420vw;
+  --sights-visibility: hidden;
+  --sights-scale: 1;
+  --sights-top: clamp(112px, 19vh, 220px);
+  --sights-screen-top: clamp(112px, 19vh, 220px);
+  --cue-opacity: 1;
+
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  min-height: 620px;
+  overflow: hidden;
+  isolation: isolate;
+  background: #7fb4d4;
+  color: var(--paper);
+}
+
+.world,
+.back-stack,
+.sky-img,
+.shade,
+.scene-img,
+.sights-slider,
+.sights-controls,
+.hero-title,
+.intro-copy,
+.story-panel,
+.scroll-cue {
+  position: absolute;
+}
+
+.world {
+  inset: 0;
+  overflow: hidden;
+  background: #79b7dd;
+}
+
+/* A soft scrim so the header stays legible over bright sky. */
+.world::after {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: 7;
+  height: 220px;
+  background: linear-gradient(180deg, rgb(8 22 20 / 0.42), rgb(8 22 20 / 0));
+  pointer-events: none;
+}
+
+.scene-img {
+  display: block;
+  max-width: none;
+  user-select: none;
+  -webkit-user-drag: none;
+  will-change: transform, opacity, filter;
+  pointer-events: none;
+}
+
+.sky-img {
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: blur(var(--blur-px)) brightness(var(--back-brightness));
+}
+
+.back-stack {
+  top: 0;
+  bottom: 0;
+  left: -3vw;
+  right: -3vw;
+  z-index: 1;
+  opacity: var(--back-opacity);
+  transform: translate3d(var(--back-x), var(--back-y), 0) scale(var(--back-scale));
+  transform-origin: 50% 100%;
+  will-change: transform, filter, opacity;
+}
+
+.back-img {
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: blur(var(--blur-px)) brightness(var(--back-brightness));
+}
+
+.back-bazaar,
+.back-four {
+  top: auto;
+  bottom: 0;
+  left: 48%;
+  right: auto;
+  width: 112%;
+  height: auto;
+  object-fit: contain;
+}
+
+.back-bazaar {
+  z-index: 3;
+  filter: blur(var(--bazaar-blur-px)) brightness(var(--bazaar-brightness)) saturate(var(--bazaar-saturation));
+  transform: translate3d(-50%, var(--bazaar-y), 0) scale(0.86);
+}
+
+.back-four {
+  z-index: 1;
+  opacity: 0.72;
+  mix-blend-mode: screen;
+  transform: translate3d(-50%, calc(var(--four-y) - 110px), 0) scale(var(--four-scale));
+}
+
+/* House slider: lives inside the zooming back stack, above the old town,
+   and is counter-scaled to stay screen-true. */
+
+.sights-slider {
+  left: 0;
+  right: 0;
+  top: var(--sights-top);
+  z-index: 4;
+  visibility: var(--sights-visibility);
+  transform: translate3d(var(--sights-enter-x), 0, 0) scale(var(--sights-scale));
+  transform-origin: 0 0;
+  will-change: transform;
+}
+
+.sights-track {
+  display: flex;
+  gap: clamp(16px, 1.15vw, 24px);
+  align-items: stretch;
+  transition: transform 640ms cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+}
+
+.sights-track.is-jumping {
+  transition: none;
+}
+
+.sight-card {
+  position: relative;
+  flex: 0 0 clamp(360px, 19.4vw, 430px);
+  height: 220px;
+  padding: 24px;
+  overflow: hidden;
+  border: 1px solid rgb(253 241 225 / 0.42);
+  border-radius: 22px;
+  background: var(--paper);
+  color: var(--ink);
+  text-decoration: none;
+  box-shadow: 0 18px 52px rgb(2 47 64 / 0.14);
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.3s ease;
+}
+
+.sight-card:focus-visible {
+  outline: 2px solid var(--copper);
+  outline-offset: 3px;
+}
+
+.sight-card.is-active {
+  background: #fff7ea;
+}
+
+.sight-kicker {
+  position: relative;
+  display: block;
+  margin-bottom: 56px;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  line-height: 1.05;
+  text-transform: uppercase;
+}
+
+.sight-pin {
+  position: absolute;
+  top: 22px;
+  right: 22px;
+  width: 64px;
+  height: 64px;
+  pointer-events: none;
+}
+
+.sight-card h3 {
+  position: absolute;
+  left: 24px;
+  right: 24px;
+  bottom: calc(24px + (16px * 1.25 * 2) + 10px);
+  max-width: calc(100% - 76px);
+  margin: 0;
+  overflow: hidden;
+  font-family: var(--font-display);
+  font-size: 30px;
+  font-weight: 500;
+  line-height: 0.95;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sight-card p {
+  position: absolute;
+  left: 24px;
+  right: 24px;
+  bottom: 24px;
+  display: -webkit-box;
+  margin: 0;
+  overflow: hidden;
+  font-size: 15px;
+  line-height: 1.25;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.sights-controls {
+  left: 48px;
+  top: calc(var(--sights-screen-top) + 220px + 16px);
+  z-index: 5;
+  display: flex;
+  gap: 14px;
+  opacity: var(--sights-controls-opacity);
+  pointer-events: none;
+}
+
+.sights-controls.is-ready {
+  pointer-events: auto;
+}
+
+.sight-nav {
+  display: inline-grid;
+  place-items: center;
+  width: 54px;
+  height: 54px;
+  border: 0;
+  border-radius: 999px;
+  background: rgb(253 241 225 / 0.94);
+  color: var(--ink);
+  font: inherit;
+  font-size: 18px;
+  box-shadow: 0 18px 36px rgb(0 0 0 / 0.2);
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.sight-nav:hover {
+  transform: scale(1.06);
+}
+
+/* Title and foreground */
+
+.hero-title {
+  left: 50%;
+  top: clamp(122px, 19vh, 205px);
+  z-index: 3;
+  width: min(94vw, 1780px);
+  margin: 0;
+  color: var(--paper);
+  font-family: var(--font-display);
+  font-size: 14rem;
+  font-weight: 500;
+  line-height: 0.78;
+  letter-spacing: 0.01em;
+  text-align: center;
+  text-transform: uppercase;
+  transform: translate3d(-50%, var(--title-y), 0) scale(var(--title-scale));
+  opacity: var(--title-opacity);
+  will-change: transform, opacity;
+}
+
+.bridge-img {
+  left: 50%;
+  bottom: var(--bridge-bottom);
+  z-index: 4;
+  width: min(var(--bridge-width), 2140px);
+  height: auto;
+  transform: translate3d(var(--bridge-x), var(--bridge-y), 0) scale(var(--bridge-scale));
+  transform-origin: 50% 48%;
+}
+
+.splitframe-img {
+  left: 50%;
+  bottom: -2vh;
+  z-index: 6;
+  width: min(118vw, 2240px);
+  height: auto;
+}
+
+.splitframe-left {
+  transform: translate3d(var(--split-left-x), var(--split-y), 0) scale(var(--split-scale));
+  transform-origin: 21% 52%;
+}
+
+.splitframe-right {
+  transform: translate3d(var(--split-right-x), var(--split-y), 0) scale(var(--split-scale));
+  transform-origin: 79% 52%;
+}
+
+.frame-two-img {
+  left: 50%;
+  top: 50%;
+  z-index: 5;
+  width: min(122vw, 2160px);
+  height: auto;
+  opacity: var(--frame2-opacity);
+  transform: translate3d(var(--frame2-x), var(--frame2-y), 0) scale(var(--frame2-scale));
+  transform-origin: 50% 48%;
+}
+
+.shade {
+  inset: 0;
+  z-index: var(--shade-z);
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    rgba(var(--blur-tint), var(--shade-top-alpha)) 0%,
+    rgba(var(--blur-tint), var(--shade-mid-alpha)) 48%,
+    rgba(var(--blur-tint), var(--shade-bottom-alpha)) 100%
+  );
+}
+
+/* Copy */
+
+.intro-copy {
+  left: 50%;
+  bottom: clamp(56px, 24vh, 360px);
+  z-index: 9;
+  width: min(580px, calc(100vw - 40px));
+  text-align: center;
+  transform: translate3d(-50%, var(--intro-copy-y), 0);
+  opacity: var(--intro-copy-opacity);
+  will-change: transform, opacity;
+}
+
+.intro-copy p {
+  margin: 0 auto;
+  font-size: 1.18rem;
+  font-weight: 400;
+  line-height: 1.32;
+  text-shadow: 0 2px 18px rgb(0 0 0 / 0.5);
+}
+
+.intro-copy em {
+  font-family: var(--font-display);
+  font-size: 1.12em;
+}
+
+.hero-tags {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin: 26px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.hero-tags li {
+  display: inline-flex;
+  align-items: center;
+  min-height: 42px;
+  padding: 0 22px;
+  border-radius: 999px;
+  background: var(--paper);
+  color: var(--ink);
+  font-size: 0.92rem;
+  font-weight: 500;
+  box-shadow: 0 12px 30px rgb(0 0 0 / 0.18);
+}
+
+.story-panel {
+  left: 50%;
+  top: 45%;
+  z-index: 10;
+  width: min(780px, calc(100vw - 42px));
+  text-align: center;
+  pointer-events: none;
+  transform: translate3d(-50%, -50%, 0);
+  will-change: transform, opacity;
+}
+
+.story-panel h2 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 5rem;
+  font-weight: 500;
+  line-height: 0.95;
+  text-shadow: 0 16px 38px rgb(0 0 0 / 0.32);
+}
+
+.story-panel p {
+  width: min(540px, 100%);
+  margin: 26px auto 0;
+  font-size: 1.14rem;
+  line-height: 1.3;
+  text-shadow: 0 2px 18px rgb(0 0 0 / 0.42);
+}
+
+.story-panel-bridge {
+  top: 60%;
+  opacity: var(--panel2-opacity);
+  transform: translate3d(-50%, var(--panel2-y), 0);
+}
+
+.story-panel-bazaar {
+  top: 29%;
+  opacity: var(--panel3-opacity);
+  transform: translate3d(-50%, var(--panel3-y), 0);
+}
+
+.facts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 86px;
+  width: min(470px, 100%);
+  margin: 64px auto 0;
+}
+
+.facts dt {
+  font-family: var(--font-display);
+  font-size: 4.4rem;
+  font-weight: 500;
+  line-height: 0.9;
+  text-shadow: 0 14px 34px rgb(0 0 0 / 0.32);
+}
+
+.facts dd {
+  margin: 16px 0 0;
+  font-size: 0.82rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  line-height: 1.3;
+  text-transform: uppercase;
+  text-shadow: 0 2px 18px rgb(0 0 0 / 0.42);
+}
+
+.note-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  min-height: 50px;
+  margin-top: 28px;
+  padding: 0 28px;
+  border-radius: 999px;
+  background: var(--paper);
+  color: var(--ink);
+  font-weight: 500;
+  text-decoration: none;
+  box-shadow: 0 16px 34px rgb(0 0 0 / 0.18);
+  pointer-events: auto;
+  transition: transform 0.25s ease;
+}
+
+.note-button:hover {
+  transform: translateY(-2px);
+}
+
+.note-button span:first-child {
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+.scroll-cue {
+  right: 32px;
+  bottom: 32px;
+  z-index: 11;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  opacity: var(--cue-opacity);
+  text-shadow: 0 2px 12px rgb(0 0 0 / 0.4);
+}
+
+.scroll-cue-line {
+  position: relative;
+  width: 1px;
+  height: 46px;
+  overflow: hidden;
+  background: rgb(253 241 225 / 0.35);
+}
+
+.scroll-cue-line::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--paper);
+  animation: cue 2.2s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+}
+
+@keyframes cue {
+  from {
+    transform: translateY(-100%);
+  }
+  to {
+    transform: translateY(100%);
+  }
+}
+
+@media (max-width: 1500px) {
+  .hero-title {
+    font-size: 11rem;
+  }
+
+  .story-panel h2 {
+    font-size: 4.2rem;
+  }
+}
+
+@media (max-width: 1100px) {
+  .hero-title {
+    top: 15vh;
+    font-size: 7.5rem;
+  }
+
+  .bridge-img {
+    width: 138vw;
+  }
+
+  .frame-two-img {
+    width: 132vw;
+  }
+
+  .story-panel h2 {
+    font-size: 3.3rem;
+  }
+
+  .facts {
+    gap: 34px;
+    margin-top: 44px;
+  }
+
+  .facts dt {
+    font-size: 3.2rem;
+  }
+
+  .sight-card {
+    flex-basis: clamp(320px, 40vw, 390px);
+  }
+
+  .scroll-cue {
+    display: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .stage {
+    min-height: 640px;
+  }
+
+  .hero-title {
+    top: 18vh;
+    font-size: 4.6rem;
+  }
+
+  .bridge-img {
+    bottom: 2vh;
+    width: 190vw;
+  }
+
+  .frame-two-img {
+    width: 176vw;
+  }
+
+  .intro-copy {
+    bottom: 42px;
+  }
+
+  .intro-copy p,
+  .story-panel p {
+    font-size: 1rem;
+  }
+
+  .hero-tags {
+    gap: 8px;
+  }
+
+  .hero-tags li {
+    min-height: 36px;
+    padding: 0 15px;
+    font-size: 0.84rem;
+  }
+
+  .story-panel {
+    top: 42%;
+  }
+
+  .story-panel-bazaar {
+    top: 26%;
+  }
+
+  .story-panel h2 {
+    font-size: 2.6rem;
+  }
+
+  .facts {
+    gap: 18px;
+    margin-top: 34px;
+  }
+
+  .facts dt {
+    font-size: 2.6rem;
+  }
+
+  .sights-track {
+    gap: 12px;
+  }
+
+  .sight-card {
+    flex-basis: min(82vw, 330px);
+  }
+
+  .sights-controls {
+    left: 20px;
+    top: calc(var(--sights-screen-top) + 236px);
+  }
+
+  .sight-card h3 {
+    max-width: 74%;
+  }
+
+  .sight-pin {
+    width: 56px;
+    height: 56px;
+  }
+}
+
+/* Portrait screens: the background layers are 16:9, so widen them until
+   the old town fills the lower half instead of sinking out of frame. */
+@media (max-aspect-ratio: 4/5) {
+  .back-bazaar,
+  .back-four {
+    width: 230%;
+  }
+
+  .back-bazaar {
+    transform: translate3d(-50%, calc(var(--bazaar-y) * 0.35), 0) scale(0.86);
+  }
+
+  .back-four {
+    transform: translate3d(-50%, calc(var(--four-y) * 0.5 - 60px), 0) scale(var(--four-scale));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scene-img,
+  .back-stack,
+  .hero-title,
+  .intro-copy,
+  .story-panel,
+  .sights-track,
+  .sights-slider,
+  .sight-card,
+  .note-button {
+    transition: none;
+  }
+
+  .scroll-cue-line::after {
+    animation: none;
+  }
+}
