@@ -1,0 +1,15 @@
+{
+  "name": "scroldev-portfolio",
+  "version": "0.1.0",
+  "private": true,
+  "description": "ScrolDev's website portfolio: each site in sites/, plus the showcase hub that lists them.",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "node hub/build.mjs",
+    "check": "node hub/build.mjs --check",
+    "new-site": "node hub/new-site.mjs"
+  }
+}

@@ -1,0 +1,16 @@
+# Hub build output
+/dist/
+
+# Dependencies and build output inside individual sites
+node_modules/
+.next/
+.vercel/
+
+# Secrets: never commit real env files
+.env
+.env.*
+!.env.example
+
+# OS / editor
+.DS_Store
+Thumbs.db
