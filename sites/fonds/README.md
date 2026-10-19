@@ -6,8 +6,8 @@ The drop page for **fonds**, a fictional archive fashion label, launching its fo
 
 One page, two phases, all driven by scroll position:
 
-1. **Hero.** A full-screen film of the model behind the wordmark, nav and product block. Her head follows the cursor: two clips that start on the same front-facing frame turn it to either side, and the cursor scrubs whichever matches, easing towards it rather than jumping. A dead zone in the middle holds her facing forward. When the mouse rests, and on phones, she slowly looks from side to side on her own.
-2. **Gallery.** A black panel rises over the hero during the first screen of scroll, then the ten looks scroll past in a scattered grid, each one scaling up as it enters and down as it leaves. At the end the page washes to white and the "view" pill grows out of the corner.
+1. **Hero.** A full-screen film of the model behind the wordmark, nav and product block. His head follows the cursor: two clips that start on the same front-facing frame turn it to either side, and the cursor scrubs whichever matches, easing towards it rather than jumping. A dead zone in the middle holds him facing forward. When the mouse rests, and on phones, he slowly looks from side to side on his own.
+2. **Gallery.** A black panel rises over the hero during the first screen of scroll, then the seven pieces scroll past in a scattered grid, each one scaling up as it enters and down as it leaves. At the end the page washes to white and the "view" pill grows out of the corner.
 
 Every overlay uses `mix-blend-mode: exclusion`, so the same white type reads on the film, on black and on white.
 
@@ -29,7 +29,7 @@ npm run typecheck
 
 | File | Role |
 | --- | --- |
-| `src/content/site.ts` | All copy, the video URLs and the ten look images. Edit here, not in components. |
+| `src/content/site.ts` | All copy, the video URLs and the gallery images. Edit here, not in components. |
 | `src/App.tsx` | The scroll engine: one animation-frame loop that reads `scrollY`, moves the gallery, scales the cards and runs the outro. Writes only when something changed. |
 | `src/components/video-stage.tsx` | The head-turn: one eased "pose" value, driven by the cursor or the idle sway, scrubs the two clips. Seeks only when the previous seek has finished. |
 | `src/components/gallery-panel.tsx`, `src/lib/layout.ts` | The black panel and its scattered grid (2, 3 or 4 columns). |
@@ -42,8 +42,10 @@ npm run typecheck
 
 URLs live in `src/content/site.ts`.
 
-- **Hero clips** are hosted on our Higgsfield storage. They must be encoded with a keyframe on every frame, or scrubbing stutters: `ffmpeg -i in.mp4 -an -c:v libx264 -crf 21 -g 1 -pix_fmt yuv420p -movflags +faststart out.mp4`. Both clips must start on the same frame.
-- **Still to replace:** the current hero clips and the ten look images come from the original brief and show a "PROMPT" logo on every hat. They are placeholders until fonds-branded versions are generated.
+All media was generated for fonds with Higgsfield and is hosted on our Higgsfield storage.
+
+- **Hero clips:** one still of the model (GPT Image 2.5), animated twice with Kling 3.0 Motion Control, once turning each way. They must be encoded with a keyframe on every frame, or scrubbing stutters: `ffmpeg -i in.mp4 -an -c:v libx264 -crf 20 -g 1 -pix_fmt yuv420p -movflags +faststart out.mp4`. Both clips must start on the same frame.
+- **Gallery:** seven 1024px WebP images, edited from the same model so the face stays consistent.
 
 ## Deploy
 

@@ -39,16 +39,23 @@ export function VideoStage({ ref }: { ref: Ref<VideoStageHandle> }) {
     [],
   );
 
-  // Fade in once both videos have a frame to show.
+  // Fade in once both videos have had a frame to show. Each one is counted the
+  // first time it loads: readyState dips again during every seek, so checking it
+  // later could miss the moment and leave the hero blank.
   useEffect(() => {
     const container = containerRef.current!;
     const pair = [leftRef.current!, rightRef.current!];
-    const check = () => {
-      if (pair.every((v) => v.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA)) container.style.opacity = "1";
+    const loaded = new Set<HTMLVideoElement>();
+    const mark = (video: HTMLVideoElement) => {
+      loaded.add(video);
+      if (loaded.size === pair.length) container.style.opacity = "1";
     };
-    pair.forEach((v) => v.addEventListener("loadeddata", check));
-    check();
-    return () => pair.forEach((v) => v.removeEventListener("loadeddata", check));
+    const onLoaded = (e: Event) => mark(e.currentTarget as HTMLVideoElement);
+    for (const video of pair) {
+      video.addEventListener("loadeddata", onLoaded);
+      if (video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) mark(video);
+    }
+    return () => pair.forEach((v) => v.removeEventListener("loadeddata", onLoaded));
   }, []);
 
   useEffect(() => {
@@ -75,9 +82,9 @@ export function VideoStage({ ref }: { ref: Ref<VideoStageHandle> }) {
     let raf = 0;
 
     // Only ask for a new frame once the browser has finished the previous seek,
-    // and only when it is at least half a frame (at 24 fps) away.
+    // and only when it is at least half a frame (at 30 fps) away.
     const seek = (video: HTMLVideoElement, time: number) => {
-      if (!video.seeking && Math.abs(video.currentTime - time) > 1 / 48) video.currentTime = time;
+      if (!video.seeking && Math.abs(video.currentTime - time) > 1 / 60) video.currentTime = time;
     };
 
     const tick = (now: number) => {
@@ -124,7 +131,9 @@ export function VideoStage({ ref }: { ref: Ref<VideoStageHandle> }) {
     };
   }, []);
 
-  const video = "absolute inset-0 size-full object-cover";
+  // The two clips' first frames are near-identical, not pixel-identical, so the
+  // swap at the centre crossfades rather than cuts.
+  const video = "absolute inset-0 size-full object-cover transition-opacity duration-200";
   return (
     <div
       ref={containerRef}
