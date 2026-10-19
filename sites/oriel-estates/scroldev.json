@@ -1,13 +1,20 @@
 {
   "name": "Oriel",
-  "client": "",
   "category": "Luxury real estate",
   "summary": "Concept site for a private luxury estate agency: layered WebGL hero, scroll-driven collection, filterable residences with animated floor plans, and fully original 3D-rendered architecture.",
   "type": "concept",
   "year": 2026,
   "url": "",
-  "cover": "",
-  "stack": ["HTML", "CSS", "JavaScript", "GSAP", "Lenis", "WebGL", "Blender"],
+  "cover": "cover.jpg",
+  "stack": [
+    "HTML",
+    "CSS",
+    "JavaScript",
+    "GSAP",
+    "Lenis",
+    "WebGL",
+    "Blender"
+  ],
   "featured": true,
-  "draft": true
+  "draft": false
 }

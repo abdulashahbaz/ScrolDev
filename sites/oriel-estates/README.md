@@ -14,6 +14,8 @@ A concept website for **Oriel**, a fictional private estate agency that represen
 | `journal.html?id=…` | Three essays |
 | `404.html` | Lost-address page |
 
+A **shortlist** works on every page: save residences from the collection or a residence page, review them in a slide-out drawer, and send one enquiry that arrives pre-filled on the contact form (stored in `localStorage`).
+
 Shared across pages: Lenis smooth scrolling synced to ScrollTrigger, curtain page transitions, custom cursor with contextual labels, magnetic buttons, masked line reveals (SplitText), header that hides on scroll and switches colour per section, velocity skew on imagery, film grain, and a full-screen menu with image previews.
 
 ## Imagery

@@ -58,7 +58,7 @@ function heroIntro(fromLoader) {
   fitTitle();
   title.classList.add("is-split");
   if (reduced) return gsap.timeline();
-  const small = SplitText.create(".hero__title .t-small", { type: "lines, chars", mask: "lines" });
+  const small = SplitText.create(".hero__title .t-small", { type: "lines, words, chars", mask: "lines" });
   const big = SplitText.create(".hero__title .t-big", { type: "lines, chars", mask: "lines" });
   const tl = gsap.timeline({ paused: true });
   tl.from(small.chars, { yPercent: 115, duration: 1.2, stagger: 0.035 }, 0)

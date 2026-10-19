@@ -91,7 +91,7 @@ function render() {
       <div class="r-hero__content">
         <div>
           <p class="r-hero__loc"><span class="chip ${status}"><i></i>${r.status}</span><span>${r.city}, ${r.country}</span></p>
-          <h1 class="display r-hero__title" data-split="manual">${r.name}</h1>
+          <h1 class="display r-hero__title${r.name.length > 13 ? " is-long" : ""}" data-split="manual">${r.name}</h1>
         </div>
         <div class="r-hero__side" data-hero-side>
           <span class="eyebrow">${price ? "Guide price" : "Offered privately"}</span>
@@ -249,7 +249,7 @@ function hero() {
   const title = $(".r-hero__title");
   title.classList.add("is-split");
   if (reduced) return;
-  const split = SplitText.create(title, { type: "lines, chars", mask: "lines" });
+  const split = SplitText.create(title, { type: "lines, words, chars", mask: "lines" });
   gsap.timeline({ delay: 0.15 })
     .from(".r-hero__img img", { scale: 1.2, duration: 2.4, ease: "oriel" }, 0)
     .from(split.chars, { yPercent: 115, duration: 1.3, stagger: 0.03 }, 0.2)
