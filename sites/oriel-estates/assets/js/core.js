@@ -63,6 +63,7 @@ function initHeader() {
       const y = self.scroll();
       const down = y > last && y > window.innerHeight * 0.6;
       header.classList.toggle("is-hidden", down && !document.documentElement.classList.contains("menu-open"));
+      header.classList.toggle("is-scrolled", y > 60);
       last = y;
     },
   });
@@ -303,6 +304,7 @@ function splitLines(el, { delay = 0, stagger = 0.09, trigger = el, start = "top 
   let anim;
   SplitText.create(el, {
     type: "lines",
+    aria: "none",
     mask: "lines",
     linesClass: "line",
     autoSplit: true,
@@ -362,7 +364,7 @@ function initReveals() {
 // images lean into fast scrolling, then settle
 function initSkew() {
   if (reduced || !fine) return;
-  const els = $$(".card__img, .post__img, .gallery__item");
+  const els = $$(".card__img, .post__img, .gal__item");
   if (!els.length) return;
   const proxy = { skew: 0 };
   const set = gsap.quickSetter(els, "skewY", "deg");
@@ -381,7 +383,7 @@ function initSkew() {
 function initWords() {
   $$("[data-words]").forEach((el) => {
     if (reduced) return;
-    const split = SplitText.create(el, { type: "words", wordsClass: "w" });
+    const split = SplitText.create(el, { type: "words", wordsClass: "w", aria: "none" });
     gsap.to(split.words, {
       opacity: 1, ease: "none", stagger: 0.1,
       scrollTrigger: { trigger: el, start: "top 78%", end: "bottom 42%", scrub: true },

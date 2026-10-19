@@ -107,8 +107,10 @@ const residences = [
     cover: "monolith-hero",
     images: [
       { src: "monolith-hero", cap: "South-east elevation" },
-      { src: "monolith-detail", cap: "The garden reveal" },
-      { src: "monolith-portrait", cap: "Approach, late morning" },
+      { src: "monolith-detail", cap: "The garden reveal", p: true },
+      { src: "monolith-dusk", cap: "At dusk, lit from within" },
+      { src: "monolith-portrait", cap: "Approach, late morning", p: true },
+      { src: "monolith-elevation", cap: "The long wall" },
     ],
     lead: "A single oxblood volume pressed into the high desert, crowned by a pale concrete pavilion that hangs over the corner like a held breath.",
     story: [
@@ -142,8 +144,10 @@ const residences = [
     cover: "solenne-exterior",
     images: [
       { src: "solenne-exterior", cap: "Above the Tramuntana coast" },
+      { src: "solenne-pool", cap: "Infinity edge", p: true },
+      { src: "solenne-aerial", cap: "The headland from the air" },
       { src: "solenne-living", cap: "The long room at blue hour" },
-      { src: "solenne-pool", cap: "Infinity edge" },
+      { src: "solenne-terrace", cap: "The terrace, looking west" },
     ],
     lead: "Two horizontal planes of pale concrete laid over a sea cliff, with nothing between the living room and the horizon but a single pane of glass.",
     story: [
@@ -177,7 +181,8 @@ const residences = [
     cover: "ardesia-exterior",
     images: [
       { src: "ardesia-exterior", cap: "Three volumes at blue hour" },
-      { src: "ardesia-steps", cap: "The lit stair" },
+      { src: "ardesia-steps", cap: "The lit stair", p: true },
+      { src: "ardesia-pool", cap: "From the lower garden" },
     ],
     lead: "Three white volumes stacked crosswise above the San José hills, each one turned to catch a different hour of light.",
     story: [
@@ -210,7 +215,8 @@ const residences = [
     cover: "atrium-court",
     images: [
       { src: "atrium-court", cap: "The courtyard at dusk" },
-      { src: "atrium-lounge", cap: "Sunken lounge and fire wall" },
+      { src: "atrium-lounge", cap: "Sunken lounge and fire wall", p: true },
+      { src: "atrium-tree", cap: "From the living wing" },
     ],
     lead: "A board-formed concrete courtyard in Higashiyama, arranged around a single olive tree, a reflecting pool and a wall of fire.",
     story: [
@@ -243,7 +249,8 @@ const residences = [
     cover: "lakehouse-exterior",
     images: [
       { src: "lakehouse-exterior", cap: "From the water, first light" },
-      { src: "lakehouse-dock", cap: "From the jetty" },
+      { src: "lakehouse-dock", cap: "From the jetty", p: true },
+      { src: "lakehouse-interior", cap: "The long window" },
     ],
     lead: "Two charred-timber gables at the water's edge, facing a wall of peaks across the lake.",
     story: [
@@ -276,7 +283,8 @@ const residences = [
     cover: "penthouse-night",
     images: [
       { src: "penthouse-night", cap: "Living room, 47th floor" },
-      { src: "penthouse-view", cap: "Looking north after dark" },
+      { src: "penthouse-view", cap: "Looking north after dark", p: true },
+      { src: "penthouse-dining", cap: "Dining under the pendants" },
     ],
     lead: "A full floor 180 metres above Manhattan, panelled in walnut and bronze, with the city laid out like a second, brighter floor beneath it.",
     story: [
@@ -309,7 +317,9 @@ const residences = [
     cover: "dune-pavilion",
     images: [
       { src: "dune-pavilion", cap: "Across the dunes, golden hour" },
-      { src: "dune-colonnade", cap: "The bronze colonnade" },
+      { src: "dune-colonnade", cap: "The bronze colonnade", p: true },
+      { src: "dune-aerial", cap: "The roof from above" },
+      { src: "dune-interior", cap: "The glazed core" },
     ],
     lead: "A sixty-metre travertine roof floating on bronze columns at the edge of the Empty Quarter.",
     story: [

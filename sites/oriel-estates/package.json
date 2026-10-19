@@ -4,6 +4,8 @@
   "description": "Oriel luxury real estate concept site. Static; no dependencies.",
   "scripts": {
     "dev": "node serve.mjs",
-    "start": "node serve.mjs"
+    "start": "node serve.mjs",
+    "pages": "node tools/build-pages.mjs",
+    "set-url": "node tools/site-url.mjs"
   }
 }

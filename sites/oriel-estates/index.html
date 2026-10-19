@@ -9,12 +9,17 @@
   <meta property="og:title" content="Oriel — Residences of rare permanence">
   <meta property="og:description" content="A private collection of singular homes, offered with discretion.">
   <meta property="og:type" content="website">
-  <meta property="og:image" content="assets/img/monolith-hero-2200.webp">
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%230d0c0b'/%3E%3Crect x='19' y='19' width='6' height='6' fill='%23b2321f'/%3E%3Cpath d='M7 16a7 7 0 1 0 14 0a7 7 0 1 0-14 0' fill='none' stroke='%23ece6dc' stroke-width='3.2'/%3E%3C/svg%3E">
+  <meta property="og:image" content="assets/img/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
   <link rel="stylesheet" href="assets/css/fonts.css">
   <link rel="preload" as="image" href="assets/img/hero-sky-2400.webp" media="(min-aspect-ratio: 4/5)">
   <link rel="preload" as="image" href="assets/img/hero-fg-2400.webp" media="(min-aspect-ratio: 4/5)">
   <link rel="stylesheet" href="assets/css/main.css">
+  <link rel="icon" href="assets/icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+  <link rel="manifest" href="site.webmanifest">
   <script>(function(d){d.classList.replace("no-js","js");if(location.protocol!=="file:"){var l=document.createElement("link");l.rel="preload";l.as="font";l.type="font/woff2";l.crossOrigin="";l.href="assets/fonts/archivo-latin.woff2";document.head.appendChild(l)}try{var s=sessionStorage;if(s.getItem("oriel:nav")==="1")d.classList.add("is-arriving");if(s.getItem("oriel:loaded")||s.getItem("oriel:nav")||matchMedia("(prefers-reduced-motion: reduce)").matches)d.classList.add("no-loader")}catch(e){}setTimeout(function(){if(!window.__oriel){d.classList.add("no-loader");d.classList.remove("is-arriving","js")}},10000)})(document.documentElement);</script>
 </head>
 <body data-page="home">
@@ -107,9 +112,9 @@
           <canvas class="hero__gl" aria-hidden="true"></canvas>
         </div>
       </div>
-      <h1 class="hero__title display" data-split="manual">
-        <span class="t-small">Live the</span>
-        <span class="t-big">Unrepeatable</span>
+      <h1 class="hero__title display" data-split="manual" aria-label="Live the unrepeatable">
+        <span class="t-small" aria-hidden="true">Live the</span>
+        <span class="t-big" aria-hidden="true">Unrepeatable</span>
       </h1>
       <div class="hero__layer hero__fg">
         <div class="hero__inner">
@@ -150,7 +155,7 @@
       <div class="strip__pin">
         <div class="strip__bg" aria-hidden="true">The Collection&nbsp;·&nbsp;The Collection&nbsp;·&nbsp;</div>
         <div class="strip__head">
-          <h2 id="strip-title" data-split>Seven residences, each the only one of its kind.</h2>
+          <h2 id="strip-title" class="headline" data-split>Seven residences, <em>each the only one</em> of its kind.</h2>
           <a class="btn" href="residences.html" data-magnetic="0.25"><span class="roll"><span>View the collection</span><span aria-hidden="true">View the collection</span></span></a>
         </div>
         <ul class="strip__list">
@@ -211,7 +216,7 @@
       <div class="wrap">
         <div class="approach__head">
           <p class="eyebrow"><b>(03)</b>&nbsp;&nbsp;What we do</p>
-          <h2 id="approach-title" class="display" data-split>Four disciplines. One standard.</h2>
+          <h2 id="approach-title" class="headline" data-split>Four disciplines. <em>One standard.</em></h2>
         </div>
         <ul class="rows" data-float>
           <li class="row" data-img="assets/img/monolith-detail-800.webp"><span class="row__no">01</span><h3 class="row__title">Private acquisition</h3><p class="row__text">We search on your behalf, on and off market, and only show you homes we would buy ourselves.</p></li>
@@ -235,7 +240,7 @@
     <section class="section places" data-header="bone" aria-labelledby="places-title">
       <div class="wrap">
         <div class="places__head">
-          <h2 id="places-title" class="display" data-split>Where we are, right now.</h2>
+          <h2 id="places-title" class="headline" data-split>Where we are, <em>right now.</em></h2>
           <p class="eyebrow"><b>(04)</b>&nbsp;&nbsp;Local time</p>
         </div>
         <ul class="places__list" data-float>
@@ -282,27 +287,27 @@
   <footer class="footer" data-header="bone">
     <div class="footer__cta">
       <p class="eyebrow"><b>●</b>&nbsp;&nbsp;Private enquiries</p>
-      <h2 class="display" data-split>Begin a quiet conversation.</h2>
+      <h2 class="headline" data-split>Begin a <em>quiet</em> conversation.</h2>
       <a class="circle-btn" href="contact.html" data-magnetic="0.4">Speak with<br>a partner</a>
     </div>
     <div class="footer__grid">
       <div class="footer__col footer__col--offices">
-        <h4>Offices</h4>
+        <h3>Offices</h3>
         <div class="office"><strong>Mallorca</strong><span>Passeig del Born 15, Palma</span><span data-clock="Europe/Madrid"><time>--:--</time></span></div>
         <div class="office"><strong>New York</strong><span>740 Madison Avenue</span><span data-clock="America/New_York"><time>--:--</time></span></div>
         <div class="office"><strong>Dubai</strong><span>Gate Village 4, DIFC</span><span data-clock="Asia/Dubai"><time>--:--</time></span></div>
         <div class="office"><strong>Kyoto</strong><span>Gion, Higashiyama-ku</span><span data-clock="Asia/Tokyo"><time>--:--</time></span></div>
       </div>
       <div class="footer__col footer__col--nav">
-        <h4>Navigate</h4>
+        <h3>Navigate</h3>
         <ul><li><a class="link-line" href="residences.html">Residences</a></li><li><a class="link-line" href="studio.html">Studio</a></li><li><a class="link-line" href="index.html#journal">Journal</a></li><li><a class="link-line" href="contact.html">Contact</a></li></ul>
       </div>
       <div class="footer__col footer__col--social">
-        <h4>Follow</h4>
+        <h3>Follow</h3>
         <ul><li><span>Instagram</span></li><li><span>LinkedIn</span></li></ul>
       </div>
       <div class="footer__col footer__col--news">
-        <h4>The private list</h4>
+        <h3>The private list</h3>
         <form class="news js-news" novalidate><label class="sr" for="news-email">Email address</label><input id="news-email" type="email" placeholder="Email address" autocomplete="email"><button type="submit" aria-label="Subscribe">→</button></form>
         <p class="news-msg" aria-live="polite"></p>
       </div>

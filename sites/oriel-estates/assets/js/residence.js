@@ -1,5 +1,5 @@
 (() => {
-const { boot, gsap, ScrollTrigger, SplitText, reduced, $, $$, dragScroll, lockScroll, plusIcon, residences, img, src, srcset, planFor } = window.Oriel;
+const { boot, gsap, ScrollTrigger, SplitText, reduced, $, $$, lockScroll, plusIcon, residences, img, src, srcset, planFor } = window.Oriel;
 
 const params = new URLSearchParams(location.search);
 const r = residences.find((x) => x.id === params.get("id")) || residences[0];
@@ -72,6 +72,31 @@ function planSvg(level, k) {
   </svg>`;
 }
 
+// Editorial mosaic: pair images row by row (portrait with landscape, two
+// landscapes with alternating weights); a leftover image runs full width.
+function galleryRows() {
+  const imgs = r.images;
+  const rows = [];
+  for (let i = 0, k = 0; i < imgs.length; k++) {
+    const a = imgs[i], b = imgs[i + 1];
+    if (!b) { rows.push([[i, 12]]); i += 1; continue; }
+    if (a.p && !b.p) rows.push([[i, 4], [i + 1, 8]]);
+    else if (!a.p && b.p) rows.push([[i, 8], [i + 1, 4]]);
+    else rows.push(k % 2 ? [[i, 5], [i + 1, 7]] : [[i, 7], [i + 1, 5]]);
+    i += 2;
+  }
+  const tile = ([j, span]) => {
+    const im = imgs[j];
+    return `<figure class="gal__item${im.p ? " is-p" : ""}" style="--span:${span}" data-img-reveal>
+      <button type="button" data-open="${j}" data-cursor="View" aria-label="Open image ${j + 1} of ${imgs.length}: ${im.cap}">
+        <span class="gal__media"><img src="${src(im.src)}" srcset="${srcset(im.src)}" sizes="(max-width: 820px) 100vw, ${Math.round((span / 12) * 100)}vw" alt="${im.cap}" loading="lazy" decoding="async" draggable="false"></span>
+      </button>
+      <figcaption><span class="tabular">${pad(j + 1)}</span>${im.cap}</figcaption>
+    </figure>`;
+  };
+  return rows.map((row) => `<div class="gal__row${row.length === 1 ? " gal__row--wide" : ""}">${row.map(tile).join("")}</div>`).join("");
+}
+
 function render() {
   document.title = `${r.name}, ${r.city} — Oriel`;
   const price = parsePrice(r.price);
@@ -123,32 +148,22 @@ function render() {
       <blockquote class="story__quote" data-reveal>“${r.quote.text}”<cite>${r.quote.by}</cite></blockquote>
     </section>
 
-    <section class="gallery" data-header="bone" aria-labelledby="g-title">
-      <div class="gallery__head">
-        <h2 id="g-title" class="display" data-split>Gallery<sup class="tabular" style="font-family:var(--f-body);font-size:.2em;font-weight:400;vertical-align:top;margin-left:.4em">(${pad(r.images.length)})</sup></h2>
-        <div class="gallery__nav">
-          <button class="icon-btn" type="button" data-g="prev" aria-label="Previous image"><svg viewBox="0 0 16 16"><path d="M15 8H1M6 3L1 8l5 5" fill="none" stroke="currentColor" stroke-width="1.2"/></svg></button>
-          <button class="icon-btn" type="button" data-g="next" aria-label="Next image"><svg viewBox="0 0 16 16"><path d="M1 8h14M10 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.2"/></svg></button>
-        </div>
+    <section class="section gal" data-header="bone" aria-labelledby="g-title">
+      <div class="wrap gal__head">
+        <p class="eyebrow"><b>(02)</b>&nbsp;&nbsp;Gallery</p>
+        <h2 id="g-title" class="headline" data-split>Every room, <em>in its own light.</em></h2>
+        <button class="btn" type="button" data-open="0" data-magnetic="0.25"><span class="roll"><span>View all ${pad(r.images.length)}</span><span aria-hidden="true">View all ${pad(r.images.length)}</span></span></button>
       </div>
-      <div class="gallery__track" data-drag data-cursor="Drag">
-        ${r.images.map((im, j) => `
-          <figure class="gallery__item">
-            <button type="button" data-open="${j}" data-cursor="Open" aria-label="Open image ${j + 1}: ${im.cap}">
-              <img src="${src(im.src)}" srcset="${srcset(im.src)}" sizes="(max-width: 820px) 90vw, 70vw" alt="${im.cap}" loading="lazy" decoding="async" draggable="false">
-            </button>
-            <figcaption>${pad(j + 1)} — ${im.cap}</figcaption>
-          </figure>`).join("")}
-      </div>
+      <div class="wrap gal__grid">${galleryRows()}</div>
     </section>
 
     <section class="section" data-header="bone" aria-labelledby="plan-title">
       <div class="wrap plan">
         <div class="plan__info">
-          <p class="eyebrow"><b>(02)</b>&nbsp;&nbsp;Plan</p>
-          <h2 id="plan-title" class="display" data-split>The layout</h2>
+          <p class="eyebrow"><b>(03)</b>&nbsp;&nbsp;Plan</p>
+          <h2 id="plan-title" class="headline" data-split>The <em>layout</em></h2>
           <p data-reveal>Indicative plan of ${r.interior.toLocaleString("en-US")} m² across ${levels.length === 1 ? "a single level" : levels.length + " levels"}. Full drawings are shared after a first conversation.</p>
-          ${levels.length > 1 ? `<div class="plan__tabs" role="tablist">${levels.map((l, j) => `<button class="fchip" type="button" role="tab" aria-selected="${j === 0}" aria-pressed="${j === 0}" data-level="${j}">${l.name}</button>`).join("")}</div>` : ""}
+          ${levels.length > 1 ? `<div class="plan__tabs" role="tablist">${levels.map((l, j) => `<button class="fchip" type="button" role="tab" aria-selected="${j === 0}" data-level="${j}">${l.name}</button>`).join("")}</div>` : ""}
           <ul class="plan__rooms" data-rooms></ul>
         </div>
         <div class="plan__drawing" data-plan><span class="plan__north">N ↑</span></div>
@@ -157,7 +172,7 @@ function render() {
 
     <section class="section" data-header="bone" aria-labelledby="amen-title" style="padding-top:0">
       <div class="wrap amen">
-        <p class="eyebrow" id="amen-title"><b>(03)</b>&nbsp;&nbsp;Amenities</p>
+        <p class="eyebrow" id="amen-title"><b>(04)</b>&nbsp;&nbsp;Amenities</p>
         <ul>${r.amenities.map((a, j) => `<li data-reveal><span>${pad(j + 1)}</span>${a}</li>`).join("")}</ul>
       </div>
     </section>
@@ -166,7 +181,7 @@ function render() {
       <div class="wrap locate">
         <div class="locate__map" data-img-reveal>${mapSvg()}<span class="locate__pin" aria-hidden="true"></span><span class="locate__coords">${r.coords}</span></div>
         <div class="locate__info">
-          <p class="eyebrow"><b>(04)</b>&nbsp;&nbsp;Location</p>
+          <p class="eyebrow"><b>(05)</b>&nbsp;&nbsp;Location</p>
           <h2 id="loc-title" class="display" data-split>${r.city}</h2>
           <ul class="dist" style="border-top:1px solid var(--line-ink)">${r.distances.map(([a, b]) => `<li style="border-color:var(--line-ink)"><span>${a}</span><span style="color:var(--mute-ink)">${b}</span></li>`).join("")}</ul>
           <p style="margin-top:22px;font-size:var(--fs-sm);color:var(--mute-ink)">Local time <span data-clock="${r.tz}"><time>--:--</time></span>. Exact address shared on request.</p>
@@ -177,17 +192,19 @@ function render() {
     ${price ? `
     <section class="section section--paper" data-header="ink" aria-labelledby="calc-title" style="padding-top:0">
       <div class="wrap calc">
-        <p class="eyebrow" id="calc-title"><b>(05)</b>&nbsp;&nbsp;Financing, indicative</p>
+        <p class="eyebrow" id="calc-title"><b>(06)</b>&nbsp;&nbsp;Financing, indicative</p>
         <form class="calc__form" data-calc data-cur="${price.cur}" data-price="${price.value}" onsubmit="return false">
           <div class="field-range"><label for="dep"><span>Deposit</span><output for="dep" data-o="dep">40%</output></label><input id="dep" type="range" min="20" max="80" step="5" value="40"></div>
           <div class="field-range"><label for="rate"><span>Interest rate</span><output for="rate" data-o="rate">4.2%</output></label><input id="rate" type="range" min="2" max="7.5" step="0.1" value="4.2"></div>
           <div class="field-range"><label for="term"><span>Term</span><output for="term" data-o="term">25 years</output></label><input id="term" type="range" min="10" max="30" step="5" value="25"></div>
         </form>
-        <dl class="calc__out">
-          <dt>Monthly, indicative</dt><dd class="tabular" data-monthly>—</dd>
-          <dt>Loan amount</dt><dd class="tabular" style="font-size:1.4rem;margin-bottom:18px" data-loan>—</dd>
+        <div class="calc__out">
+          <dl>
+            <dt>Monthly, indicative</dt><dd class="tabular" data-monthly>—</dd>
+            <dt>Loan amount</dt><dd class="tabular" style="font-size:1.4rem;margin-bottom:18px" data-loan>—</dd>
+          </dl>
           <small>Illustration only, before fees and taxes. Our advisory team works with private banks in each market.</small>
-        </dl>
+        </div>
       </div>
     </section>` : ""}
 
@@ -195,7 +212,7 @@ function render() {
       <div class="wrap enquire">
         <div class="enquire__intro">
           <p class="eyebrow"><b>●</b>&nbsp;&nbsp;Private viewing</p>
-          <h2 id="enq-title" class="display" data-split>See it in person.</h2>
+          <h2 id="enq-title" class="headline" data-split>See it <em>in person.</em></h2>
           <p data-reveal>Viewings are hosted by a partner, usually with the architect. Choose a day and we will confirm a time.</p>
         </div>
         <div class="enquire__form">
@@ -232,10 +249,22 @@ function render() {
     </a>`;
 
   document.body.insertAdjacentHTML("beforeend", `
-    <div class="lightbox" role="dialog" aria-modal="true" aria-label="Image viewer" aria-hidden="true">
-      <div class="lightbox__top"><span class="tabular" data-lb-count></span><button class="icon-btn" type="button" data-lb="close" aria-label="Close viewer"><svg viewBox="0 0 16 16"><path d="M2 2l12 12M14 2L2 14" fill="none" stroke="currentColor" stroke-width="1.2"/></svg></button></div>
-      <div class="lightbox__stage"><img alt=""></div>
-      <div class="lightbox__bottom"><span data-lb-cap></span><span style="display:flex;gap:8px"><button class="icon-btn" type="button" data-lb="prev" aria-label="Previous image"><svg viewBox="0 0 16 16"><path d="M15 8H1M6 3L1 8l5 5" fill="none" stroke="currentColor" stroke-width="1.2"/></svg></button><button class="icon-btn" type="button" data-lb="next" aria-label="Next image"><svg viewBox="0 0 16 16"><path d="M1 8h14M10 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.2"/></svg></button></span></div>
+    <div class="lb" role="dialog" aria-modal="true" aria-label="${r.name} gallery" aria-hidden="true">
+      <div class="lb__bg"></div>
+      <div class="lb__top">
+        <span class="lb__title">${r.name}</span>
+        <span class="lb__count tabular"></span>
+        <button class="icon-btn lb__close" type="button" data-lb="close" aria-label="Close gallery"><svg viewBox="0 0 16 16"><path d="M2 2l12 12M14 2L2 14" fill="none" stroke="currentColor" stroke-width="1.2"/></svg></button>
+      </div>
+      <div class="lb__stage">
+        <div class="lb__frame"><img class="lb__img" alt="" draggable="false"></div>
+        <button class="lb__zone lb__zone--prev" type="button" data-lb="prev" data-cursor="Prev" aria-label="Previous image"></button>
+        <button class="lb__zone lb__zone--next" type="button" data-lb="next" data-cursor="Next" aria-label="Next image"></button>
+      </div>
+      <div class="lb__bottom">
+        <p class="lb__cap" aria-live="polite"></p>
+        <div class="lb__thumbs">${r.images.map((im, j) => `<button class="lb__thumb" type="button" data-lb-go="${j}" aria-label="Image ${j + 1}: ${im.cap}"><img src="${src(im.src, 800)}" alt="" loading="lazy" draggable="false"></button>`).join("")}</div>
+      </div>
     </div>`);
 
   // floor plan state for init()
@@ -260,68 +289,178 @@ function hero() {
 }
 
 function gallery() {
-  const track = $(".gallery__track");
-  const items = $$(".gallery__item", track);
-  dragScroll(track);
-  const step = (dir) => {
-    const x = track.scrollLeft;
-    const target = items.map((it) => it.offsetLeft - track.offsetLeft).find((o) => (dir > 0 ? o > x + 10 : false)) ?? null;
-    if (dir > 0) track.scrollTo({ left: target ?? track.scrollWidth, behavior: "smooth" });
-    else {
-      const prev = items.map((it) => it.offsetLeft - track.offsetLeft).filter((o) => o < x - 10).pop() ?? 0;
-      track.scrollTo({ left: prev, behavior: "smooth" });
-    }
-  };
-  $("[data-g=prev]").addEventListener("click", () => step(-1));
-  $("[data-g=next]").addEventListener("click", () => step(1));
-  if (!reduced) {
-    gsap.from(items, { x: 160, opacity: 0, duration: 1.4, stagger: 0.1, scrollTrigger: { trigger: track, start: "top 85%", once: true } });
-  }
+  if (reduced) return;
+  // gentle parallax inside each tile
+  $$(".gal__media img").forEach((img) => {
+    gsap.fromTo(img, { yPercent: -6 }, {
+      yPercent: 6, ease: "none",
+      scrollTrigger: { trigger: img.closest(".gal__item"), start: "top bottom", end: "bottom top", scrub: true },
+    });
+  });
+}
 
-  // lightbox
-  const lb = $(".lightbox");
-  const lbImg = $(".lightbox__stage img", lb);
-  const cap = $("[data-lb-cap]", lb);
-  const count = $("[data-lb-count]", lb);
-  let at = 0, opener = null;
-  const show = (j) => {
-    at = (j + r.images.length) % r.images.length;
-    const im = r.images[at];
-    lbImg.src = src(im.src, 2200);
-    lbImg.alt = im.cap;
-    cap.textContent = im.cap;
-    count.textContent = `${pad(at + 1)} / ${pad(r.images.length)}`;
-    if (!reduced) gsap.fromTo(lbImg, { opacity: 0, scale: 0.97 }, { opacity: 1, scale: 1, duration: 0.8 });
+// Full-screen viewer: opens out of the tile you clicked, thumbnails, swipe,
+// click-to-zoom, arrow keys, adjacent images preloaded.
+function viewer() {
+  const n = r.images.length;
+  const lb = $(".lb");
+  const bg = $(".lb__bg", lb);
+  const stage = $(".lb__stage", lb);
+  const pic = $(".lb__img", lb);
+  const cap = $(".lb__cap", lb);
+  const count = $(".lb__count", lb);
+  const thumbs = $$(".lb__thumb", lb);
+  const chrome = [$(".lb__top", lb), $(".lb__bottom", lb)];
+  let at = 0, isOpen = false, busy = false, zoomed = false, opener = null;
+
+  const big = (j) => src(r.images[j].src, 2200);
+  const wrap = (j) => (j + n) % n;
+  const loaded = new Map();
+  const preload = (j) => {
+    j = wrap(j);
+    if (!loaded.has(j)) {
+      const im = new Image();
+      im.src = big(j);
+      loaded.set(j, (im.decode ? im.decode() : Promise.resolve()).catch(() => {}));
+    }
+    return loaded.get(j);
   };
-  const open = (j, from) => {
+  const meta = () => {
+    cap.textContent = r.images[at].cap;
+    count.textContent = `${pad(at + 1)} / ${pad(n)}`;
+    thumbs.forEach((t, j) => t.setAttribute("aria-current", String(j === at)));
+    thumbs[at]?.scrollIntoView({ block: "nearest", inline: "center", behavior: reduced ? "auto" : "smooth" });
+  };
+  const unzoom = () => {
+    if (!zoomed) return;
+    zoomed = false;
+    lb.classList.remove("is-zoomed");
+    gsap.to(pic, { scale: 1, x: 0, y: 0, duration: 0.5, ease: "oriel" });
+  };
+  const go = async (j, dir) => {
+    j = wrap(j);
+    if (busy || j === at) return;
+    busy = true;
+    unzoom();
+    dir = dir || (j > at ? 1 : -1);
+    await gsap.to(pic, { opacity: 0, x: -dir * 60, duration: reduced ? 0 : 0.28, ease: "power2.in" });
+    at = j;
+    await preload(at);
+    pic.src = big(at);
+    pic.alt = r.images[at].cap;
+    meta();
+    await gsap.fromTo(pic, { opacity: 0, x: dir * 60 }, { opacity: 1, x: 0, duration: reduced ? 0 : 0.7, ease: "oriel" });
+    preload(at + 1); preload(at - 1);
+    busy = false;
+  };
+  const visible = (el) => {
+    const b = el.getBoundingClientRect();
+    return b.bottom > 0 && b.top < innerHeight && b.width > 0;
+  };
+  const fly = (fromRect, toRect, srcUrl, radius) => {
+    const f = document.createElement("img");
+    f.className = "lb__fly";
+    f.src = srcUrl;
+    f.alt = "";
+    document.body.appendChild(f);
+    gsap.set(f, { left: fromRect.left, top: fromRect.top, width: fromRect.width, height: fromRect.height, borderRadius: radius[0] });
+    return gsap.to(f, { left: toRect.left, top: toRect.top, width: toRect.width, height: toRect.height, borderRadius: radius[1], duration: 0.9, ease: "oriel-io" })
+      .then(() => f.remove());
+  };
+
+  const open = async (j, from) => {
+    if (isOpen) return;
+    isOpen = true;
     opener = from;
-    show(j);
+    at = wrap(j);
     lb.classList.add("is-open");
     lb.setAttribute("aria-hidden", "false");
     lockScroll(true);
-    $("[data-lb=close]", lb).focus();
+    meta();
+    await preload(at);
+    pic.src = big(at);
+    pic.alt = r.images[at].cap;
+    const tile = from?.closest(".gal__item")?.querySelector("button");
+    gsap.fromTo(chrome, { opacity: 0, y: (k) => (k ? 20 : -20) }, { opacity: 1, y: 0, duration: reduced ? 0 : 0.8, delay: reduced ? 0 : 0.2 });
+    if (!reduced && tile && visible(tile)) {
+      gsap.set(pic, { opacity: 0 });
+      gsap.to(bg, { opacity: 1, duration: 0.6 });
+      await new Promise((res) => requestAnimationFrame(res));
+      await fly(tile.getBoundingClientRect(), pic.getBoundingClientRect(), pic.src, [6, 3]);
+      gsap.set(pic, { opacity: 1 });
+    } else {
+      gsap.to(bg, { opacity: 1, duration: reduced ? 0 : 0.5 });
+      gsap.fromTo(pic, { opacity: 0, scale: 0.96 }, { opacity: 1, scale: 1, duration: reduced ? 0 : 0.8 });
+    }
+    preload(at + 1); preload(at - 1);
+    $(".lb__close", lb).focus();
   };
-  const close = () => {
+
+  const close = async () => {
+    if (!isOpen || busy) return;
+    busy = true;
+    unzoom();
+    const tile = $(`.gal__item [data-open="${at}"]`);
+    gsap.to(chrome, { opacity: 0, duration: reduced ? 0 : 0.3 });
+    if (!reduced && tile && visible(tile)) {
+      const from = pic.getBoundingClientRect();
+      gsap.set(pic, { opacity: 0 });
+      gsap.to(bg, { opacity: 0, duration: 0.7, delay: 0.15 });
+      await fly(from, tile.getBoundingClientRect(), pic.src, [3, 6]);
+    } else {
+      await gsap.to([bg, pic], { opacity: 0, duration: reduced ? 0 : 0.4 });
+    }
+    gsap.set(pic, { opacity: 1, x: 0 });
     lb.classList.remove("is-open");
     lb.setAttribute("aria-hidden", "true");
     lockScroll(false);
-    opener?.focus({ preventScroll: true });
+    isOpen = false;
+    busy = false;
+    (tile || opener)?.focus({ preventScroll: true });
   };
-  $$("[data-open]", track).forEach((b) => b.addEventListener("click", () => open(Number(b.dataset.open), b)));
-  $("[data-lb=close]", lb).addEventListener("click", close);
-  $("[data-lb=prev]", lb).addEventListener("click", () => show(at - 1));
-  $("[data-lb=next]", lb).addEventListener("click", () => show(at + 1));
-  lb.addEventListener("click", (e) => e.target === lb || e.target.classList.contains("lightbox__stage") ? close() : null);
+
+  $$("[data-open]").forEach((b) => b.addEventListener("click", () => open(Number(b.dataset.open), b)));
+  $(".lb__close", lb).addEventListener("click", close);
+  $("[data-lb=prev]", lb).addEventListener("click", () => go(at - 1, -1));
+  $("[data-lb=next]", lb).addEventListener("click", () => go(at + 1, 1));
+  thumbs.forEach((t) => t.addEventListener("click", () => go(Number(t.dataset.lbGo))));
+
+  // click the picture to zoom; move the pointer to look around
+  pic.addEventListener("click", (e) => {
+    if (zoomed) return unzoom();
+    zoomed = true;
+    lb.classList.add("is-zoomed");
+    const b = pic.getBoundingClientRect();
+    gsap.to(pic, { scale: 2.2, x: (b.left + b.width / 2 - e.clientX) * 1.2, y: (b.top + b.height / 2 - e.clientY) * 1.2, duration: 0.7, ease: "oriel" });
+  });
+  stage.addEventListener("pointermove", (e) => {
+    if (!zoomed || e.pointerType !== "mouse") return;
+    const s = stage.getBoundingClientRect();
+    const nx = (e.clientX - s.left) / s.width - 0.5;
+    const ny = (e.clientY - s.top) / s.height - 0.5;
+    gsap.to(pic, { x: -nx * pic.offsetWidth * 1.2, y: -ny * pic.offsetHeight * 1.2, duration: 0.6, ease: "power3", overwrite: "auto" });
+  });
+
+  // swipe
+  let sx = null, sy = null;
+  stage.addEventListener("pointerdown", (e) => { if (!zoomed) { sx = e.clientX; sy = e.clientY; } });
+  stage.addEventListener("pointerup", (e) => {
+    if (sx === null) return;
+    const dx = e.clientX - sx, dy = e.clientY - sy;
+    sx = sy = null;
+    if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy)) go(at + (dx < 0 ? 1 : -1), dx < 0 ? 1 : -1);
+  });
+
   document.addEventListener("keydown", (e) => {
-    if (!lb.classList.contains("is-open")) return;
+    if (!isOpen) return;
     if (e.key === "Escape") close();
-    if (e.key === "ArrowRight") show(at + 1);
-    if (e.key === "ArrowLeft") show(at - 1);
-    if (e.key === "Tab") {
-      const f = $$("button", lb);
-      const idx = f.indexOf(document.activeElement);
+    else if (e.key === "ArrowRight") go(at + 1, 1);
+    else if (e.key === "ArrowLeft") go(at - 1, -1);
+    else if (e.key === "Tab") {
+      const f = $$("button", lb).filter((b) => b.offsetParent !== null);
+      const k = f.indexOf(document.activeElement);
       e.preventDefault();
-      f[(idx + (e.shiftKey ? -1 : 1) + f.length) % f.length].focus();
+      f[(k + (e.shiftKey ? -1 : 1) + f.length) % f.length].focus();
     }
   });
 }
@@ -359,7 +498,7 @@ function plan() {
   let drawn = false;
   ScrollTrigger.create({ trigger: host, start: "top 80%", once: true, onEnter: () => { drawn = true; draw(0); } });
   tabs.forEach((t) => t.addEventListener("click", () => {
-    tabs.forEach((o) => { o.setAttribute("aria-selected", String(o === t)); o.setAttribute("aria-pressed", String(o === t)); });
+    tabs.forEach((o) => o.setAttribute("aria-selected", String(o === t)));
     if (drawn) draw(Number(t.dataset.level));
   }));
 }
@@ -393,6 +532,7 @@ function calc() {
 boot(() => {
   hero();
   gallery();
+  viewer();
   plan();
   calc();
 }, render);

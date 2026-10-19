@@ -37,33 +37,50 @@ async function runLoader() {
 
 // ---------------------------------------------------------------- hero
 
-// size the big word so it spans the full measure exactly
+// size the big word so it spans the full measure exactly (applied to the title and its ghost)
 function fitTitle() {
-  const big = $(".hero__title .t-big");
-  if (!big) return;
+  const bigs = $$(".hero__title .t-big");
+  if (!bigs.length) return;
   const fit = () => {
+    const big = bigs[0];
     big.style.display = "inline-block";
     big.style.fontSize = "100px";
     const w = big.getBoundingClientRect().width;
     big.style.display = "";
-    big.style.fontSize = (100 * big.parentElement.clientWidth) / w + "px";
+    const size = (100 * big.parentElement.clientWidth) / w + "px";
+    bigs.forEach((b) => (b.style.fontSize = size));
   };
   fit();
   let raf;
   window.addEventListener("resize", () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(fit); });
 }
 
-function heroIntro(fromLoader) {
+// The headline sits behind the house; an outline copy above the house keeps
+// the covered letters readable without losing the depth.
+function addGhost() {
   const title = $(".hero__title");
+  const ghost = document.createElement("div");
+  ghost.className = title.className + " hero__title--ghost";
+  ghost.setAttribute("aria-hidden", "true");
+  ghost.innerHTML = title.innerHTML;
+  $(".hero__fg").after(ghost);
+}
+
+function heroIntro(fromLoader) {
+  addGhost();
   fitTitle();
-  title.classList.add("is-split");
+  $$(".hero__title").forEach((t) => t.classList.add("is-split"));
   if (reduced) return gsap.timeline();
-  const small = SplitText.create(".hero__title .t-small", { type: "lines, words, chars", mask: "lines" });
-  const big = SplitText.create(".hero__title .t-big", { type: "lines, chars", mask: "lines" });
   const tl = gsap.timeline({ paused: true });
-  tl.from(small.chars, { yPercent: 115, duration: 1.2, stagger: 0.035 }, 0)
-    .from(big.chars, { yPercent: 115, duration: 1.5, stagger: 0.04 }, 0.12)
-    .from("[data-hero-fade]", { opacity: 0, y: 24, duration: 1.2, stagger: 0.12 }, 0.7);
+  $$(".hero__title .t-small").forEach((el) => {
+    const { chars } = SplitText.create(el, { type: "lines, words, chars", mask: "lines", aria: "none" });
+    tl.from(chars, { yPercent: 115, duration: 1.2, stagger: 0.035 }, 0);
+  });
+  $$(".hero__title .t-big").forEach((el) => {
+    const { chars } = SplitText.create(el, { type: "lines, chars", mask: "lines", aria: "none" });
+    tl.from(chars, { yPercent: 115, duration: 1.5, stagger: 0.04 }, 0.12);
+  });
+  tl.from("[data-hero-fade]", { opacity: 0, y: 24, duration: 1.2, stagger: 0.12 }, 0.7);
   if (!fromLoader) {
     tl.from(".hero__fg .hero__inner", { scale: 1.08, duration: 2.4, ease: "oriel" }, 0)
       .from(".hero__sky .hero__inner", { scale: 1.14, duration: 2.6, ease: "oriel" }, 0);

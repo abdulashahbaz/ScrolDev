@@ -9,9 +9,15 @@
   <meta property="og:title" content="The Collection — Oriel">
   <meta property="og:description" content="Seven singular residences across four continents, offered privately by Oriel.">
   <meta property="og:type" content="website">
-  <meta property="og:image" content="assets/img/monolith-hero-2200.webp">
+  <meta property="og:image" content="assets/img/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
   <link rel="stylesheet" href="assets/css/fonts.css">
   <link rel="stylesheet" href="assets/css/main.css">
+  <link rel="icon" href="assets/icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+  <link rel="manifest" href="site.webmanifest">
   <script>(function(d){d.classList.replace("no-js","js");if(location.protocol!=="file:"){var l=document.createElement("link");l.rel="preload";l.as="font";l.type="font/woff2";l.crossOrigin="";l.href="assets/fonts/archivo-latin.woff2";document.head.appendChild(l)}try{var s=sessionStorage;if(s.getItem("oriel:nav")==="1")d.classList.add("is-arriving");if(s.getItem("oriel:loaded")||s.getItem("oriel:nav")||matchMedia("(prefers-reduced-motion: reduce)").matches)d.classList.add("no-loader")}catch(e){}setTimeout(function(){if(!window.__oriel){d.classList.add("no-loader");d.classList.remove("is-arriving","js")}},10000)})(document.documentElement);</script>
 </head>
 <body data-page="residences">
@@ -109,12 +115,13 @@
       </div>
     </div>
 
+    <noscript><p class="noscript">The collection needs JavaScript to display. <a class="link-line" href="contact.html">Contact us</a> for the list.</p></noscript>
     <section class="cards" data-cards data-header="bone" aria-label="Residences"></section>
     <p class="empty-note" aria-live="polite">Nothing in this setting right now. Ask us about private listings.</p>
 
     <section class="offmarket" data-header="bone" aria-labelledby="off-title">
       <p class="eyebrow"><b>●</b>&nbsp;&nbsp;Off market</p>
-      <h2 id="off-title" class="display" data-split>Some homes are never listed.</h2>
+      <h2 id="off-title" class="headline" data-split>Some homes are <em>never listed.</em></h2>
       <a class="btn" href="contact.html" data-magnetic="0.25"><span class="roll"><span>Request private access</span><span aria-hidden="true">Request private access</span></span></a>
     </section>
   </main>
@@ -123,27 +130,27 @@
   <footer class="footer" data-header="bone">
     <div class="footer__cta">
       <p class="eyebrow"><b>●</b>&nbsp;&nbsp;Private enquiries</p>
-      <h2 class="display" data-split>Begin a quiet conversation.</h2>
+      <h2 class="headline" data-split>Begin a <em>quiet</em> conversation.</h2>
       <a class="circle-btn" href="contact.html" data-magnetic="0.4">Speak with<br>a partner</a>
     </div>
     <div class="footer__grid">
       <div class="footer__col footer__col--offices">
-        <h4>Offices</h4>
+        <h3>Offices</h3>
         <div class="office"><strong>Mallorca</strong><span>Passeig del Born 15, Palma</span><span data-clock="Europe/Madrid"><time>--:--</time></span></div>
         <div class="office"><strong>New York</strong><span>740 Madison Avenue</span><span data-clock="America/New_York"><time>--:--</time></span></div>
         <div class="office"><strong>Dubai</strong><span>Gate Village 4, DIFC</span><span data-clock="Asia/Dubai"><time>--:--</time></span></div>
         <div class="office"><strong>Kyoto</strong><span>Gion, Higashiyama-ku</span><span data-clock="Asia/Tokyo"><time>--:--</time></span></div>
       </div>
       <div class="footer__col footer__col--nav">
-        <h4>Navigate</h4>
+        <h3>Navigate</h3>
         <ul><li><a class="link-line" href="residences.html">Residences</a></li><li><a class="link-line" href="studio.html">Studio</a></li><li><a class="link-line" href="index.html#journal">Journal</a></li><li><a class="link-line" href="contact.html">Contact</a></li></ul>
       </div>
       <div class="footer__col footer__col--social">
-        <h4>Follow</h4>
+        <h3>Follow</h3>
         <ul><li><span>Instagram</span></li><li><span>LinkedIn</span></li></ul>
       </div>
       <div class="footer__col footer__col--news">
-        <h4>The private list</h4>
+        <h3>The private list</h3>
         <form class="news js-news" novalidate><label class="sr" for="news-email">Email address</label><input id="news-email" type="email" placeholder="Email address" autocomplete="email"><button type="submit" aria-label="Subscribe">→</button></form>
         <p class="news-msg" aria-live="polite"></p>
       </div>
