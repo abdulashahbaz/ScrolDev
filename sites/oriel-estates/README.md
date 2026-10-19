@@ -36,7 +36,8 @@ Plain HTML, CSS and JavaScript. No build step, no runtime dependencies.
 From a terminal (Windows cmd, PowerShell, macOS or Linux):
 
 ```bash
-npm run oriel                      # from the repo root: starts a local server and opens your browser
+npm run dev                        # inside sites/oriel-estates: starts a local server and opens your browser
+npm run oriel                      # same, from the repo root
 node sites/oriel-estates/serve.mjs # same thing; add a port number or --no-open if you like
 ```
 

@@ -1,0 +1,9 @@
+{
+  "name": "oriel-estates",
+  "private": true,
+  "description": "Oriel luxury real estate concept site. Static; no dependencies.",
+  "scripts": {
+    "dev": "node serve.mjs",
+    "start": "node serve.mjs"
+  }
+}
