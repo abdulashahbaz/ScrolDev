@@ -416,8 +416,8 @@ a:hover .roll > span + span, button:hover .roll > span + span, a:focus-visible .
 .hero__inner img, .hero__inner canvas { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 100%; }
 .hero__canvas, .spot__film canvas { opacity: 0; transition: opacity 0.6s ease; }
 .hero__canvas.is-ready, .spot__film canvas.is-ready { opacity: 1; }
-/* the hero holds for one more screen while its film plays under the scroll */
-.has-film .statement { margin-top: 100svh; }
+/* the hero holds while its film plays under the scroll (FILM in home.js) */
+.has-film .statement { margin-top: 160svh; }
 /* the type sits in front of the picture, so the lower third is darkened for it */
 .hero__shade {
   position: absolute; inset: 0; pointer-events: none;

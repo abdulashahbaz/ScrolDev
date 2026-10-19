@@ -53,28 +53,41 @@ function fitTitle() {
   window.addEventListener("resize", () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(fit); });
 }
 
-// Draws an image sequence on a canvas, one frame per scroll position, so the
-// films only move when the reader scrolls. Frames load coarse to fine, so
-// scrubbing works before the whole set has arrived.
+// Draws an image sequence on a canvas, one position per scroll position, so
+// the films only move when the reader scrolls. Between two frames the next one
+// is blended in, so motion stays fluid with a light frame set. Frames load
+// coarse to fine, so scrubbing works before the whole set has arrived.
 function frameSequence(canvas, { dir, count, alignY = 0.5 }) {
   const ctx = canvas.getContext("2d");
   const frames = [];
-  let want = 0, drawn = -1, raf = 0, started = false;
+  let pos = 0, drawn = "", raf = 0, started = false;
 
-  const draw = () => {
-    raf = 0;
-    let i = -1;
-    for (let d = 0; d < count && i < 0; d++) {
-      if (frames[want - d]?.ok) i = want - d;
-      else if (frames[want + d]?.ok) i = want + d;
+  const nearest = (i) => {
+    for (let d = 0; d < count; d++) {
+      if (frames[i - d]?.ok) return i - d;
+      if (frames[i + d]?.ok) return i + d;
     }
-    if (i < 0 || i === drawn) return;
-    const img = frames[i].img;
+    return -1;
+  };
+  const paint = (img, alpha) => {
     const cw = canvas.width, ch = canvas.height;
     const k = Math.max(cw / img.naturalWidth, ch / img.naturalHeight);
     const w = img.naturalWidth * k, h = img.naturalHeight * k;
+    ctx.globalAlpha = alpha;
     ctx.drawImage(img, (cw - w) / 2, (ch - h) * alignY, w, h);
-    drawn = i;
+  };
+  const draw = () => {
+    raf = 0;
+    const base = Math.floor(pos), t = pos - base;
+    const a = frames[base]?.ok ? base : nearest(base);
+    if (a < 0) return;
+    const b = a === base && t > 0.02 && frames[base + 1]?.ok ? base + 1 : -1;
+    const key = b < 0 ? `${a}` : `${a}:${t.toFixed(2)}`;
+    if (key === drawn) return;
+    paint(frames[a].img, 1);
+    if (b >= 0) paint(frames[b].img, t);
+    ctx.globalAlpha = 1;
+    drawn = key;
     canvas.classList.add("is-ready");
   };
   const schedule = () => { if (!raf) raf = requestAnimationFrame(draw); };
@@ -91,7 +104,7 @@ function frameSequence(canvas, { dir, count, alignY = 0.5 }) {
     canvas.width = Math.max(1, Math.round(canvas.clientWidth * dpr));
     canvas.height = Math.max(1, Math.round(canvas.clientHeight * dpr));
     ctx.imageSmoothingQuality = "high";
-    drawn = -1;
+    drawn = "";
     schedule();
   };
   size();
@@ -111,7 +124,7 @@ function frameSequence(canvas, { dir, count, alignY = 0.5 }) {
       for (let c = 0; c < 4; c++) next();
     },
     seek(p) {
-      want = Math.round(Math.min(1, Math.max(0, p)) * (count - 1));
+      pos = Math.min(1, Math.max(0, p)) * (count - 1);
       schedule();
     },
   };
@@ -150,24 +163,26 @@ function heroIntro(fromLoader) {
   return tl;
 }
 
-// With the film, the hero holds for an extra screen (the statement's top
-// margin makes the room) and the camera moves in as the page is scrolled.
+// With the film, the hero holds while the flight plays (the statement's top
+// margin, FILM screens, makes the room), then the statement slides over the
+// last frame.
+const FILM = 1.6;
 function heroScroll(film) {
   if (reduced) return;
+  const pin = film ? FILM + 1 : 1;
   const tl = gsap.timeline({
     scrollTrigger: {
       trigger: ".hero",
       start: "top top",
-      end: () => "+=" + window.innerHeight * (film ? 2 : 1),
+      end: () => "+=" + window.innerHeight * pin,
       scrub: true,
       pin: true,
       pinSpacing: false,
-      // the film is done by the time the next section starts to cover it
-      onUpdate: film ? (self) => film.seek(self.progress / 0.55) : undefined,
+      onUpdate: film ? (self) => film.seek((self.progress * pin) / FILM) : undefined,
     },
   });
-  tl.to(".hero__title", { yPercent: -45, opacity: 0, ease: "none", duration: 0.45 }, 0)
-    .to("[data-hero-fade]", { opacity: 0, ease: "none", duration: 0.12 }, 0);
+  tl.to(".hero__title", { yPercent: -45, opacity: 0, ease: "none", duration: 0.7 / pin }, 0)
+    .to("[data-hero-fade]", { opacity: 0, ease: "none", duration: 0.2 / pin }, 0);
   if (!film) tl.to(".hero__media", { scale: 1.1, yPercent: 6, ease: "none", duration: 1 }, 0);
   tl.set({}, {}, 1); // durations above are fractions of the pin
 }
