@@ -6,7 +6,7 @@ A concept website for **Oriel**, a fictional private estate agency that represen
 
 | Page | Highlights |
 | --- | --- |
-| `index.html` | Counting preloader whose last frame expands to full screen and hands over to the hero film without a cut · film hero (Casa Solenne at blue hour) with the headline in front and a pause control · pinned collection strip that expands one residence at a time · sticky spotlight that opens on a film of The Monolith, then chaptered image wipes · hover lists with a cursor-following image · scroll-scaled quote · live clocks · journal |
+| `index.html` | Counting preloader whose last frame expands to full screen and hands over to the hero without a cut · scroll-driven film hero (Casa Solenne at blue hour): the camera moves in as you scroll and holds when you stop, with the headline in front · pinned collection strip that expands one residence at a time · sticky spotlight whose film of The Monolith is scrubbed by the first chapter, then chaptered image wipes · hover lists with a cursor-following image · scroll-scaled quote · live clocks · journal |
 | `residences.html` | Filter by setting, sort by price/date, grid ⇄ list views, all animated with GSAP Flip · editorial asymmetric grid · cursor-follow preview in list view |
 | `residence.html?id=…` | One template for all seven homes: split-letter hero, facts bar, story, editorial gallery mosaic with a full-screen viewer (opens out of the tile, thumbnails, swipe, click-to-zoom, arrow keys), floor plans that draw themselves (per level, hover-linked to the room list), generated topographic map, live finance calculator, viewing request with date picker, "next residence" footer |
 | `studio.html` | Principles, draggable timeline, partners |
@@ -20,7 +20,7 @@ Shared across pages: Lenis smooth scrolling synced to ScrollTrigger, curtain pag
 
 ## Imagery
 
-All photographs and both films are AI-generated for this concept with [Higgsfield](https://higgsfield.ai): stills with Seedream 4.5, each residence's interiors and details generated against its own exterior so the house stays consistent, and the two films animated from those stills with Kling. None of these places exist. Stills ship as WebP at 800/1400/2200 px with `srcset`; the films are H.264 MP4s that play forward and back so they loop without a seam, with a portrait cut of the hero for phones. Films are skipped with reduced motion or data saver, pause off-screen, and the hero has a pause button.
+All photographs and both films are AI-generated for this concept with [Higgsfield](https://higgsfield.ai): stills with Seedream 4.5, each residence's interiors and details generated against its own exterior so the house stays consistent, and the two films animated from those stills with Kling. None of these places exist. Stills ship as WebP at 800/1400/2200 px with `srcset`. The films ship as WebP frame sequences (`assets/frames/`) drawn to a canvas, one frame per scroll position, so they only move when the reader scrolls; frames load coarse to fine, the hero has a portrait cut for phones, and the Monolith clip was stabilised. With reduced motion or data saver the first frame stays as a still.
 
 ## Stack
 
@@ -72,7 +72,7 @@ Residences, floor plans and journal posts live in `assets/js/data.js`. Gallery t
 - Keyboard: skip link, focus styles, Escape closes the menu, shortlist and gallery viewer; arrow keys page through the viewer, which traps focus while open.
 - Lighthouse: Accessibility, Best Practices and SEO score 100 on the home, collection, residence and contact pages (local audit).
 - The custom cursor, magnetic buttons and hover previews only run on fine pointers.
-- If a film can't play, its first frame is already on screen as a still.
+- The films' first frames are ordinary images, so if the frames can't load the still is already on screen.
 - Forms validate and show a success state, but are **not connected** to anything; the page says so.
 
 ## Files
@@ -85,7 +85,7 @@ assets/js/core.js          shared behaviour (scroll, cursor, menu, transitions, 
 assets/js/data.js          residences, floor plans, journal posts
 assets/js/home.js …        one script per page (shared code lives on window.Oriel)
 assets/img/                photographs (WebP)
-assets/video/              hero and spotlight films (MP4)
+assets/frames/             hero and spotlight films as frame sequences (WebP)
 ```
 
 Header, menu and footer markup lives in `index.html`; `npm run pages` copies it to every other page.

@@ -109,7 +109,7 @@
             <source media="(max-aspect-ratio: 4/5)" srcset="assets/img/hero-poster-portrait-720.webp">
             <img class="hero__poster" src="assets/img/hero-poster-1920.webp" srcset="assets/img/hero-poster-1280.webp 1280w, assets/img/hero-poster-1920.webp 1920w" sizes="100vw" alt="Casa Solenne at blue hour: two pale concrete roofs over a lit glass pavilion on a Mallorcan sea cliff." fetchpriority="high">
           </picture>
-          <video class="hero__video" muted playsinline loop preload="none" aria-hidden="true" tabindex="-1" data-src="assets/video/hero-1080.mp4" data-src-portrait="assets/video/hero-portrait.mp4"></video>
+          <canvas class="hero__canvas" aria-hidden="true" data-frames="assets/frames/hero/" data-frames-portrait="assets/frames/hero-portrait/" data-count="121"></canvas>
         </div>
       </div>
       <div class="hero__shade" aria-hidden="true"></div>
@@ -125,7 +125,6 @@
         </div>
         <div class="hide-sm">39.53° N — 2.38° E</div>
         <div class="hero__ctrl">
-          <button class="hero__play" type="button" aria-pressed="false" hidden><span class="hero__play-icon" aria-hidden="true"></span><span class="hero__play-label">Pause film</span></button>
           <div class="hero__scroll"><i></i><span>Scroll</span></div>
         </div>
       </div>
@@ -174,7 +173,10 @@
       <div class="spot__body">
         <div class="spot__media">
           <div class="spot__tag"><span class="chip"><i></i>Available</span><span class="chip">Palm Desert</span></div>
-          <video class="spot__frame spot__film" muted playsinline loop preload="none" poster="assets/img/monolith-film-1280.webp" aria-label="Approaching The Monolith: a red plaster house under a pale concrete pavilion in the desert." data-src="assets/video/monolith-720.mp4"></video>
+          <div class="spot__frame spot__film" role="img" aria-label="Approaching The Monolith: a red plaster house under a pale concrete pavilion in the desert.">
+            <img src="assets/img/monolith-film-1280.webp" alt="" loading="lazy">
+            <canvas aria-hidden="true" data-frames="assets/frames/monolith/" data-count="61"></canvas>
+          </div>
           <img class="spot__frame" src="assets/img/monolith-detail-1400.webp" srcset="assets/img/monolith-detail-800.webp 800w, assets/img/monolith-detail-1400.webp 1400w, assets/img/monolith-detail-2200.webp 2200w" sizes="(max-width: 820px) 100vw, 58vw" alt="A full-height slot in the red plaster wall opening onto a private garden with a single palo verde tree." loading="lazy">
           <img class="spot__frame" src="assets/img/monolith-dusk-1400.webp" srcset="assets/img/monolith-dusk-800.webp 800w, assets/img/monolith-dusk-1400.webp 1400w, assets/img/monolith-dusk-2200.webp 2200w" sizes="(max-width: 820px) 100vw, 58vw" alt="The Monolith at dusk, a ribbon of warm light under the concrete pavilion reflected in a long pool." loading="lazy">
           <span class="spot__count tabular"><span class="spot__idx">01</span>/03</span>

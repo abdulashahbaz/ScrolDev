@@ -53,36 +53,85 @@ function fitTitle() {
   window.addEventListener("resize", () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(fit); });
 }
 
-// The hero film starts on the poster frame, so it can take over from the
-// loader without a cut. Skipped for reduced motion and data saver.
-function heroFilm() {
-  const video = $(".hero__video");
-  const btn = $(".hero__play");
-  const noop = { start() {} };
-  if (!video || reduced || navigator.connection?.saveData) return noop;
-  const portrait = window.matchMedia("(max-aspect-ratio: 4/5)").matches;
-  video.src = (portrait && video.dataset.srcPortrait) || video.dataset.src;
-  video.muted = true;
-  let wanted = false, userPaused = false, onScreen = true;
-  const label = $(".hero__play-label", btn);
-  const sync = () => {
-    const go = wanted && !userPaused && onScreen && document.visibilityState === "visible";
-    if (go && video.paused) video.play().catch(() => {});
-    else if (!go && !video.paused) video.pause();
-    btn.setAttribute("aria-pressed", String(userPaused));
-    label.textContent = userPaused ? "Play film" : "Pause film";
+// Draws an image sequence on a canvas, one frame per scroll position, so the
+// films only move when the reader scrolls. Frames load coarse to fine, so
+// scrubbing works before the whole set has arrived.
+function frameSequence(canvas, { dir, count, alignY = 0.5 }) {
+  const ctx = canvas.getContext("2d");
+  const frames = [];
+  let want = 0, drawn = -1, raf = 0, started = false;
+
+  const draw = () => {
+    raf = 0;
+    let i = -1;
+    for (let d = 0; d < count && i < 0; d++) {
+      if (frames[want - d]?.ok) i = want - d;
+      else if (frames[want + d]?.ok) i = want + d;
+    }
+    if (i < 0 || i === drawn) return;
+    const img = frames[i].img;
+    const cw = canvas.width, ch = canvas.height;
+    const k = Math.max(cw / img.naturalWidth, ch / img.naturalHeight);
+    const w = img.naturalWidth * k, h = img.naturalHeight * k;
+    ctx.drawImage(img, (cw - w) / 2, (ch - h) * alignY, w, h);
+    drawn = i;
+    canvas.classList.add("is-ready");
   };
-  video.addEventListener("playing", () => video.classList.add("is-playing"), { once: true });
-  video.addEventListener("error", () => { btn.hidden = true; });
-  btn.hidden = false;
-  btn.addEventListener("click", () => { userPaused = !userPaused; sync(); });
-  document.addEventListener("visibilitychange", sync);
-  ScrollTrigger.create({
-    trigger: ".hero", start: "top top", end: "bottom top",
-    onToggle: (self) => { onScreen = self.isActive || window.scrollY < 10; sync(); },
+  const schedule = () => { if (!raf) raf = requestAnimationFrame(draw); };
+  const load = (i) => new Promise((done) => {
+    const img = new Image();
+    const entry = { img, ok: false };
+    frames[i] = entry;
+    img.decoding = "async";
+    img.onload = () => { entry.ok = true; schedule(); done(); };
+    img.onerror = done;
+    img.src = `${dir}${String(i).padStart(4, "0")}.webp`;
   });
-  video.load();
-  return { start() { wanted = true; sync(); } };
+  const size = () => {
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = Math.max(1, Math.round(canvas.clientWidth * dpr));
+    canvas.height = Math.max(1, Math.round(canvas.clientHeight * dpr));
+    ctx.imageSmoothingQuality = "high";
+    drawn = -1;
+    schedule();
+  };
+  size();
+  window.addEventListener("resize", size);
+
+  return {
+    start() {
+      if (started) return;
+      started = true;
+      const order = [], seen = new Set();
+      for (const step of [count - 1, 16, 8, 4, 2, 1]) {
+        for (let i = 0; i < count; i += step) if (!seen.has(i)) { seen.add(i); order.push(i); }
+      }
+      // four requests at a time leaves room for everything else on the page
+      let k = 0;
+      const next = () => { if (k < order.length) load(order[k++]).then(next); };
+      for (let c = 0; c < 4; c++) next();
+    },
+    seek(p) {
+      want = Math.round(Math.min(1, Math.max(0, p)) * (count - 1));
+      schedule();
+    },
+  };
+}
+
+// The hero film is scrubbed by the scroll. Its first frame is the poster, so
+// it takes over from the loader without a cut. Skipped for reduced motion and
+// data saver, which keep the still.
+function heroFilm() {
+  const canvas = $(".hero__canvas");
+  if (!canvas || reduced || navigator.connection?.saveData) return null;
+  const portrait = window.matchMedia("(max-aspect-ratio: 4/5)").matches;
+  const seq = frameSequence(canvas, {
+    dir: (portrait && canvas.dataset.framesPortrait) || canvas.dataset.frames,
+    count: Number(canvas.dataset.count),
+    alignY: 1,
+  });
+  document.documentElement.classList.add("has-film");
+  return seq;
 }
 
 function heroIntro(fromLoader) {
@@ -100,29 +149,26 @@ function heroIntro(fromLoader) {
   return tl;
 }
 
-function heroScroll() {
+// With the film, the hero holds for an extra screen (the statement's top
+// margin makes the room) and the camera moves in as the page is scrolled.
+function heroScroll(film) {
   if (reduced) return;
-  gsap.timeline({
-    scrollTrigger: { trigger: ".hero", start: "top top", end: "bottom top", scrub: true, pin: true, pinSpacing: false },
-  })
-    .to(".hero__title", { yPercent: -45, opacity: 0, ease: "none" }, 0)
-    .to(".hero__media", { scale: 1.1, yPercent: 6, ease: "none" }, 0)
-    .to(".hero__shade", { opacity: 0.6, ease: "none" }, 0)
-    .to("[data-hero-fade]", { opacity: 0, ease: "none", duration: 0.25 }, 0);
-}
-
-function heroMouse() {
-  if (!fine || reduced) return;
-  const hero = $(".hero");
-  const q = (sel, prop) => gsap.quickTo(sel, prop, { duration: 1.6, ease: "power3" });
-  const mx = q(".hero__inner", "x"), my = q(".hero__inner", "y");
-  const tx = q(".hero__title", "x");
-  hero.addEventListener("pointermove", (e) => {
-    const nx = e.clientX / window.innerWidth - 0.5;
-    const ny = e.clientY / window.innerHeight - 0.5;
-    mx(nx * -22); my(ny * -12);
-    tx(nx * 10);
+  const tl = gsap.timeline({
+    scrollTrigger: {
+      trigger: ".hero",
+      start: "top top",
+      end: () => "+=" + window.innerHeight * (film ? 2 : 1),
+      scrub: true,
+      pin: true,
+      pinSpacing: false,
+      // the film is done by the time the next section starts to cover it
+      onUpdate: film ? (self) => film.seek(self.progress / 0.55) : undefined,
+    },
   });
+  tl.to(".hero__title", { yPercent: -45, opacity: 0, ease: "none", duration: 0.45 }, 0)
+    .to("[data-hero-fade]", { opacity: 0, ease: "none", duration: 0.12 }, 0);
+  if (!film) tl.to(".hero__media", { scale: 1.1, yPercent: 6, ease: "none", duration: 1 }, 0);
+  tl.set({}, {}, 1); // durations above are fractions of the pin
 }
 
 // ---------------------------------------------------------------- collection strip
@@ -184,18 +230,27 @@ function strip() {
 
 // ---------------------------------------------------------------- spotlight
 
-// the spotlight film only loads and plays while its section is on screen
+// The spotlight film moves with the scroll: through the first chapter on
+// wide screens, and while it crosses the screen on phones.
 function spotFilm() {
-  const film = $(".spot__film");
-  if (!film || reduced || navigator.connection?.saveData) return;
-  ScrollTrigger.create({
-    trigger: ".spot", start: "top bottom", end: "bottom top",
-    onToggle(self) {
-      if (self.isActive) {
-        if (!film.src) film.src = film.dataset.src;
-        film.play().catch(() => {});
-      } else film.pause();
-    },
+  const canvas = $(".spot__film canvas");
+  if (!canvas || reduced || navigator.connection?.saveData) return;
+  const seq = frameSequence(canvas, { dir: canvas.dataset.frames, count: Number(canvas.dataset.count) });
+  ScrollTrigger.create({ trigger: ".spot", start: "top bottom+=100%", once: true, onEnter: () => seq.start() });
+  const mm = gsap.matchMedia();
+  mm.add("(min-width: 821px)", () => {
+    const st = ScrollTrigger.create({
+      trigger: ".spot", start: "top bottom", endTrigger: $$(".chapter")[1], end: "top bottom",
+      onUpdate: (self) => seq.seek(self.progress),
+    });
+    return () => st.kill();
+  });
+  mm.add("(max-width: 820px)", () => {
+    const st = ScrollTrigger.create({
+      trigger: ".spot__media", start: "top bottom", end: "bottom top",
+      onUpdate: (self) => seq.seek(self.progress / 0.5),
+    });
+    return () => st.kill();
   });
 }
 
@@ -215,16 +270,18 @@ function spotlight() {
     });
   });
   mm.add("(max-width: 820px)", () => {
-    // on phones the media is not sticky; cycle the three frames instead
-    let i = 0;
-    const id = setInterval(() => {
-      const next = (i + 1) % imgs.length;
-      if (next === 0) imgs.slice(1).forEach((im) => gsap.set(im, { clipPath: "inset(100% 0 0 0)" }));
-      else gsap.fromTo(imgs[next], { clipPath: "inset(100% 0 0 0)" }, { clipPath: "inset(0% 0 0 0)", duration: 1.2, ease: "oriel-io" });
-      idx.textContent = pad(next + 1);
-      i = next;
-    }, 3200);
-    return () => clearInterval(id);
+    // on phones the media is not sticky: the film runs as it comes up the
+    // screen, then the two photographs wipe in as it leaves
+    if (reduced) return;
+    const tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: ".spot__media", start: "top bottom", end: "bottom top", scrub: true,
+        onUpdate: (self) => (idx.textContent = pad(self.progress < 0.62 ? 1 : self.progress < 0.8 ? 2 : 3)),
+      },
+    });
+    imgs.slice(1).forEach((im, j) => tl.fromTo(im, { clipPath: "inset(100% 0 0 0)" }, { clipPath: "inset(0% 0 0 0)", ease: "none", duration: 0.16 }, 0.48 + j * 0.18));
+    tl.set({}, {}, 1);
+    return () => { tl.scrollTrigger?.kill(); tl.kill(); };
   });
 }
 
@@ -286,9 +343,8 @@ boot(async () => {
   const film = heroFilm();
   const fromLoader = await runLoader();
   heroIntro(fromLoader).play();
-  film.start();
-  heroScroll();
-  heroMouse();
+  film?.start();
+  heroScroll(film);
   strip();
   spotlight();
   spotFilm();
