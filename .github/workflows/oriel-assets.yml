@@ -1,0 +1,32 @@
+# Pulls the Oriel image/video bundle into the repo. Generated media is
+# produced in Higgsfield's cloud and published as one zip; committing the
+# zip's URL to sites/oriel-estates/tools/assets-source.txt runs this job.
+name: Oriel assets
+
+on:
+  push:
+    paths:
+      - sites/oriel-estates/tools/assets-source.txt
+
+permissions:
+  contents: write
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download and unpack the bundle
+        run: |
+          url=$(head -n 1 sites/oriel-estates/tools/assets-source.txt | tr -d '[:space:]')
+          if [ -z "$url" ]; then echo "No bundle URL yet."; exit 0; fi
+          curl -fsSL "$url" -o "$RUNNER_TEMP/assets.zip"
+          unzip -o "$RUNNER_TEMP/assets.zip" -d sites/oriel-estates/
+      - name: Commit the media
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A sites/oriel-estates/assets
+          git diff --cached --quiet && exit 0
+          git commit -m "Oriel: add generated imagery"
+          git push
