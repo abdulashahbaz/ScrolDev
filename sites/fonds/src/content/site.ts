@@ -24,11 +24,13 @@ export const collection = {
 // Shown in the small circle above the collection label; swapped at random while scrolling.
 export const symbols = ["4", "§", "&", "*", "/", "%"];
 
-// Desktop scrubs these with the cursor; touch devices play them back to back.
+// The hero clips. Both start on the same front-facing frame; "left" turns the head
+// towards the right of the screen, "right" towards the left. They are encoded with
+// every frame as a keyframe (ffmpeg -g 1) so scrubbing can seek to any frame
+// instantly. A clip with normal keyframe spacing will stutter when scrubbed.
 export const videos = {
-  left: "https://d8j0ntlcm91z4.cloudfront.net/user_39ca84eAE1ODL9hbR5VhoEj8tBf/hf_20260625_154433_532a85d3-dabf-4265-b8bd-19ac6af31842.mp4",
-  right:
-    "https://d8j0ntlcm91z4.cloudfront.net/user_39ca84eAE1ODL9hbR5VhoEj8tBf/hf_20260625_154401_a664f076-b971-4557-8728-40ef9ea4c49b.mp4",
+  left: "https://d2ol7oe51mr4n9.cloudfront.net/user_3DigAGHsL7XlpG98dcFNpat7g9G/f0ad1011-e527-4f19-aadf-023f04fbd753.mp4",
+  right: "https://d2ol7oe51mr4n9.cloudfront.net/user_3DigAGHsL7XlpG98dcFNpat7g9G/f32fe684-4cd7-432f-80d5-39a33c8d5b3f.mp4",
 };
 
 const look = (file: string) =>

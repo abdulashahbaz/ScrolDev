@@ -7,19 +7,26 @@ export type VideoStageHandle = {
   setVisible: (visible: boolean) => void;
 };
 
-// How long the mouse has to rest before the films go back to playing on their own.
+// How quickly the head catches up with where it should be looking (per second).
+const EASE = 6;
+// How long the mouse has to rest before the idle sway takes over again.
 const IDLE_MS = 2500;
+// The idle sway: a slow look to one side, back, then the other side.
+const SWAY_PERIOD_MS = 14000;
+const SWAY_AMPLITUDE = 0.8;
 
-// Two stacked videos that play back to back on their own. With a mouse, moving
-// the cursor takes over and scrubs them: left of centre scrubs the right video,
-// right of centre scrubs the left one, and a dead zone in the middle parks both
-// on their first frame. Once the mouse rests, playback resumes from that frame.
+// Two clips that both start on the same front-facing frame and turn the head
+// to opposite sides. A single "pose" from -1 to 1 drives them: positive scrubs
+// the left clip, negative the right one, and 0 is the shared first frame, so
+// crossing the centre is seamless. The cursor sets the target pose (with a dead
+// zone in the middle); when the mouse rests, or on touch screens, a slow sway
+// does. The pose eases towards its target every frame, and the clips are
+// encoded with every frame as a keyframe, so each seek lands immediately.
 export function VideoStage({ ref }: { ref: Ref<VideoStageHandle> }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const leftRef = useRef<HTMLVideoElement>(null);
   const rightRef = useRef<HTMLVideoElement>(null);
   const visibleRef = useRef(true);
-  const playbackRef = useRef<{ pause: () => void; resume: () => void } | null>(null);
 
   useImperativeHandle(
     ref,
@@ -27,8 +34,6 @@ export function VideoStage({ ref }: { ref: Ref<VideoStageHandle> }) {
       setVisible(visible) {
         visibleRef.current = visible;
         containerRef.current!.style.visibility = visible ? "" : "hidden";
-        if (visible) playbackRef.current?.resume();
-        else playbackRef.current?.pause();
       },
     }),
     [],
@@ -50,104 +55,72 @@ export function VideoStage({ ref }: { ref: Ref<VideoStageHandle> }) {
     const container = containerRef.current!;
     const left = leftRef.current!;
     const right = rightRef.current!;
-    const autoplay = !window.matchMedia(queries.reducedMotion).matches;
-    let active = right;
-    let playing = false;
+    const sway = !window.matchMedia(queries.reducedMotion).matches;
+    const pointer = window.matchMedia(queries.finePointer).matches;
 
-    const show = (video: HTMLVideoElement) => {
-      active = video;
-      left.style.display = video === left ? "block" : "none";
-      right.style.display = video === right ? "block" : "none";
+    // Some mobile browsers only fetch video data once playback has started.
+    for (const video of [left, right]) {
+      video
+        .play()
+        .then(() => video.pause())
+        .catch(() => {});
+    }
+
+    let shown = right;
+    let pose = 0;
+    let mouseX = window.innerWidth / 2;
+    let lastMove = -Infinity;
+    let swayStart = performance.now();
+    let last = performance.now();
+    let raf = 0;
+
+    // Only ask for a new frame once the browser has finished the previous seek,
+    // and only when it is at least half a frame (at 24 fps) away.
+    const seek = (video: HTMLVideoElement, time: number) => {
+      if (!video.seeking && Math.abs(video.currentTime - time) > 1 / 48) video.currentTime = time;
     };
 
-    // Back-to-back playback: whichever video is showing plays to its end, then the other starts.
-    const play = () => {
-      playing = true;
-      if (autoplay && visibleRef.current) active.play().catch(() => {});
-    };
-    const stop = () => {
-      playing = false;
-      left.pause();
-      right.pause();
-    };
-    const onEnded = (e: Event) => {
-      if (!playing) return;
-      const next = e.target === left ? right : left;
-      show(next);
-      next.currentTime = 0;
-      play();
-    };
-    left.addEventListener("ended", onEnded);
-    right.addEventListener("ended", onEnded);
-    playbackRef.current = {
-      pause: () => active.pause(),
-      resume: () => {
-        if (playing) play();
-      },
-    };
+    const tick = (now: number) => {
+      raf = requestAnimationFrame(tick);
+      const dt = Math.min(0.1, (now - last) / 1000);
+      last = now;
+      if (!visibleRef.current) return;
 
-    let cleanupPointer = () => {};
-    if (window.matchMedia(queries.finePointer).matches) {
-      let mouseX = window.innerWidth / 2;
-      let lastMove = -Infinity;
-      let raf = 0;
-
-      // Only ask for a new frame once the browser has finished the previous
-      // seek; queuing seeks while one is in flight is what makes scrubbing jitter.
-      const seek = (video: HTMLVideoElement, time: number) => {
-        if (!video.seeking && Math.abs(video.currentTime - time) > 0.001) video.currentTime = time;
-      };
-
-      const tick = (now: number) => {
-        raf = requestAnimationFrame(tick);
-        if (!visibleRef.current) return;
-        if (now - lastMove > IDLE_MS) {
-          if (!playing) play();
-          return;
-        }
-        if (playing) stop();
-
+      let target = 0;
+      if (pointer && now - lastMove <= IDLE_MS) {
         const { left: x0, width } = container.getBoundingClientRect();
         const center = width / 2;
         const deadZone = Math.max(30, width * 0.05);
         const dx = mouseX - x0 - center;
+        if (Math.abs(dx) > deadZone) target = Math.sign(dx) * Math.min(1, (Math.abs(dx) - deadZone) / (center - deadZone));
+        swayStart = now;
+      } else if (sway) {
+        target = SWAY_AMPLITUDE * Math.sin(((now - swayStart) / SWAY_PERIOD_MS) * 2 * Math.PI);
+      }
+      pose += (target - pose) * (1 - Math.exp(-EASE * dt));
 
-        if (Math.abs(dx) <= deadZone) {
-          seek(left, 0);
-          seek(right, 0);
-          return;
-        }
-        const video = dx < 0 ? right : left;
-        if (video !== active) show(video);
-        if (!video.duration) return;
-        const progress = Math.min(1, (Math.abs(dx) - deadZone) / (center - deadZone));
-        // Stop just short of the end: seeking to the exact duration can show a blank frame.
-        seek(video, progress * Math.max(0, video.duration - 0.05));
-      };
+      // Cursor right of centre turns the head with the left clip, left of centre with the right clip.
+      const video = pose >= 0 ? left : right;
+      const parked = video === left ? right : left;
+      if (video !== shown) {
+        shown = video;
+        video.style.opacity = "1";
+        parked.style.opacity = "0";
+      }
+      if (video.duration) seek(video, Math.abs(pose) * Math.max(0, video.duration - 0.05));
+      // Keep the hidden clip on the shared first frame, ready for the next crossing.
+      seek(parked, 0);
+    };
 
-      const move = (e: MouseEvent) => {
-        mouseX = e.clientX;
-        lastMove = performance.now();
-      };
-      window.addEventListener("mousemove", move, { passive: true });
-      raf = requestAnimationFrame(tick);
-      cleanupPointer = () => {
-        window.removeEventListener("mousemove", move);
-        cancelAnimationFrame(raf);
-      };
-    } else {
-      // Touch: start with the left video.
-      show(left);
-      left.currentTime = 0;
-      play();
-    }
-
+    const move = (e: MouseEvent) => {
+      mouseX = e.clientX;
+      lastMove = performance.now();
+    };
+    window.addEventListener("mousemove", move, { passive: true });
+    raf = requestAnimationFrame(tick);
     return () => {
-      cleanupPointer();
-      left.removeEventListener("ended", onEnded);
-      right.removeEventListener("ended", onEnded);
-      playbackRef.current = null;
-      stop();
+      window.removeEventListener("mousemove", move);
+      cancelAnimationFrame(raf);
     };
   }, []);
 
@@ -159,8 +132,8 @@ export function VideoStage({ ref }: { ref: Ref<VideoStageHandle> }) {
       aria-hidden
       className="pointer-events-none fixed top-[220px] left-0 z-0 h-[calc(100vh-220px)] w-screen overflow-hidden opacity-0 transition-opacity duration-300 ease-[ease] sm:inset-0 sm:h-full sm:w-full"
     >
-      <video ref={leftRef} className={video} style={{ display: "none" }} src={videos.left} muted playsInline preload="auto" />
-      <video ref={rightRef} className={video} style={{ display: "block" }} src={videos.right} muted playsInline preload="auto" />
+      <video ref={leftRef} className={video} style={{ opacity: 0 }} src={videos.left} muted playsInline preload="auto" />
+      <video ref={rightRef} className={video} style={{ opacity: 1 }} src={videos.right} muted playsInline preload="auto" />
     </div>
   );
 }

@@ -1,6 +1,8 @@
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import Lenis from "lenis";
+import "lenis/dist/lenis.css";
 import { domAnimation, LazyMotion, MotionConfig } from "motion/react";
 import { useEffect, useRef } from "react";
 import { Cursor } from "./components/cursor";
@@ -45,8 +47,25 @@ export default function App() {
     { scope: spacerRef },
   );
 
-  // Everything else is driven from one animation frame loop that reads
-  // window.scrollY and only writes when the position or layout changed.
+  // Smooth, eased scrolling with the mouse wheel and trackpad. Touch keeps the
+  // device's native scrolling. Lenis and ScrollTrigger run on GSAP's ticker so
+  // the panel and everything below move from the same scroll position each frame.
+  useEffect(() => {
+    if (window.matchMedia(queries.reducedMotion).matches) return;
+    const lenis = new Lenis({ lerp: 0.09 });
+    lenis.on("scroll", ScrollTrigger.update);
+    const raf = (time: number) => lenis.raf(time * 1000);
+    gsap.ticker.add(raf);
+    gsap.ticker.lagSmoothing(0);
+    return () => {
+      gsap.ticker.remove(raf);
+      lenis.destroy();
+    };
+  }, []);
+
+  // Everything else is driven from one per-frame callback that reads
+  // window.scrollY and only writes when the position or layout changed. It runs
+  // on GSAP's ticker after Lenis, so it sees this frame's scroll position.
   useEffect(() => {
     const spacer = spacerRef.current!;
     const wrap = wrapRef.current!;
@@ -64,7 +83,6 @@ export default function App() {
     let dirty = true;
     let heroVisible = true;
     let lastSymbolAt = 0;
-    let raf = 0;
 
     const measure = () => {
       vh = window.innerHeight;
@@ -80,8 +98,8 @@ export default function App() {
       dirty = true;
     };
 
-    const frame = (now: number) => {
-      raf = requestAnimationFrame(frame);
+    const frame = () => {
+      const now = performance.now();
       const y = window.scrollY;
       if (y === lastY && !dirty) return;
       const scrolled = lastY >= 0 && y !== lastY;
@@ -132,11 +150,11 @@ export default function App() {
     resizeObserver.observe(wrap);
     window.addEventListener("resize", measure);
     measure();
-    raf = requestAnimationFrame(frame);
+    gsap.ticker.add(frame);
     return () => {
       resizeObserver.disconnect();
       window.removeEventListener("resize", measure);
-      cancelAnimationFrame(raf);
+      gsap.ticker.remove(frame);
     };
   }, [cols, tablet]);
 
