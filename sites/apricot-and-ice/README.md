@@ -44,4 +44,4 @@ Journeys, places and seasons live in `src/content/`. Real-world facts are limite
 
 ## Deploy
 
-On Vercel, import the ScrolDev repository as a new project with **Root Directory** set to `sites/apricot-and-ice`. See the repository README for the Ignored Build Step setting.
+On Vercel, import the ScrolDev repository as a new project with **Root Directory** set to `sites/apricot-and-ice`. Its `vercel.json` makes Vercel skip rebuilds when nothing in this folder changed.

@@ -42,4 +42,4 @@ The display font is Cormorant (SIL Open Font License); the reference's paid font
 
 ## Deploy
 
-On Vercel, import the ScrolDev repository as a new project with **Root Directory** set to `sites/bridgekeepers-house`.
+On Vercel, import the ScrolDev repository as a new project with **Root Directory** set to `sites/bridgekeepers-house`. Its `vercel.json` makes Vercel skip rebuilds when nothing in this folder changed.

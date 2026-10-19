@@ -103,7 +103,11 @@ Each site is its own Vercel project pointing at the same repository:
 
 1. **Add New → Project**, import this repository again.
 2. Set **Root Directory** to `sites/<slug>`. Vercel detects the framework from that folder.
-3. Under **Settings → Git → Ignored Build Step**, use `git diff HEAD^ HEAD --quiet -- .` so the site only rebuilds when its own folder changes, not on every push to the repo.
-4. Once it's live, put the URL in that site's `scroldev.json` → `url`.
+3. Deploy. Leave the Ignored Build Step setting alone: the site's own `vercel.json` already makes Vercel skip a rebuild when nothing in that folder changed since its last successful deploy. The first deploy always builds.
+4. Once it's live, put the URL in that site's `scroldev.json` → `url`, and push so the hub picks it up.
+
+To check a site locally before deploying it: `cd sites/<slug> && npm ci && npm run build && npm run start`, then open http://localhost:3000. Use `npm run dev` while editing.
+
+New sites need the same `vercel.json`; copy it from `sites/halvo/`.
 
 Never commit `.env` files or API keys for a site. Set them in that site's Vercel project instead. The root `.gitignore` blocks `.env*` files everywhere in the repo.
