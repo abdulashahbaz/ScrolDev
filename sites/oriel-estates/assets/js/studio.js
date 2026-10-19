@@ -1,5 +1,7 @@
-import { boot, $, dragScroll } from "./core.js";
+(() => {
+const { boot, $, dragScroll } = window.Oriel;
 
 boot(() => {
   dragScroll($("[data-drag]"));
 });
+})();

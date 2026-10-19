@@ -24,26 +24,33 @@ All imagery was modelled and rendered from scratch in Blender (Cycles) for this 
 
 ## Stack
 
-Plain HTML, CSS and ES modules. No build step.
+Plain HTML, CSS and JavaScript. No build step, no runtime dependencies.
 
 - [GSAP](https://gsap.com) 3.15 with ScrollTrigger, SplitText, Flip and CustomEase (GSAP standard no-charge licence), vendored in `assets/js/vendor/`
 - [Lenis](https://github.com/darkroomengineering/lenis) 1.3 (MIT), vendored
 - A small hand-written WebGL shader for the sky (`assets/js/gl.js`)
-- Fonts from Google Fonts: Archivo (expanded), Inter Tight, Instrument Serif
+- Fonts bundled in `assets/fonts/`: Archivo (expanded), Inter Tight, Instrument Serif (SIL Open Font License)
 
-## Run it locally
+## Open it
 
-ES modules need a server (opening the file directly will not work):
+From a terminal (Windows cmd, PowerShell, macOS or Linux):
 
 ```bash
-npx serve sites/oriel-estates
-# or
-python3 -m http.server -d sites/oriel-estates 4173
+npm run oriel                      # from the repo root: starts a local server and opens your browser
+node sites/oriel-estates/serve.mjs # same thing; add a port number or --no-open if you like
 ```
+
+On Windows you can also double-click `start.cmd` (or run it in cmd). It uses the local server when Node.js is installed and otherwise opens `index.html` directly. The site also works opened straight from disk (`start index.html`); only the drifting-sky shader is skipped there, because browsers don't allow WebGL to read local files.
 
 ## Deploy
 
-Static. On Vercel, create a project with **Root Directory** `sites/oriel-estates`, framework preset **Other**, no build command. `404.html` is picked up automatically.
+Static files, no build step, no external requests (fonts are bundled).
+
+- **Vercel (dashboard):** new project from this repo, **Root Directory** `sites/oriel-estates`, framework preset **Other**. `vercel.json` adds caching and security headers; `.vercelignore` keeps the launcher and notes out of the deploy.
+- **Vercel (command line):** `npx vercel sites/oriel-estates --prod`
+- **Anywhere else** (Netlify, Cloudflare Pages, GitHub Pages, any web server): upload the folder as is. `404.html` is used for unknown addresses.
+
+Once it is live, put the URL in `scroldev.json` → `"url"` so the hub card links to it.
 
 ## Accessibility and fallbacks
 
@@ -61,7 +68,7 @@ contact.html  journal.html  404.html
 assets/css/main.css        design tokens + all components
 assets/js/core.js          shared behaviour (scroll, cursor, menu, transitions, reveals, forms)
 assets/js/data.js          residences, floor plans, journal posts
-assets/js/home.js …        one module per page
+assets/js/home.js …        one script per page (shared code lives on window.Oriel)
 assets/js/gl.js            WebGL sky
 assets/img/                rendered imagery (WebP)
 ```

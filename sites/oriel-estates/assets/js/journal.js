@@ -1,5 +1,5 @@
-import { boot, $ } from "./core.js";
-import { posts, img } from "./data.js";
+(() => {
+const { boot, $, posts, img } = window.Oriel;
 
 const id = new URLSearchParams(location.search).get("id");
 const post = posts.find((p) => p.id === id) || posts[0];
@@ -36,3 +36,4 @@ function render() {
 }
 
 boot(null, render);
+})();

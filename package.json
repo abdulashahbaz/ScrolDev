@@ -10,6 +10,7 @@
   "scripts": {
     "build": "node hub/build.mjs",
     "check": "node hub/build.mjs --check",
-    "new-site": "node hub/new-site.mjs"
+    "new-site": "node hub/new-site.mjs",
+    "oriel": "node sites/oriel-estates/serve.mjs"
   }
 }

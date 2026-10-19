@@ -1,5 +1,5 @@
-import { boot, $ } from "./core.js";
-import { residences } from "./data.js";
+(() => {
+const { boot, $, residences } = window.Oriel;
 
 // arriving from the shortlist: name the residences in the message
 function prefill() {
@@ -21,3 +21,4 @@ boot(() => {
   range.addEventListener("input", update);
   update();
 }, prefill);
+})();

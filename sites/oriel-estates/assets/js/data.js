@@ -1,15 +1,16 @@
 // Content for the concept. Every residence, architect and figure here is fictional.
+(() => {
 
-export const IMG = "assets/img/";
-export const WIDTHS = [800, 1400, 2200];
+const IMG = "assets/img/";
+const WIDTHS = [800, 1400, 2200];
 
-export function srcset(name) {
+function srcset(name) {
   return WIDTHS.map((w) => `${IMG}${name}-${w}.webp ${w}w`).join(", ");
 }
-export function src(name, w = 1400) {
+function src(name, w = 1400) {
   return `${IMG}${name}-${w}.webp`;
 }
-export function img(name, alt, sizes = "100vw", extra = "") {
+function img(name, alt, sizes = "100vw", extra = "") {
   return `<img src="${src(name)}" srcset="${srcset(name)}" sizes="${sizes}" alt="${alt}" loading="lazy" decoding="async" ${extra}>`;
 }
 
@@ -85,7 +86,7 @@ const plans = {
   ],
 };
 
-export const residences = [
+const residences = [
   {
     id: "the-monolith",
     name: "The Monolith",
@@ -323,9 +324,9 @@ export const residences = [
   },
 ];
 
-export const planFor = (r) => plans[r.plan];
+const planFor = (r) => plans[r.plan];
 
-export const posts = [
+const posts = [
   {
     id: "unfinished-room",
     title: "The case for the unfinished room",
@@ -368,11 +369,14 @@ export const posts = [
   },
 ];
 
-export const offices = [
+const offices = [
   { city: "Mallorca", tz: "Europe/Madrid", lines: ["Passeig del Born 15", "07012 Palma"] },
   { city: "New York", tz: "America/New_York", lines: ["740 Madison Avenue", "New York, NY"] },
   { city: "Dubai", tz: "Asia/Dubai", lines: ["Gate Village 4", "DIFC, Dubai"] },
   { city: "Kyoto", tz: "Asia/Tokyo", lines: ["Gion-machi Minamigawa", "Higashiyama-ku"] },
 ];
 
-export const contact = { email: "private@oriel.example", phone: "+34 971 000 470" };
+const contact = { email: "private@oriel.example", phone: "+34 971 000 470" };
+
+window.Oriel = Object.assign(window.Oriel || {}, { IMG, WIDTHS, srcset, src, img, residences, planFor, posts, offices, contact });
+})();

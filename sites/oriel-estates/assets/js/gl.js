@@ -1,7 +1,7 @@
 // Living sky: the hero's sky layer redrawn in WebGL with a slow domain-warp
 // so the clouds drift, plus a soft lens that follows the pointer.
 // Falls back silently to the plain <img> underneath.
-
+(() => {
 const VERT = `
 attribute vec2 p;
 varying vec2 vUv;
@@ -59,7 +59,7 @@ void main() {
   gl_FragColor = vec4(col, 1.0);
 }`;
 
-export function livingSky(canvas, url) {
+function livingSky(canvas, url) {
   const gl = canvas.getContext("webgl", { antialias: false, alpha: false, premultipliedAlpha: false, powerPreference: "low-power" });
   if (!gl) return null;
 
@@ -125,7 +125,12 @@ export function livingSky(canvas, url) {
   image.onload = () => {
     gl.bindTexture(gl.TEXTURE_2D, tex);
     gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, image);
+    try {
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, image);
+    } catch {
+      // opened from file://: the browser treats the image as cross-origin, so keep the static sky
+      return;
+    }
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
@@ -153,3 +158,6 @@ export function livingSky(canvas, url) {
     },
   };
 }
+
+window.Oriel.livingSky = livingSky;
+})();

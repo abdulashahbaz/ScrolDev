@@ -1,21 +1,20 @@
 // Shared behaviour for every page: smooth scroll, header, cursor, menu,
 // page transitions and the scroll-driven reveal vocabulary.
+(() => {
 
-import { residences } from "./data.js";
-
+const { residences } = window.Oriel;
 const { gsap, ScrollTrigger, SplitText, Flip, CustomEase } = window;
 gsap.registerPlugin(ScrollTrigger, SplitText, Flip, CustomEase);
 CustomEase.create("oriel", "0.16, 1, 0.3, 1");
 CustomEase.create("oriel-io", "0.76, 0, 0.24, 1");
 gsap.defaults({ ease: "oriel", duration: 1.1 });
 
-export { gsap, ScrollTrigger, SplitText, Flip };
-export const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
-export const fine = matchMedia("(hover: hover) and (pointer: fine)").matches;
-export const $ = (s, el = document) => el.querySelector(s);
-export const $$ = (s, el = document) => [...el.querySelectorAll(s)];
+const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const fine = matchMedia("(hover: hover) and (pointer: fine)").matches;
+const $ = (s, el = document) => el.querySelector(s);
+const $$ = (s, el = document) => [...el.querySelectorAll(s)];
 
-export let lenis = null;
+let lenis = null;
 
 // ---------------------------------------------------------------- scroll
 
@@ -28,7 +27,7 @@ function initScroll() {
   gsap.ticker.lagSmoothing(0);
 }
 
-export function scrollTo(target, opts = {}) {
+function scrollTo(target, opts = {}) {
   if (lenis) lenis.scrollTo(target, { duration: 1.6, offset: 0, ...opts });
   else {
     const el = typeof target === "string" ? $(target) : target;
@@ -37,7 +36,7 @@ export function scrollTo(target, opts = {}) {
   }
 }
 
-export function lockScroll(lock) {
+function lockScroll(lock) {
   document.body.classList.toggle("is-locked", lock);
   if (lenis) lock ? lenis.stop() : lenis.start();
 }
@@ -175,8 +174,8 @@ try {
   saved = JSON.parse(localStorage.getItem(SAVED_KEY) || "[]").filter((id) => residences.some((r) => r.id === id));
 } catch { /* storage blocked: the shortlist lives for this page only */ }
 
-export const plusIcon = `<svg viewBox="0 0 14 14" aria-hidden="true"><path d="M7 1v12M1 7h12" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>`;
-export const isSaved = (id) => saved.includes(id);
+const plusIcon = `<svg viewBox="0 0 14 14" aria-hidden="true"><path d="M7 1v12M1 7h12" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>`;
+const isSaved = (id) => saved.includes(id);
 
 function syncSaved() {
   $$("[data-saved-count]").forEach((el) => {
@@ -298,7 +297,7 @@ function initTransitions() {
 
 // ---------------------------------------------------------------- reveal vocabulary
 
-export function splitLines(el, { delay = 0, stagger = 0.09, trigger = el, start = "top 88%", immediate = false } = {}) {
+function splitLines(el, { delay = 0, stagger = 0.09, trigger = el, start = "top 88%", immediate = false } = {}) {
   el.classList.add("is-split");
   if (reduced) return null;
   let anim;
@@ -424,7 +423,7 @@ function initForms() {
   });
 }
 
-export function initMarquees() {
+function initMarquees() {
   $$("[data-marquee]").forEach((m) => {
     const track = $(".marquee__track", m);
     if (!track) return;
@@ -447,7 +446,7 @@ export function initMarquees() {
 
 // ---------------------------------------------------------------- small utilities
 
-export function initClocks() {
+function initClocks() {
   const els = $$("[data-clock]");
   if (!els.length) return;
   const fmts = new Map();
@@ -465,7 +464,7 @@ export function initClocks() {
 }
 
 // scale a single line of display type to exactly fill its container
-export function fitText(el) {
+function fitText(el) {
   if (!el) return;
   const fit = () => {
     el.style.fontSize = "100px";
@@ -511,7 +510,7 @@ function markNav() {
   $$(`.nav [data-nav="${key}"]`).forEach((a) => a.setAttribute("aria-current", "page"));
 }
 
-export function dragScroll(el) {
+function dragScroll(el) {
   if (!el) return;
   let down = false, startX = 0, startLeft = 0, moved = false;
   el.addEventListener("pointerdown", (e) => {
@@ -533,7 +532,7 @@ export function dragScroll(el) {
   }, { passive: true });
 }
 
-export function onHashArrival() {
+function onHashArrival() {
   if (!location.hash) return;
   const el = document.getElementById(location.hash.slice(1));
   if (!el) return;
@@ -543,7 +542,7 @@ export function onHashArrival() {
 }
 
 // prepare(): synchronous render of data-driven markup, before reveals bind
-export async function boot(pageInit, prepare) {
+async function boot(pageInit, prepare) {
   window.__oriel = true;
   prepare?.();
   markNav();
@@ -566,3 +565,9 @@ export async function boot(pageInit, prepare) {
   ScrollTrigger.refresh();
   window.addEventListener("load", () => ScrollTrigger.refresh());
 }
+
+Object.assign(window.Oriel, {
+  gsap, ScrollTrigger, SplitText, Flip, reduced, fine, $, $$, scrollTo, lockScroll, plusIcon, isSaved,
+  splitLines, initMarquees, initClocks, fitText, dragScroll, onHashArrival, boot,
+});
+})();

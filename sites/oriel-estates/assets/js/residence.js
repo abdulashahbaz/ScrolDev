@@ -1,5 +1,5 @@
-import { boot, gsap, ScrollTrigger, SplitText, reduced, $, $$, dragScroll, lockScroll, plusIcon } from "./core.js";
-import { residences, img, src, srcset, planFor } from "./data.js";
+(() => {
+const { boot, gsap, ScrollTrigger, SplitText, reduced, $, $$, dragScroll, lockScroll, plusIcon, residences, img, src, srcset, planFor } = window.Oriel;
 
 const params = new URLSearchParams(location.search);
 const r = residences.find((x) => x.id === params.get("id")) || residences[0];
@@ -396,3 +396,4 @@ boot(() => {
   plan();
   calc();
 }, render);
+})();

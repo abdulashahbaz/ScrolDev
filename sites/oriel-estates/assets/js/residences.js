@@ -1,5 +1,5 @@
-import { boot, gsap, Flip, ScrollTrigger, reduced, fine, $, $$, plusIcon } from "./core.js";
-import { residences, img } from "./data.js";
+(() => {
+const { boot, gsap, Flip, ScrollTrigger, reduced, fine, $, $$, plusIcon, residences, img } = window.Oriel;
 
 const pad = (n) => String(n).padStart(2, "0");
 const statusChip = (s) => `<span class="chip ${s === "Under offer" ? "chip--offer" : s === "Private" ? "chip--private" : ""}"><i></i>${s}</span>`;
@@ -141,3 +141,4 @@ function init() {
 }
 
 boot(init, render);
+})();

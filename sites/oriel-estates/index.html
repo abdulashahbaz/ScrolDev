@@ -11,13 +11,11 @@
   <meta property="og:type" content="website">
   <meta property="og:image" content="assets/img/monolith-hero-2200.webp">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%230d0c0b'/%3E%3Crect x='19' y='19' width='6' height='6' fill='%23b2321f'/%3E%3Cpath d='M7 16a7 7 0 1 0 14 0a7 7 0 1 0-14 0' fill='none' stroke='%23ece6dc' stroke-width='3.2'/%3E%3C/svg%3E">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Inter+Tight:wght@300;400;500;600&family=Instrument+Serif:ital@0;1&display=swap">
+  <link rel="stylesheet" href="assets/css/fonts.css">
   <link rel="preload" as="image" href="assets/img/hero-sky-2400.webp" media="(min-aspect-ratio: 4/5)">
   <link rel="preload" as="image" href="assets/img/hero-fg-2400.webp" media="(min-aspect-ratio: 4/5)">
   <link rel="stylesheet" href="assets/css/main.css">
-  <script>(function(d){d.classList.replace("no-js","js");try{var s=sessionStorage;if(s.getItem("oriel:nav")==="1")d.classList.add("is-arriving");if(s.getItem("oriel:loaded")||s.getItem("oriel:nav")||matchMedia("(prefers-reduced-motion: reduce)").matches)d.classList.add("no-loader")}catch(e){}setTimeout(function(){if(!window.__oriel){d.classList.add("no-loader");d.classList.remove("is-arriving","js")}},10000)})(document.documentElement);</script>
+  <script>(function(d){d.classList.replace("no-js","js");if(location.protocol!=="file:"){var l=document.createElement("link");l.rel="preload";l.as="font";l.type="font/woff2";l.crossOrigin="";l.href="assets/fonts/archivo-latin.woff2";document.head.appendChild(l)}try{var s=sessionStorage;if(s.getItem("oriel:nav")==="1")d.classList.add("is-arriving");if(s.getItem("oriel:loaded")||s.getItem("oriel:nav")||matchMedia("(prefers-reduced-motion: reduce)").matches)d.classList.add("no-loader")}catch(e){}setTimeout(function(){if(!window.__oriel){d.classList.add("no-loader");d.classList.remove("is-arriving","js")}},10000)})(document.documentElement);</script>
 </head>
 <body data-page="home">
   <a class="skip" href="#main">Skip to content</a>
@@ -325,6 +323,9 @@
   <script src="assets/js/vendor/Flip.min.js" defer></script>
   <script src="assets/js/vendor/CustomEase.min.js" defer></script>
   <script src="assets/js/vendor/lenis.min.js" defer></script>
-  <script type="module" src="assets/js/home.js"></script>
+  <script src="assets/js/data.js" defer></script>
+  <script src="assets/js/core.js" defer></script>
+  <script src="assets/js/gl.js" defer></script>
+  <script src="assets/js/home.js" defer></script>
 </body>
 </html>

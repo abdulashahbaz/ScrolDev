@@ -1,3 +1,5 @@
-import { boot } from "./core.js";
+(() => {
+const { boot } = window.Oriel;
 
 boot();
+})();

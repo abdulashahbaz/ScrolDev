@@ -1,5 +1,5 @@
-import { boot, gsap, ScrollTrigger, SplitText, reduced, fine, $, $$, lockScroll, onHashArrival } from "./core.js";
-import { livingSky } from "./gl.js";
+(() => {
+const { boot, gsap, ScrollTrigger, SplitText, reduced, fine, $, $$, lockScroll, onHashArrival, livingSky } = window.Oriel;
 
 const pad = (n) => String(n).padStart(2, "0");
 
@@ -261,3 +261,4 @@ boot(async () => {
   quote();
   requestAnimationFrame(onHashArrival);
 });
+})();
