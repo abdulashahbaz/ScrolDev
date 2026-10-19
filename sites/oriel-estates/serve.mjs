@@ -24,14 +24,32 @@ const TYPES = {
   ".png": "image/png",
   ".svg": "image/svg+xml",
   ".woff2": "font/woff2",
+  ".mp4": "video/mp4",
 };
 
-async function send(res, file, status, method) {
+async function send(res, file, status, method, range) {
   const body = await readFile(file);
-  res.writeHead(status, {
+  const headers = {
     "Content-Type": TYPES[path.extname(file).toLowerCase()] || "application/octet-stream",
     "Cache-Control": "no-cache",
-  });
+    "Accept-Ranges": "bytes",
+  };
+  // Safari will only play video when the server answers byte-range requests
+  const m = status === 200 && range && /^bytes=(\d*)-(\d*)$/.exec(range);
+  if (m && (m[1] || m[2])) {
+    const size = body.length;
+    let start = m[1] ? Number(m[1]) : size - Number(m[2]);
+    let end = m[1] && m[2] ? Math.min(Number(m[2]), size - 1) : size - 1;
+    start = Math.max(0, start);
+    if (start > end) {
+      res.writeHead(416, { "Content-Range": `bytes */${size}` }).end();
+      return;
+    }
+    res.writeHead(206, { ...headers, "Content-Range": `bytes ${start}-${end}/${size}`, "Content-Length": end - start + 1 });
+    res.end(method === "HEAD" ? undefined : body.subarray(start, end + 1));
+    return;
+  }
+  res.writeHead(status, headers);
   res.end(method === "HEAD" ? undefined : body);
 }
 
@@ -56,7 +74,7 @@ const server = createServer(async (req, res) => {
       res.writeHead(301, { Location: pathname + "/" }).end();
       return;
     }
-    await send(res, file, 200, req.method);
+    await send(res, file, 200, req.method, req.headers.range);
   } catch {
     await send(res, path.join(root, "404.html"), 404, req.method).catch(() => res.writeHead(404).end());
   }

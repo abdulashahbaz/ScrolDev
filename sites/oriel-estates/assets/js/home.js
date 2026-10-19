@@ -1,5 +1,5 @@
 (() => {
-const { boot, gsap, ScrollTrigger, SplitText, reduced, fine, $, $$, lockScroll, onHashArrival, livingSky } = window.Oriel;
+const { boot, gsap, ScrollTrigger, SplitText, reduced, fine, $, $$, lockScroll, onHashArrival } = window.Oriel;
 
 const pad = (n) => String(n).padStart(2, "0");
 
@@ -37,54 +37,66 @@ async function runLoader() {
 
 // ---------------------------------------------------------------- hero
 
-// size the big word so it spans the full measure exactly (applied to the title and its ghost)
+// size the big word so it spans the full measure exactly
 function fitTitle() {
-  const bigs = $$(".hero__title .t-big");
-  if (!bigs.length) return;
+  const big = $(".hero__title .t-big");
+  if (!big) return;
   const fit = () => {
-    const big = bigs[0];
     big.style.display = "inline-block";
     big.style.fontSize = "100px";
     const w = big.getBoundingClientRect().width;
     big.style.display = "";
-    const size = (100 * big.parentElement.clientWidth) / w + "px";
-    bigs.forEach((b) => (b.style.fontSize = size));
+    big.style.fontSize = (100 * big.parentElement.clientWidth) / w + "px";
   };
   fit();
   let raf;
   window.addEventListener("resize", () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(fit); });
 }
 
-// The headline sits behind the house; an outline copy above the house keeps
-// the covered letters readable without losing the depth.
-function addGhost() {
-  const title = $(".hero__title");
-  const ghost = document.createElement("div");
-  ghost.className = title.className + " hero__title--ghost";
-  ghost.setAttribute("aria-hidden", "true");
-  ghost.innerHTML = title.innerHTML;
-  $(".hero__fg").after(ghost);
+// The hero film starts on the poster frame, so it can take over from the
+// loader without a cut. Skipped for reduced motion and data saver.
+function heroFilm() {
+  const video = $(".hero__video");
+  const btn = $(".hero__play");
+  const noop = { start() {} };
+  if (!video || reduced || navigator.connection?.saveData) return noop;
+  const portrait = window.matchMedia("(max-aspect-ratio: 4/5)").matches;
+  video.src = (portrait && video.dataset.srcPortrait) || video.dataset.src;
+  video.muted = true;
+  let wanted = false, userPaused = false, onScreen = true;
+  const label = $(".hero__play-label", btn);
+  const sync = () => {
+    const go = wanted && !userPaused && onScreen && document.visibilityState === "visible";
+    if (go && video.paused) video.play().catch(() => {});
+    else if (!go && !video.paused) video.pause();
+    btn.setAttribute("aria-pressed", String(userPaused));
+    label.textContent = userPaused ? "Play film" : "Pause film";
+  };
+  video.addEventListener("playing", () => video.classList.add("is-playing"), { once: true });
+  video.addEventListener("error", () => { btn.hidden = true; });
+  btn.hidden = false;
+  btn.addEventListener("click", () => { userPaused = !userPaused; sync(); });
+  document.addEventListener("visibilitychange", sync);
+  ScrollTrigger.create({
+    trigger: ".hero", start: "top top", end: "bottom top",
+    onToggle: (self) => { onScreen = self.isActive || window.scrollY < 10; sync(); },
+  });
+  video.load();
+  return { start() { wanted = true; sync(); } };
 }
 
 function heroIntro(fromLoader) {
-  addGhost();
   fitTitle();
-  $$(".hero__title").forEach((t) => t.classList.add("is-split"));
+  $(".hero__title").classList.add("is-split");
   if (reduced) return gsap.timeline();
   const tl = gsap.timeline({ paused: true });
-  $$(".hero__title .t-small").forEach((el) => {
-    const { chars } = SplitText.create(el, { type: "lines, words, chars", mask: "lines", aria: "none" });
-    tl.from(chars, { yPercent: 115, duration: 1.2, stagger: 0.035 }, 0);
-  });
-  $$(".hero__title .t-big").forEach((el) => {
-    const { chars } = SplitText.create(el, { type: "lines, chars", mask: "lines", aria: "none" });
-    tl.from(chars, { yPercent: 115, duration: 1.5, stagger: 0.04 }, 0.12);
-  });
-  tl.from("[data-hero-fade]", { opacity: 0, y: 24, duration: 1.2, stagger: 0.12 }, 0.7);
-  if (!fromLoader) {
-    tl.from(".hero__fg .hero__inner", { scale: 1.08, duration: 2.4, ease: "oriel" }, 0)
-      .from(".hero__sky .hero__inner", { scale: 1.14, duration: 2.6, ease: "oriel" }, 0);
-  }
+  const small = SplitText.create(".hero__title .t-small", { type: "lines, words, chars", mask: "lines", aria: "none" });
+  const big = SplitText.create(".hero__title .t-big", { type: "lines, chars", mask: "lines", aria: "none" });
+  tl.from(small.chars, { yPercent: 115, duration: 1.2, stagger: 0.035 }, 0.1)
+    .from(big.chars, { yPercent: 115, duration: 1.5, stagger: 0.04 }, 0.2)
+    .from(".hero__shade", { opacity: 0, duration: 1.6, ease: "power2.out" }, 0)
+    .from("[data-hero-fade]", { opacity: 0, y: 24, duration: 1.2, stagger: 0.12 }, 0.8);
+  if (!fromLoader) tl.from(".hero__inner", { scale: 1.12, duration: 2.6, ease: "oriel" }, 0);
   return tl;
 }
 
@@ -93,25 +105,23 @@ function heroScroll() {
   gsap.timeline({
     scrollTrigger: { trigger: ".hero", start: "top top", end: "bottom top", scrub: true, pin: true, pinSpacing: false },
   })
-    .to(".hero__title", { yPercent: -70, opacity: 0, ease: "none" }, 0)
-    .to(".hero__fg", { scale: 1.16, ease: "none" }, 0)
-    .to(".hero__sky", { yPercent: 10, scale: 1.04, ease: "none" }, 0)
+    .to(".hero__title", { yPercent: -45, opacity: 0, ease: "none" }, 0)
+    .to(".hero__media", { scale: 1.1, yPercent: 6, ease: "none" }, 0)
+    .to(".hero__shade", { opacity: 0.6, ease: "none" }, 0)
     .to("[data-hero-fade]", { opacity: 0, ease: "none", duration: 0.25 }, 0);
 }
 
 function heroMouse() {
   if (!fine || reduced) return;
   const hero = $(".hero");
-  const q = (sel, prop) => gsap.quickTo(sel, prop, { duration: 1.4, ease: "power3" });
-  const fx = q(".hero__fg .hero__inner", "x"), fy = q(".hero__fg .hero__inner", "y");
-  const sx = q(".hero__sky .hero__inner", "x"), sy = q(".hero__sky .hero__inner", "y");
+  const q = (sel, prop) => gsap.quickTo(sel, prop, { duration: 1.6, ease: "power3" });
+  const mx = q(".hero__inner", "x"), my = q(".hero__inner", "y");
   const tx = q(".hero__title", "x");
   hero.addEventListener("pointermove", (e) => {
     const nx = e.clientX / window.innerWidth - 0.5;
     const ny = e.clientY / window.innerHeight - 0.5;
-    fx(nx * -26); fy(ny * -12);
-    sx(nx * 12); sy(ny * 8);
-    tx(nx * -6);
+    mx(nx * -22); my(ny * -12);
+    tx(nx * 10);
   });
 }
 
@@ -151,10 +161,6 @@ function strip() {
         }
       },
     });
-    const bg = gsap.fromTo(".strip__bg", { xPercent: 0 }, {
-      xPercent: -45, ease: "none",
-      scrollTrigger: { trigger: section, start: "top bottom", end: () => "+=" + window.innerHeight * 4.4, scrub: true },
-    });
     const enter = (i) => { hovering = i; setActive(i); };
     const handlers = items.map((it, i) => {
       const h = () => enter(i);
@@ -165,7 +171,7 @@ function strip() {
     const leave = () => { hovering = null; setActive(active); };
     list.addEventListener("pointerleave", leave);
     return () => {
-      st.kill(); bg.scrollTrigger?.kill(); bg.kill();
+      st.kill();
       items.forEach((it, i) => {
         it.removeEventListener("pointerenter", handlers[i]);
         it.removeEventListener("focusin", handlers[i]);
@@ -178,8 +184,23 @@ function strip() {
 
 // ---------------------------------------------------------------- spotlight
 
+// the spotlight film only loads and plays while its section is on screen
+function spotFilm() {
+  const film = $(".spot__film");
+  if (!film || reduced || navigator.connection?.saveData) return;
+  ScrollTrigger.create({
+    trigger: ".spot", start: "top bottom", end: "bottom top",
+    onToggle(self) {
+      if (self.isActive) {
+        if (!film.src) film.src = film.dataset.src;
+        film.play().catch(() => {});
+      } else film.pause();
+    },
+  });
+}
+
 function spotlight() {
-  const imgs = $$(".spot__media img");
+  const imgs = $$(".spot__frame");
   const chapters = $$(".chapter");
   const idx = $(".spot__idx");
   if (!imgs.length) return;
@@ -250,9 +271,11 @@ function quote() {
   if (reduced) return;
   const mm = gsap.matchMedia();
   mm.add("(min-width: 821px)", () => {
+    // the words only arrive once the picture fills the screen, so they never sit half on paper
     gsap.timeline({ scrollTrigger: { trigger: ".quote", start: "top 75%", end: "bottom bottom", scrub: true } })
-      .to(".quote__frame", { clipPath: "inset(0% 0% 0% 0% round 0px)", ease: "none" }, 0)
-      .to(".quote__frame img", { scale: 1, ease: "none" }, 0);
+      .to(".quote__frame", { clipPath: "inset(0% 0% 0% 0% round 0px)", ease: "none", duration: 1 }, 0)
+      .to(".quote__frame img", { scale: 1, ease: "none", duration: 1 }, 0)
+      .fromTo(".quote blockquote", { opacity: 0, y: 40 }, { opacity: 1, y: 0, ease: "power1.out", duration: 0.3 }, 0.72);
   });
   mm.add("(max-width: 820px)", () => gsap.set(".quote__frame", { clipPath: "inset(0% 0% 0% 0%)" }));
 }
@@ -260,20 +283,15 @@ function quote() {
 // ---------------------------------------------------------------- boot
 
 boot(async () => {
-  const canvas = $(".hero__gl");
-  const skyImg = $(".hero__sky img");
-  if (canvas && !reduced) {
-    const pick = () => skyImg.currentSrc || skyImg.src;
-    if (skyImg.complete) livingSky(canvas, pick());
-    else skyImg.addEventListener("load", () => livingSky(canvas, pick()), { once: true });
-  }
-
+  const film = heroFilm();
   const fromLoader = await runLoader();
   heroIntro(fromLoader).play();
+  film.start();
   heroScroll();
   heroMouse();
   strip();
   spotlight();
+  spotFilm();
   floatImages();
   quote();
   requestAnimationFrame(onHashArrival);

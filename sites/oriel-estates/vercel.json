@@ -12,7 +12,7 @@
       ]
     },
     {
-      "source": "/assets/(img|fonts)/(.*)",
+      "source": "/assets/(img|fonts|video)/(.*)",
       "headers": [{ "key": "Cache-Control", "value": "public, max-age=2592000" }]
     },
     {

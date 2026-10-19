@@ -15,7 +15,9 @@ const headStart = index.slice(0, index.indexOf("<title>"));
 const headTail = index.slice(index.indexOf('  <link rel="stylesheet" href="assets/css/fonts.css">'), index.indexOf("</head>"))
   .replace(/  <link rel="preload" as="image"[^\n]*\n/g, "");
 if (!headTail.includes("main.css")) throw new Error("head anchor not found in index.html");
-const scripts = index.slice(index.indexOf('  <script src="assets/js/vendor/gsap.min.js"'), index.indexOf('  <script src="assets/js/gl.js"'));
+const scriptsEnd = index.indexOf('  <script src="assets/js/home.js"');
+if (scriptsEnd < 0) throw new Error("home.js script tag not found in index.html");
+const scripts = index.slice(index.indexOf('  <script src="assets/js/vendor/gsap.min.js"'), scriptsEnd);
 
 const pages = [
   { file: "residences.html", page: "residences", title: "The Collection — Oriel", desc: "Seven singular residences across four continents, offered privately by Oriel.", js: "residences.js" },

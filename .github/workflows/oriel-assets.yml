@@ -21,6 +21,8 @@ jobs:
           url=$(head -n 1 sites/oriel-estates/tools/assets-source.txt | tr -d '[:space:]')
           if [ -z "$url" ]; then echo "No bundle URL yet."; exit 0; fi
           curl -fsSL "$url" -o "$RUNNER_TEMP/assets.zip"
+          sum=$(sed -n 2p sites/oriel-estates/tools/assets-source.txt | tr -d '[:space:]')
+          if [ -n "$sum" ]; then echo "$sum  $RUNNER_TEMP/assets.zip" | sha256sum -c -; fi
           unzip -o "$RUNNER_TEMP/assets.zip" -d sites/oriel-estates/
       - name: Commit the media
         run: |
