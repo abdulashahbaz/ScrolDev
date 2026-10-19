@@ -1,6 +1,6 @@
 # fonds (ScrolDev concept)
 
-The store front for **fonds**, a fictional headwear label, launching Collection Nº 04: caps, beanies and bucket hats in five colourways. It is a ScrolDev portfolio piece: the brand, the copy, the prices and the run of 300 are invented, and the footer says "Concept by ScrolDev".
+The store front for **fonds**, a fictional headwear label, launching Collection Nº 04: summer caps and bucket hats in four colourways. It is a ScrolDev portfolio piece: the brand, the copy, the prices and the run of 300 are invented, and the footer says "Concept by ScrolDev".
 
 ## What it does
 
@@ -45,7 +45,7 @@ URLs live in `src/content/site.ts`.
 All media was generated for fonds with Higgsfield and is hosted on our Higgsfield storage.
 
 - **Hero clips:** one still of the model (GPT Image 2.5), animated twice with Kling 3.0 Motion Control, once turning each way. They must be encoded with a keyframe on every frame, or scrubbing stutters: `ffmpeg -i in.mp4 -an -c:v libx264 -crf 20 -g 1 -pix_fmt yuv420p -movflags +faststart out.mp4`. Both clips must start on the same frame.
-- **Gallery:** nine portrait WebP images (GPT Image 2): model shots that keep the hero model's face, alternating with product shots.
+- **Gallery:** eight portrait WebP images (GPT Image 2): model shots that keep the hero model's face, alternating with product shots.
 
 ## Deploy
 

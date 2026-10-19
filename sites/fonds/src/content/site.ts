@@ -7,7 +7,7 @@ export const brand = {
 };
 
 export const caption =
-  "fonds makes headwear: caps, beanies and bucket hats in washed cotton and ribbed wool, finished with one embroidered word. Collection Nº 04 comes in five colourways, black, charcoal, ecru, olive and navy, each in a numbered run of 300.";
+  "fonds makes summer headwear: caps and bucket hats in lightweight washed cotton, finished with one embroidered word. Collection Nº 04 comes in four colourways, black, charcoal, ecru and olive, each in a numbered run of 300.";
 
 export const nav = {
   about: "About",
@@ -45,6 +45,5 @@ export const looks = [
   ["88815373-1c4f-42e8-b2cc-d624649b11db", "Olive cap, worn, in profile"],
   ["f3989f8e-6321-4390-864a-0435642bd555", "Olive, ecru and black caps, stacked"],
   ["a60fe148-4cff-4e98-80c9-cab9b76e1d57", "Black cap with a grey sweatshirt"],
-  ["69a95f18-de0d-4964-9299-bdef4d4a9752", "Navy ribbed beanie"],
   ["bddf5f25-e75b-41a0-9317-79db205fc6cf", "Washed black bucket hat, worn"],
 ].map(([id, alt]) => ({ src: `${media}/${id}.webp`, alt }));
