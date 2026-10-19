@@ -82,10 +82,9 @@ function frameSequence(canvas, { dir, count, alignY = 0.5 }) {
     const img = new Image();
     const entry = { img, ok: false };
     frames[i] = entry;
-    img.decoding = "async";
-    img.onload = () => { entry.ok = true; schedule(); done(); };
-    img.onerror = done;
     img.src = `${dir}${String(i).padStart(4, "0")}.webp`;
+    // decode off the main thread now, so drawing it mid-scroll costs nothing
+    img.decode().then(() => { entry.ok = true; schedule(); }, () => {}).finally(done);
   });
   const size = () => {
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -125,8 +124,10 @@ function heroFilm() {
   const canvas = $(".hero__canvas");
   if (!canvas || reduced || navigator.connection?.saveData) return null;
   const portrait = window.matchMedia("(max-aspect-ratio: 4/5)").matches;
+  // large or high-density screens get the 2560 px set, everything else 1920
+  const hd = canvas.clientWidth * Math.min(window.devicePixelRatio || 1, 2) > 2100;
   const seq = frameSequence(canvas, {
-    dir: (portrait && canvas.dataset.framesPortrait) || canvas.dataset.frames,
+    dir: portrait ? canvas.dataset.framesPortrait : hd ? canvas.dataset.framesHd : canvas.dataset.frames,
     count: Number(canvas.dataset.count),
     alignY: 1,
   });

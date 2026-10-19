@@ -20,7 +20,7 @@ Shared across pages: Lenis smooth scrolling synced to ScrollTrigger, curtain pag
 
 ## Imagery
 
-All photographs and both films are AI-generated for this concept with [Higgsfield](https://higgsfield.ai): stills with Seedream 4.5, each residence's interiors and details generated against its own exterior so the house stays consistent, and the two films animated from those stills with Kling. None of these places exist. Stills ship as WebP at 800/1400/2200 px with `srcset`. The films ship as WebP frame sequences (`assets/frames/`) drawn to a canvas, one frame per scroll position, so they only move when the reader scrolls; frames load coarse to fine, the hero has a portrait cut for phones, and the Monolith clip was stabilised. With reduced motion or data saver the first frame stays as a still.
+All photographs and both films are AI-generated for this concept with [Higgsfield](https://higgsfield.ai): stills with Seedream 4.5, each residence's interiors and details generated against its own exterior so the house stays consistent, and the two films animated from those stills with Kling. None of these places exist. Stills ship as WebP at 800/1400/2200 px with `srcset`. The films ship as WebP frame sequences (`assets/frames/`) drawn to a canvas, one frame per scroll position, so they only move when the reader scrolls; both clips were upscaled with Topaz (the hero to 4K) before cutting, the hero ships at 1920 and 2560 px and as a portrait cut for phones, each screen fetching only the set it needs, frames load coarse to fine and are decoded off the main thread, and the Monolith clip was stabilised. With reduced motion or data saver the first frame stays as a still.
 
 ## Stack
 
