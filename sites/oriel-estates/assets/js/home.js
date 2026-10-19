@@ -343,7 +343,13 @@ boot(async () => {
   const film = heroFilm();
   const fromLoader = await runLoader();
   heroIntro(fromLoader).play();
-  film?.start();
+  if (film) {
+    // nothing moves until the reader scrolls, so let the first paint finish before fetching frames
+    const kick = () => { film.start(); events.forEach((e) => window.removeEventListener(e, kick)); };
+    const events = ["scroll", "wheel", "touchstart", "pointermove", "keydown"];
+    events.forEach((e) => window.addEventListener(e, kick, { once: true, passive: true }));
+    setTimeout(kick, 2500);
+  }
   heroScroll(film);
   strip();
   spotlight();
