@@ -1,7 +1,7 @@
 {
   "name": "Oriel",
   "category": "Luxury real estate",
-  "summary": "Concept site for a private luxury estate agency: layered WebGL hero, scroll-driven collection, filterable residences with animated floor plans, and fully original 3D-rendered architecture.",
+  "summary": "Concept site for a private luxury estate agency: film hero, scroll-driven collection, filterable residences with animated floor plans, and AI-generated photography and film made with Higgsfield.",
   "type": "concept",
   "year": 2026,
   "url": "",
@@ -12,8 +12,7 @@
     "JavaScript",
     "GSAP",
     "Lenis",
-    "WebGL",
-    "Blender"
+    "Higgsfield"
   ],
   "featured": true,
   "draft": false
