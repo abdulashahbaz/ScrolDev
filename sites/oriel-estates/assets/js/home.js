@@ -141,7 +141,7 @@ function heroFilm() {
   const hd = canvas.clientWidth * Math.min(window.devicePixelRatio || 1, 2) > 2100;
   const seq = frameSequence(canvas, {
     dir: portrait ? canvas.dataset.framesPortrait : hd ? canvas.dataset.framesHd : canvas.dataset.frames,
-    count: Number(canvas.dataset.count),
+    count: Number(canvas.dataset.frameCount),
     alignY: 1,
   });
   document.documentElement.classList.add("has-film");
@@ -251,7 +251,7 @@ function strip() {
 function spotFilm() {
   const canvas = $(".spot__film canvas");
   if (!canvas || reduced || navigator.connection?.saveData) return;
-  const seq = frameSequence(canvas, { dir: canvas.dataset.frames, count: Number(canvas.dataset.count) });
+  const seq = frameSequence(canvas, { dir: canvas.dataset.frames, count: Number(canvas.dataset.frameCount) });
   ScrollTrigger.create({ trigger: ".spot", start: "top bottom+=100%", once: true, onEnter: () => seq.start() });
   const mm = gsap.matchMedia();
   mm.add("(min-width: 821px)", () => {
