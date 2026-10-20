@@ -1,0 +1,670 @@
+<!doctype html>
+<html lang="en" class="no-js">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Scroldev — Websites you’d scroll for eternity</title>
+  <meta name="description" content="{{description}}">
+  <link rel="canonical" href="{{siteUrl}}/">
+  <meta name="theme-color" content="#0D0C0B">
+  <meta name="color-scheme" content="dark">
+
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Scroldev">
+  <meta property="og:title" content="Scroldev — Websites you’d scroll for eternity">
+  <meta property="og:description" content="{{description}}">
+  <meta property="og:url" content="{{siteUrl}}/">
+  <meta property="og:image" content="{{siteUrl}}/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <link rel="icon" href="/icons/favicon.ico" sizes="48x48">
+  <link rel="icon" href="/icons/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/icons/apple-touch-icon-180.png">
+  <link rel="manifest" href="/site.webmanifest">
+
+  <link rel="preload" href="/fonts/Geist-Medium.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/fonts/Geist-Regular.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/fonts/GeistMono-Regular.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="/styles.css?v={{version}}">
+
+  <script>
+    // Runs before first paint: turns on the motion layer, and plays the logo intro once per session.
+    (function () {
+      var d = document.documentElement;
+      d.classList.remove("no-js");
+      d.classList.add("js");
+      // If the motion layer never loads, show everything rather than leave it waiting to be revealed.
+      setTimeout(function () { if (!d.classList.contains("ready")) d.classList.add("no-motion"); }, 3000);
+      try {
+        var calm = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        if (!calm && !sessionStorage.getItem("sd-intro")) d.classList.add("has-intro");
+      } catch (e) {}
+    })();
+  </script>
+  <script type="module" src="/main.js?v={{version}}"></script>
+
+  <script type="application/ld+json">{{jsonLd}}</script>
+</head>
+<body>
+  <!-- Shared geometry: the wordmark, the track's fade, and the UI icons. -->
+  <svg class="sprite" aria-hidden="true" focusable="false">
+    <defs>
+      <linearGradient id="g-fade" x1="0" y1="0" x2="0" y2="64" gradientUnits="userSpaceOnUse">
+        <stop offset="0.42" stop-color="#fff"/>
+        <stop offset="1" stop-color="#fff" stop-opacity="0"/>
+      </linearGradient>
+      <mask id="m-fade" maskUnits="userSpaceOnUse" x="-4" y="-4" width="48" height="72">
+        <rect x="-4" y="-4" width="48" height="72" fill="url(#g-fade)"/>
+      </mask>
+      <path id="wm" d="M1009.875 1012Q893.875 1012 835.875 961.5Q777.875 911 771.875 832L880.875 827Q887.875 871 916.875 897.0Q945.875 923 1009.875 923Q1059.875 923 1086.375 907.0Q1112.875 891 1112.875 856Q1112.875 836 1103.875 823.0Q1094.875 810 1068.875 800.5Q1042.875 791 991.875 782Q913.875 767 870.375 746.5Q826.875 726 808.875 695.5Q790.875 665 790.875 621Q790.875 549 845.875 502.5Q900.875 456 1004.875 456Q1077.875 456 1124.875 480.5Q1171.875 505 1195.875 545.0Q1219.875 585 1224.875 631L1115.875 637Q1112.875 599 1087.375 572.0Q1061.875 545 1002.875 545Q950.875 545 925.875 565.0Q900.875 585 900.875 617Q900.875 652 924.375 669.5Q947.875 687 1012.875 697Q1093.875 710 1139.375 730.5Q1184.875 751 1203.875 781.5Q1222.875 812 1222.875 855Q1222.875 930 1163.875 971.0Q1104.875 1012 1009.875 1012ZM1548.875 1012Q1472.875 1012 1415.875 977.5Q1358.875 943 1327.875 880.5Q1296.875 818 1296.875 734Q1296.875 650 1327.875 587.5Q1358.875 525 1415.875 490.5Q1472.875 456 1548.875 456Q1645.875 456 1709.875 506.5Q1773.875 557 1786.875 649L1675.875 655Q1667.875 603 1633.875 575.5Q1599.875 548 1548.875 548Q1481.875 548 1444.375 597.5Q1406.875 647 1406.875 734Q1406.875 822 1444.375 871.0Q1481.875 920 1548.875 920Q1599.875 920 1633.875 891.5Q1667.875 863 1675.875 805L1786.875 811Q1773.875 903 1710.375 957.5Q1646.875 1012 1548.875 1012ZM1880.875 1000V468H1977.875L1980.875 569Q1995.875 517 2027.375 492.5Q2058.875 468 2107.875 468H2158.875V563H2107.875Q2046.875 563 2016.875 593.0Q1986.875 623 1986.875 686V1000ZM2463.875 1012Q2387.875 1012 2330.875 977.5Q2273.875 943 2242.875 881.0Q2211.875 819 2211.875 734Q2211.875 649 2242.875 587.0Q2273.875 525 2330.875 490.5Q2387.875 456 2463.875 456Q2539.875 456 2596.875 490.5Q2653.875 525 2684.875 587.0Q2715.875 649 2715.875 734Q2715.875 819 2684.875 881.0Q2653.875 943 2596.875 977.5Q2539.875 1012 2463.875 1012ZM2463.875 920Q2531.875 920 2568.875 871.0Q2605.875 822 2605.875 734Q2605.875 647 2568.875 597.5Q2531.875 548 2463.875 548Q2396.875 548 2359.375 597.5Q2321.875 647 2321.875 734Q2321.875 822 2359.375 871.0Q2396.875 920 2463.875 920ZM2936.875 1000Q2883.875 1000 2852.375 973.0Q2820.875 946 2820.875 887V290H2926.875V877Q2926.875 913 2963.875 913H3005.875V1000ZM3279.875 1012Q3211.875 1012 3161.875 978.0Q3111.875 944 3084.875 881.5Q3057.875 819 3057.875 734Q3057.875 649 3084.875 586.5Q3111.875 524 3161.875 490.0Q3211.875 456 3279.875 456Q3334.875 456 3377.875 479.0Q3420.875 502 3442.875 543V290H3548.875V1000H3449.875L3446.875 920Q3424.875 964 3380.375 988.0Q3335.875 1012 3279.875 1012ZM3307.875 920Q3372.875 920 3407.875 871.0Q3442.875 822 3442.875 734Q3442.875 645 3407.875 596.5Q3372.875 548 3307.875 548Q3243.875 548 3205.875 597.5Q3167.875 647 3167.875 734Q3167.875 819 3205.875 869.5Q3243.875 920 3307.875 920ZM3905.875 1012Q3827.875 1012 3771.375 977.5Q3714.875 943 3684.375 880.5Q3653.875 818 3653.875 734Q3653.875 650 3684.375 587.5Q3714.875 525 3770.875 490.5Q3826.875 456 3902.875 456Q3974.875 456 4029.875 489.5Q4084.875 523 4115.375 586.0Q4145.875 649 4145.875 738V765H3763.875Q3767.875 843 3805.375 882.0Q3842.875 921 3906.875 921Q3953.875 921 3984.375 899.5Q4014.875 878 4027.875 840L4137.875 847Q4116.875 922 4055.375 967.0Q3993.875 1012 3905.875 1012ZM3763.875 685H4033.875Q4028.875 614 3992.875 580.0Q3956.875 546 3902.875 546Q3845.875 546 3809.375 581.5Q3772.875 617 3763.875 685ZM4391.875 1000 4197.875 468H4310.875L4455.875 892L4600.875 468H4714.875L4519.875 1000Z"/>
+    </defs>
+    <symbol id="i-arrow-right" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></symbol>
+    <symbol id="i-arrow-up-right" viewBox="0 0 24 24"><path d="M7 17L17 7"/><path d="M8.5 7H17v8.5"/></symbol>
+    <symbol id="i-arrow-down" viewBox="0 0 24 24"><path d="M12 5v14"/><path d="M6 13l6 6 6-6"/></symbol>
+    <symbol id="i-arrow-up" viewBox="0 0 24 24"><path d="M12 19V5"/><path d="M6 11l6-6 6 6"/></symbol>
+    <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 9h16"/><path d="M4 15h16"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="M6 6l12 12"/><path d="M18 6L6 18"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14"/><path d="M5 12h14"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
+    <symbol id="i-mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M4 7.5l8 5.5 8-5.5"/></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="3"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></symbol>
+    <symbol id="i-cursor" viewBox="0 0 24 24"><path d="M5 3.5l13.5 6.2-5.8 1.9-2 5.9z"/></symbol>
+    <symbol id="i-speed" viewBox="0 0 24 24"><path d="M4 17a8 8 0 1 1 16 0"/><path d="M12 17l4-5"/></symbol>
+    <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3"/></symbol>
+    <symbol id="i-layers" viewBox="0 0 24 24"><path d="M12 4l8.5 4.5L12 13 3.5 8.5z"/><path d="M3.5 12.5L12 17l8.5-4.5"/><path d="M3.5 16.5L12 21l8.5-4.5"/></symbol>
+    <symbol id="i-award" viewBox="0 0 24 24"><circle cx="12" cy="9" r="5.5"/><path d="M8.6 13.4L7.5 21l4.5-2.5 4.5 2.5-1.1-7.6"/></symbol>
+    <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8.5" r="4"/><path d="M4.5 20a7.5 7.5 0 0 1 15 0"/></symbol>
+    <symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3c2.4 2.5 3.6 5.5 3.6 9s-1.2 6.5-3.6 9c-2.4-2.5-3.6-5.5-3.6-9S9.6 5.5 12 3z"/></symbol>
+    <symbol id="i-infinite" viewBox="0 0 24 24"><path d="M12 12c-2-2.7-3.6-4-5.5-4a4 4 0 0 0 0 8c1.9 0 3.5-1.3 5.5-4s3.6-4 5.5-4a4 4 0 0 1 0 8c-1.9 0-3.5-1.3-5.5-4z"/></symbol>
+  </svg>
+
+  <!-- First visit only: the mark draws on, the thumb arrives, the wordmark scrolls up, then it all dissolves downward. -->
+  <div class="intro" aria-hidden="true">
+    <svg class="intro-logo" viewBox="120 120 4662 994">
+      <g transform="translate(66.88 -170)">
+        <g transform="translate(0 283.75) scale(15.625)">
+          <path class="intro-track" d="M6 64V17A14 14 0 0 1 34 17V64" pathLength="1" fill="none" stroke="currentColor" stroke-width="5.2" mask="url(#m-fade)"/>
+          <rect class="intro-thumb" x="16.25" y="12" width="7.5" height="19" rx="3.75"/>
+        </g>
+        <g class="intro-word"><use href="#wm" fill="currentColor"/></g>
+      </g>
+    </svg>
+  </div>
+
+  <a class="skip" href="#main">Skip to content</a>
+
+  <div class="progress" aria-hidden="true"><span class="progress-thumb"></span></div>
+
+  <header class="header" data-on="ink">
+    <div class="container header-inner">
+      <a class="logo" href="#top" aria-label="Scroldev, back to top">
+        <svg viewBox="120 120 4662 994" aria-hidden="true">
+          <g transform="translate(66.88 -170)">
+            <g transform="translate(0 283.75) scale(15.625)">
+              <path d="M6 64V17A14 14 0 0 1 34 17V64" fill="none" stroke="currentColor" stroke-width="5.2" mask="url(#m-fade)"/>
+              <rect class="logo-thumb" x="16.25" y="12" width="7.5" height="19" rx="3.75"/>
+            </g>
+            <use href="#wm" fill="currentColor"/>
+          </g>
+        </svg>
+      </a>
+      <nav class="nav" aria-label="Main">
+        <a href="#work">Work</a>
+        <a href="#agency">Agency</a>
+        <a href="#process">Process</a>
+        <a href="#pricing">Pricing</a>
+      </nav>
+      <a class="btn btn--primary btn--sm header-cta" href="#contact"><span class="btn-label"><span>Start a project</span></span><svg class="icon" aria-hidden="true"><use href="#i-arrow-up-right"/></svg></a>
+      <button class="menu-button" type="button" aria-expanded="false" aria-controls="menu">
+        <span class="visually-hidden">Menu</span>
+        <svg class="icon icon-open" aria-hidden="true"><use href="#i-menu"/></svg>
+        <svg class="icon icon-close" aria-hidden="true"><use href="#i-close"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <div class="menu" id="menu" hidden>
+    <nav class="container menu-inner" aria-label="Menu">
+      <ol class="menu-links">
+        <li><a href="#work"><span class="label">02</span>Work</a></li>
+        <li><a href="#agency"><span class="label">03</span>Agency</a></li>
+        <li><a href="#process"><span class="label">04</span>Process</a></li>
+        <li><a href="#pricing"><span class="label">05</span>Pricing</a></li>
+      </ol>
+      <div class="menu-foot">
+        <a class="btn btn--primary" href="#contact"><span class="btn-label"><span>Start a project</span></span><svg class="icon" aria-hidden="true"><use href="#i-arrow-up-right"/></svg></a>
+        <a class="menu-mail" href="mailto:{{email}}">{{email}}</a>
+      </div>
+    </nav>
+  </div>
+
+  <div class="hud" aria-hidden="true" data-on="ink">
+    <span class="hud-lap"></span><span class="hud-count" data-count>0px</span><svg class="icon" aria-hidden="true"><use href="#i-arrow-down"/></svg>
+  </div>
+
+  <main id="main">
+    <!-- Hero. On desktop it is cloned after the footer, so the page loops back here without a seam. -->
+    <section class="hero" id="top" data-surface="ink" data-hero>
+      <canvas class="hero-grid" aria-hidden="true"></canvas>
+      <svg class="hero-arches" viewBox="0 0 1600 1000" aria-hidden="true" preserveAspectRatio="xMidYMax meet">
+        <defs>
+          <linearGradient id="ae0" x1="0" y1="760" x2="0" y2="1000" gradientUnits="userSpaceOnUse"><stop offset="0.62" stop-color="#F3EEE6"/><stop offset="1" stop-color="#F3EEE6" stop-opacity="0"/></linearGradient>
+          <linearGradient id="ae1" x1="0" y1="660" x2="0" y2="1000" gradientUnits="userSpaceOnUse"><stop offset="0.62" stop-color="#9A9289" stop-opacity="0.49"/><stop offset="1" stop-color="#9A9289" stop-opacity="0"/></linearGradient>
+          <linearGradient id="ae2" x1="0" y1="560" x2="0" y2="1000" gradientUnits="userSpaceOnUse"><stop offset="0.62" stop-color="#9A9289" stop-opacity="0.43"/><stop offset="1" stop-color="#9A9289" stop-opacity="0"/></linearGradient>
+          <linearGradient id="ae3" x1="0" y1="460" x2="0" y2="1000" gradientUnits="userSpaceOnUse"><stop offset="0.62" stop-color="#9A9289" stop-opacity="0.37"/><stop offset="1" stop-color="#9A9289" stop-opacity="0"/></linearGradient>
+          <linearGradient id="ae4" x1="0" y1="360" x2="0" y2="1000" gradientUnits="userSpaceOnUse"><stop offset="0.62" stop-color="#9A9289" stop-opacity="0.31"/><stop offset="1" stop-color="#9A9289" stop-opacity="0"/></linearGradient>
+          <linearGradient id="ae5" x1="0" y1="260" x2="0" y2="1000" gradientUnits="userSpaceOnUse"><stop offset="0.62" stop-color="#9A9289" stop-opacity="0.25"/><stop offset="1" stop-color="#9A9289" stop-opacity="0"/></linearGradient>
+          <linearGradient id="ae6" x1="0" y1="160" x2="0" y2="1000" gradientUnits="userSpaceOnUse"><stop offset="0.62" stop-color="#9A9289" stop-opacity="0.19"/><stop offset="1" stop-color="#9A9289" stop-opacity="0"/></linearGradient>
+        </defs>
+        <g class="arches">
+          <path style="--i:6" d="M80 1000V880A720 720 0 0 1 1520 880V1000" stroke="url(#ae6)" stroke-width="2" fill="none"/>
+          <path style="--i:5" d="M180 1000V880A620 620 0 0 1 1420 880V1000" stroke="url(#ae5)" stroke-width="2" fill="none"/>
+          <path style="--i:4" d="M280 1000V880A520 520 0 0 1 1320 880V1000" stroke="url(#ae4)" stroke-width="2" fill="none"/>
+          <path style="--i:3" d="M380 1000V880A420 420 0 0 1 1220 880V1000" stroke="url(#ae3)" stroke-width="2" fill="none"/>
+          <path style="--i:2" d="M480 1000V880A320 320 0 0 1 1120 880V1000" stroke="url(#ae2)" stroke-width="2" fill="none"/>
+          <path style="--i:1" d="M580 1000V880A220 220 0 0 1 1020 880V1000" stroke="url(#ae1)" stroke-width="2" fill="none"/>
+          <path style="--i:0" d="M680 1000V880A120 120 0 0 1 920 880V1000" stroke="url(#ae0)" stroke-width="3" fill="none"/>
+        </g>
+        <g class="hero-thumb-wrap"><rect class="hero-thumb" x="787" y="806" width="26" height="70" rx="13"/></g>
+      </svg>
+
+      <div class="container hero-inner">
+        <p class="label hero-label"><span class="pip" aria-hidden="true"></span>Scroldev · The scroll agency</p>
+        <h1 class="hero-title">
+          <span class="line"><span>Websites you’d scroll</span></span>
+          <span class="line"><span>for eternity.</span></span>
+        </h1>
+        <p class="hero-lede">We design and build motion-led websites for startups and premium brands. Live in weeks, not months.</p>
+        <div class="hero-actions">
+          <a class="btn btn--primary" href="#contact"><span class="btn-label"><span>Start a project</span></span><svg class="icon" aria-hidden="true"><use href="#i-arrow-up-right"/></svg></a>
+          <a class="btn btn--secondary" href="#work"><span class="btn-label"><span>See the work</span></span><svg class="icon" aria-hidden="true"><use href="#i-arrow-right"/></svg></a>
+        </div>
+        <p class="label hero-offer">From $1,000 · Live in as little as 7 days</p>
+      </div>
+
+      <div class="container hero-foot">
+        <a class="cue" href="#idea">
+          <svg class="cue-mark" viewBox="0 0 40 64" aria-hidden="true">
+            <path d="M6 64V17A14 14 0 0 1 34 17V64" fill="none" stroke="currentColor" stroke-width="5.2" mask="url(#m-fade)"/>
+            <rect class="cue-thumb" x="16.25" y="12" width="7.5" height="19" rx="3.75"/>
+          </svg>
+          <span class="label">Keep scrolling</span>
+        </a>
+      </div>
+    </section>
+
+    <!-- 01 The idea -->
+    <section class="section idea" id="idea" data-surface="ink">
+      <div class="container">
+        <h2 class="label section-label" data-reveal><span class="num">01</span> The idea</h2>
+        <p class="manifesto" data-words>Attention is the scarcest thing on the internet. Most websites lose it in three seconds. The visitor glances, scrolls once, and leaves.</p>
+        <div class="idea-foot">
+          <p class="idea-body" data-reveal>Scroldev exists to win the next scroll, and the one after that. We design and build websites with so much to feel, see and discover that people forget they’re scrolling. Every scroll earns the next, so nobody wants to stop.</p>
+          <p class="idea-quote" data-reveal style="--i:1">Your site has three seconds to earn the next scroll. <span>We design for the next three hundred.</span></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- The Endless Thumb: a pinned walk through the mark, one part at a time. -->
+    <section class="mark-story" id="mark" data-surface="ink" aria-labelledby="mark-title">
+      <div class="mark-sticky">
+        <div class="container mark-grid">
+          <div class="mark-visual" aria-hidden="true">
+            <svg class="mark-svg" viewBox="-6 -2 52 70">
+              <defs>
+                <linearGradient id="g-story" x1="0" y1="0" x2="0" y2="64" gradientUnits="userSpaceOnUse">
+                  <stop class="story-stop" offset="1" stop-color="#fff"/>
+                  <stop offset="1" stop-color="#fff" stop-opacity="0"/>
+                </linearGradient>
+                <mask id="m-story" maskUnits="userSpaceOnUse" x="-6" y="-2" width="52" height="70">
+                  <rect x="-6" y="-2" width="52" height="70" fill="url(#g-story)"/>
+                </mask>
+              </defs>
+              <path class="story-guide" d="M6 64V17A14 14 0 0 1 34 17V64" fill="none" stroke-width="0.25"/>
+              <path class="story-track" d="M6 64V17A14 14 0 0 1 34 17V64" pathLength="1" fill="none" stroke-width="5.2" mask="url(#m-story)"/>
+              <rect class="story-thumb" x="16.25" y="12" width="7.5" height="19" rx="3.75"/>
+            </svg>
+            <p class="label story-count"><span data-story-count>0</span>%</p>
+          </div>
+          <div class="mark-copy">
+            <p class="label section-label"><span class="pip" aria-hidden="true"></span>The Endless Thumb</p>
+            <h2 class="h1" id="mark-title">A track that hides its length.</h2>
+            <p class="mark-lede">Our mark is a scroll thumb inside a track that fades out before you can see where it ends. On a great website you never check how much is left. You just keep going.</p>
+            <ol class="mark-steps">
+              <li class="is-active"><span class="label">Track</span><span>The page. Rounded at the top, open at the bottom.</span></li>
+              <li><span class="label">Thumb</span><span>You, scrolling. Narrow, centered, always the accent.</span></li>
+              <li><span class="label">Fade</span><span>The feeling. You never see the end coming.</span></li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 02 Work: generated from sites/*/scroldev.json by hub/build.mjs -->
+    <section class="section work" id="work" data-surface="ink">
+      <div class="container">
+        <div class="section-head">
+          <p class="label section-label" data-reveal><span class="num">02</span> Work</p>
+          <h2 class="h1" data-reveal>Proof over promises.</h2>
+          <p class="section-intro" data-reveal style="--i:1">We show the work, not adjectives. Every site here was designed and built by Scroldev.</p>
+          <p class="label section-count" data-reveal style="--i:2">{{workCount}}</p>
+        </div>
+        <div class="projects">{{work}}
+        </div>
+        {{conceptNote}}
+      </div>
+    </section>
+
+    <!-- 03 Agency -->
+    <section class="section agency" id="agency" data-surface="paper">
+      <div class="container">
+        <h2 class="label section-label" data-reveal><span class="num">03</span> Agency</h2>
+        <p class="statement" data-reveal>For ambitious startups and premium brands whose website is their first impression, Scroldev is <em>the scroll agency</em>. We design and build motion-led websites people keep scrolling, and launch them in weeks, not months.</p>
+        <ul class="promises">
+          <li data-reveal>
+            <p class="label"><span class="num">01</span> Feel</p>
+            <h3>The site people screenshot.</h3>
+            <p>Scroll-led motion and craft you can feel. The first impression investors, hires and customers remember.</p>
+          </li>
+          <li data-reveal style="--i:1">
+            <p class="label"><span class="num">02</span> Speed</p>
+            <h3>Live in weeks.</h3>
+            <p>From kickoff to launch in 7 days to 4 weeks. No months-long timelines, no handoffs between strangers.</p>
+          </li>
+          <li data-reveal style="--i:2">
+            <p class="label"><span class="num">03</span> Results</p>
+            <h3>Built to convert.</h3>
+            <p>Fast load, clean SEO and a structure that moves visitors toward one clear action.</p>
+          </li>
+        </ul>
+        <div class="are">
+          <div class="card" data-reveal>
+            <p class="label"><span class="pip" aria-hidden="true"></span>We are</p>
+            <p>A specialist web agency. Custom, motion-led, launch-focused. You work directly with the people who design and build your site.</p>
+          </div>
+          <div class="card card--quiet" data-reveal style="--i:1">
+            <p class="label">We are not</p>
+            <p>A template shop, a “full-service” marketing agency, or a maintenance desk for old WordPress sites.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Who we serve -->
+    <section class="section audience" id="clients" data-surface="ink">
+      <div class="container">
+        <div class="section-head section-head--split">
+          <div>
+            <p class="label section-label" data-reveal>Who we serve</p>
+            <h2 class="h1" data-reveal>Sites that are a launch moment.</h2>
+          </div>
+          <p class="section-intro" data-reveal style="--i:1">Clients whose website is a launch, a fundraise or a reputation. They buy feel and speed, and they can tell the difference.</p>
+        </div>
+        <ul class="audience-grid">
+          <li class="card audience-card" data-reveal>
+            <p class="label">01</p>
+            <h3>Startup founders</h3>
+            <p>Seed to Series A in SaaS, AI and fintech. Launching, raising or rebranding. The site is their pitch to investors and hires.</p>
+          </li>
+          <li class="card audience-card" data-reveal style="--i:1">
+            <p class="label">02</p>
+            <h3>Premium brands</h3>
+            <p>Architecture, hospitality, fashion and DTC. They sell on feel and prestige, and a template would cost them both.</p>
+          </li>
+          <li class="card audience-card" data-reveal style="--i:2">
+            <p class="label">03</p>
+            <h3>Newly branded companies</h3>
+            <p>A new identity deserves a site that moves like it. The natural next step after a brand project.</p>
+          </li>
+          <li class="card audience-card" data-reveal style="--i:3">
+            <p class="label">04</p>
+            <h3>Founders and creators</h3>
+            <p>Personal brands that need a portfolio or launch page that signals status in one scroll.</p>
+          </li>
+        </ul>
+        <div class="say-no" data-reveal>
+          <p class="label tag"><span class="pip pip--muted" aria-hidden="true"></span>We say no to</p>
+          <ul>
+            <li>$300 brochure sites</li>
+            <li>Copy-paste templates</li>
+            <li>WordPress maintenance contracts</li>
+            <li>Projects with no launch date</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Pillars: the row nearest the middle of the screen is the one that's lit. -->
+    <section class="section pillars" id="pillars" data-surface="ink">
+      <div class="container">
+        <div class="section-head section-head--split">
+          <div>
+            <p class="label section-label" data-reveal>How we decide</p>
+            <h2 class="h1" data-reveal>Four pillars.</h2>
+          </div>
+          <p class="section-intro" data-reveal style="--i:1">The beliefs behind every decision, from a hover state to a proposal. If a choice doesn’t serve one of these, it doesn’t ship.</p>
+        </div>
+        <ol class="pillar-list">
+          <li class="pillar">
+            <span class="label pillar-num">01</span>
+            <h3 class="pillar-title">Earn the next scroll.</h3>
+            <p class="pillar-text">Every section has one job: make the visitor want the next one. Pacing over packing.</p>
+          </li>
+          <li class="pillar">
+            <span class="label pillar-num">02</span>
+            <h3 class="pillar-title">Craft you can feel.</h3>
+            <p class="pillar-text">Motion with intent, type set with care, details nobody asked for. Quality people sense before they can name it.</p>
+          </li>
+          <li class="pillar">
+            <span class="label pillar-num">03</span>
+            <h3 class="pillar-title">Live in weeks.</h3>
+            <p class="pillar-text">Speed is part of the craft. Clear scope, short loops, one team from first call to launch.</p>
+          </li>
+          <li class="pillar">
+            <span class="label pillar-num">04</span>
+            <h3 class="pillar-title">Proof over promises.</h3>
+            <p class="pillar-text">We show the work, not adjectives. Every claim we make can be checked, or we don’t make it.</p>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- 04 Process, on the blueprint grid -->
+    <section class="section process" id="process" data-surface="ink">
+      <div class="container">
+        <div class="section-head section-head--split">
+          <div>
+            <p class="label section-label" data-reveal><span class="num">04</span> Process</p>
+            <h2 class="h1" data-reveal>From first call to live.</h2>
+          </div>
+          <p class="section-intro" data-reveal style="--i:1">One team, four steps, short feedback loops. You see motion early, not at the end.</p>
+        </div>
+        <div class="steps-wrap">
+          <div class="steps-track" aria-hidden="true"><span class="steps-thumb"></span></div>
+          <ol class="steps">
+            <li class="step">
+              <p class="label">01</p>
+              <h3>Discover</h3>
+              <p>Kickoff call. Goals, audience and references. We agree the sitemap and the one action the site must drive.</p>
+            </li>
+            <li class="step">
+              <p class="label">02</p>
+              <h3>Design</h3>
+              <p>Homepage direction first, with motion. Once it’s right, every other page follows the same system.</p>
+            </li>
+            <li class="step">
+              <p class="label">03</p>
+              <h3>Build</h3>
+              <p>Production code, scroll motion and CMS. Tested on real phones and laptops, tuned for speed.</p>
+            </li>
+            <li class="step">
+              <p class="label">04</p>
+              <h3>Launch</h3>
+              <p>Domain, SEO and analytics. A handover video so you can edit it yourself, then support after launch.</p>
+            </li>
+          </ol>
+        </div>
+        <ul class="timelines" data-reveal>
+          <li class="card"><p class="label">Launch</p><p>7–10 days</p></li>
+          <li class="card card--lit"><p class="label">Studio</p><p>2–3 weeks</p></li>
+          <li class="card"><p class="label">Flagship</p><p>3–4 weeks</p></li>
+        </ul>
+        <p class="fineprint" data-reveal>Timelines start once kickoff is done and your content is in.</p>
+      </div>
+    </section>
+
+    <!-- 05 Pricing -->
+    <section class="section pricing" id="pricing" data-surface="ink">
+      <div class="container">
+        <div class="section-head section-head--split">
+          <div>
+            <p class="label section-label" data-reveal><span class="num">05</span> Pricing</p>
+            <h2 class="h1" data-reveal>Three ways to launch.</h2>
+          </div>
+          <p class="section-intro" data-reveal style="--i:1">Fixed scope, fixed price, fixed timeline. Every package is custom-designed. No templates, ever.</p>
+        </div>
+
+        <ul class="plans">
+          <li class="plan card" data-reveal>
+            <div class="plan-head">
+              <p class="label tag"><span class="pip pip--muted" aria-hidden="true"></span>Launch</p>
+            </div>
+            <p class="plan-price"><span class="plan-amount">$1,000</span><span class="label">7–10 days</span></p>
+            <h3>One page that earns the scroll.</h3>
+            <p class="plan-for">For launches, waitlists and personal brands.</p>
+            <ul class="plan-list">
+              <li>One scroll-led page, up to 6 sections</li>
+              <li>Custom design, one signature moment</li>
+              <li>Fully responsive</li>
+              <li>Contact or waitlist form</li>
+              <li>SEO basics, analytics, your domain</li>
+              <li>2 revision rounds · 7 days support</li>
+            </ul>
+            <a class="btn btn--secondary plan-cta" href="#contact" data-package="Launch"><span class="btn-label"><span>Start with Launch</span></span><svg class="icon" aria-hidden="true"><use href="#i-arrow-right"/></svg></a>
+          </li>
+          <li class="plan card plan--lit" data-reveal style="--i:1">
+            <div class="plan-head">
+              <p class="label tag"><span class="pip" aria-hidden="true"></span>Studio</p>
+              <p class="label plan-flag">Recommended</p>
+            </div>
+            <p class="plan-price"><span class="plan-amount">$2,500</span><span class="label">2–3 weeks</span></p>
+            <h3>Your full site, in motion.</h3>
+            <p class="plan-for">For seed to Series A startups and growing brands.</p>
+            <ul class="plan-list">
+              <li>Up to 5 pages</li>
+              <li>Scroll motion on every page</li>
+              <li>Page transitions</li>
+              <li>CMS you can edit, plus a training video</li>
+              <li>Copy polish, on-page SEO, 90+ speed</li>
+              <li>3 revision rounds · 14 days support</li>
+            </ul>
+            <a class="btn btn--primary plan-cta" href="#contact" data-package="Studio"><span class="btn-label"><span>Start with Studio</span></span><svg class="icon" aria-hidden="true"><use href="#i-arrow-right"/></svg></a>
+          </li>
+          <li class="plan card" data-reveal style="--i:2">
+            <div class="plan-head">
+              <p class="label tag"><span class="pip pip--muted" aria-hidden="true"></span>Flagship</p>
+            </div>
+            <p class="plan-price"><span class="plan-amount">$5,000</span><span class="label">3–4 weeks</span></p>
+            <h3>An award-level site.</h3>
+            <p class="plan-for">For funded startups and premium brands.</p>
+            <ul class="plan-list">
+              <li>Up to 10 pages</li>
+              <li>Full motion system</li>
+              <li>One 3D or WebGL hero moment</li>
+              <li>Design system, CMS, copy support</li>
+              <li>Advanced SEO, Awwwards submission</li>
+              <li>3 rounds per phase · 30 days support</li>
+            </ul>
+            <a class="btn btn--secondary plan-cta" href="#contact" data-package="Flagship"><span class="btn-label"><span>Start with Flagship</span></span><svg class="icon" aria-hidden="true"><use href="#i-arrow-right"/></svg></a>
+          </li>
+        </ul>
+        <p class="fineprint" data-reveal>Prices in USD. 50% to start, 50% before launch.</p>
+
+        <details class="compare" data-reveal>
+          <summary><span>Compare every detail</span><svg class="icon" aria-hidden="true"><use href="#i-plus"/></svg></summary>
+          <div class="compare-scroll" tabindex="0" role="region" aria-label="Package comparison">
+            <table>
+              <thead>
+                <tr><th scope="col"><span class="visually-hidden">Feature</span></th><th scope="col">Launch<span>$1,000</span></th><th scope="col" class="is-lit">Studio<span>$2,500</span></th><th scope="col">Flagship<span>$5,000</span></th></tr>
+              </thead>
+              <tbody>
+                <tr><th scope="row">Pages</th><td>1 page, up to 6 sections</td><td class="is-lit">Up to 5</td><td>Up to 10</td></tr>
+                <tr><th scope="row">Custom design, no templates</th><td>{{yes}}</td><td class="is-lit">{{yes}}</td><td>{{yes}}</td></tr>
+                <tr><th scope="row">Scroll motion</th><td>One signature moment</td><td class="is-lit">Every page</td><td>Full motion system</td></tr>
+                <tr><th scope="row">Page transitions and micro-interactions</th><td>{{no}}</td><td class="is-lit">Page transitions</td><td>{{yes}}</td></tr>
+                <tr><th scope="row">3D or WebGL hero moment</th><td>{{no}}</td><td class="is-lit">{{no}}</td><td>{{yes}}</td></tr>
+                <tr><th scope="row">CMS you can edit yourself</th><td>{{no}}</td><td class="is-lit">{{yes}}</td><td>{{yes}}</td></tr>
+                <tr><th scope="row">Copy</th><td>Light edit</td><td class="is-lit">Polish</td><td>Copywriting support</td></tr>
+                <tr><th scope="row">SEO</th><td>Basics</td><td class="is-lit">On-page and speed</td><td>Advanced and structured data</td></tr>
+                <tr><th scope="row">Analytics and conversion tracking</th><td>Analytics</td><td class="is-lit">{{yes}}</td><td>{{yes}}</td></tr>
+                <tr><th scope="row">Design system</th><td>{{no}}</td><td class="is-lit">{{no}}</td><td>{{yes}}</td></tr>
+                <tr><th scope="row">Awwwards submission</th><td>{{no}}</td><td class="is-lit">{{no}}</td><td>Prepared and filed</td></tr>
+                <tr><th scope="row">Revision rounds</th><td>2</td><td class="is-lit">3</td><td>3 per phase</td></tr>
+                <tr><th scope="row">Support after launch</th><td>7 days</td><td class="is-lit">14 days</td><td>30 days</td></tr>
+                <tr><th scope="row">Timeline</th><td>7–10 days</td><td class="is-lit">2–3 weeks</td><td>3–4 weeks</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
+
+        <div class="extras">
+          <div class="addons">
+            <h3 class="label section-label" data-reveal>Add-ons</h3>
+            <dl>
+              <div data-reveal><dt>Extra page<span>Designed and built to the same system</span></dt><dd>$250</dd></div>
+              <div data-reveal><dt>Care plan<span>Updates, new sections, monthly checks</span></dt><dd>$150–300<small>/month</small></dd></div>
+              <div data-reveal><dt>Full copywriting<span>Every word on the site, written for you</span></dt><dd><small>from</small> $400</dd></div>
+              <div data-reveal><dt>Rush delivery<span>Your launch moves to the front of the queue</span></dt><dd>+25%</dd></div>
+            </dl>
+          </div>
+          <div class="faq">
+            <h3 class="label section-label" data-reveal>Good to know</h3>
+            <details data-reveal>
+              <summary>How does payment work?<svg class="icon" aria-hidden="true"><use href="#i-plus"/></svg></summary>
+              <p>50% to start, 50% before launch. Prices are in USD and fixed for the scope you sign off.</p>
+            </details>
+            <details data-reveal>
+              <summary>When does the timeline start?<svg class="icon" aria-hidden="true"><use href="#i-plus"/></svg></summary>
+              <p>Once kickoff is done and your content is in. From there it’s 7–10 days for Launch, 2–3 weeks for Studio and 3–4 weeks for Flagship.</p>
+            </details>
+            <details data-reveal>
+              <summary>What counts as a revision round?<svg class="icon" aria-hidden="true"><use href="#i-plus"/></svg></summary>
+              <p>One consolidated list of changes, per page or phase. Collect your notes, send them together, and we work through them in one pass.</p>
+            </details>
+            <details data-reveal>
+              <summary>Who owns the site?<svg class="icon" aria-hidden="true"><use href="#i-plus"/></svg></summary>
+              <p>You do. The site, the code and the files are yours on final payment.</p>
+            </details>
+            <details data-reveal>
+              <summary>Can you write the copy?<svg class="icon" aria-hidden="true"><use href="#i-plus"/></svg></summary>
+              <p>Launch includes a light edit, Studio a polish and Flagship copywriting support. If you want every word written for you, full copywriting is an add-on from $400.</p>
+            </details>
+            <details data-reveal>
+              <summary>What isn’t included?<svg class="icon" aria-hidden="true"><use href="#i-plus"/></svg></summary>
+              <p>Domain and hosting fees, paid fonts, stock photos or video, and third-party subscriptions.</p>
+            </details>
+            <details data-reveal>
+              <summary>What happens after launch?<svg class="icon" aria-hidden="true"><use href="#i-plus"/></svg></summary>
+              <p>You get a handover video so you can edit the site yourself, then 7, 14 or 30 days of support depending on your package. After that, a care plan covers updates, new sections and monthly checks.</p>
+            </details>
+            <details data-reveal>
+              <summary>Will you show my site in your portfolio?<svg class="icon" aria-hidden="true"><use href="#i-plus"/></svg></summary>
+              <p>We may feature it in our portfolio and award entries, unless you ask us not to.</p>
+            </details>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 06 Contact, on Ember: everything here goes white, long text stays Ink. -->
+    <section class="section contact" id="contact" data-surface="ember">
+      <div class="container">
+        <p class="label section-label" data-reveal><span class="num">06</span> Start a project</p>
+        <h2 class="contact-title" data-reveal>Your site has three seconds to earn the next scroll.</h2>
+      </div>
+      <div class="container contact-grid">
+        <div class="contact-copy">
+          <p class="contact-sub" data-reveal style="--i:1">Tell us what you’re launching. We’ll come back with the package that fits, a timeline and the first questions for kickoff.</p>
+          <div class="contact-direct" data-reveal style="--i:2">
+            <p class="label">Prefer email?</p>
+            <p class="contact-email">
+              <a href="mailto:{{email}}">{{email}}</a>
+              <button class="copy" type="button" data-copy="{{email}}"><svg class="icon" aria-hidden="true"><use href="#i-copy"/></svg><span class="copy-label">Copy</span></button>
+            </p>
+          </div>
+        </div>
+
+        <form class="brief" id="brief" data-email="{{email}}" novalidate data-reveal style="--i:1">
+          <fieldset class="field field--choices">
+            <legend class="label">Package</legend>
+            <div class="choices">
+              <label class="choice"><input type="radio" name="package" value="Launch"><span>Launch<small>$1,000</small></span></label>
+              <label class="choice"><input type="radio" name="package" value="Studio"><span>Studio<small>$2,500</small></span></label>
+              <label class="choice"><input type="radio" name="package" value="Flagship"><span>Flagship<small>$5,000</small></span></label>
+              <label class="choice"><input type="radio" name="package" value="Not sure yet" checked><span>Not sure yet<small>Help me pick</small></span></label>
+            </div>
+          </fieldset>
+          <div class="field-row">
+            <div class="field">
+              <label class="label" for="f-name">Your name</label>
+              <input id="f-name" name="name" type="text" autocomplete="name" required>
+            </div>
+            <div class="field">
+              <label class="label" for="f-email">Email</label>
+              <input id="f-email" name="email" type="email" autocomplete="email" required>
+            </div>
+          </div>
+          <div class="field-row">
+            <div class="field">
+              <label class="label" for="f-company">Company or current site <span class="optional">optional</span></label>
+              <input id="f-company" name="company" type="text" autocomplete="organization">
+            </div>
+            <div class="field">
+              <label class="label" for="f-when">Launch date</label>
+              <select id="f-when" name="when">
+                <option>As soon as possible</option>
+                <option>Within a month</option>
+                <option>In 1–3 months</option>
+                <option>Just exploring</option>
+              </select>
+            </div>
+          </div>
+          <div class="field">
+            <label class="label" for="f-message">What are you launching?</label>
+            <textarea id="f-message" name="message" rows="4" required placeholder="A new product, a raise, a rebrand… and the one thing the site must get people to do."></textarea>
+          </div>
+          <div class="brief-foot">
+            <button class="btn btn--white" type="submit"><span class="btn-label"><span>Send the brief</span></span><svg class="icon" aria-hidden="true"><use href="#i-arrow-up-right"/></svg></button>
+            <p class="brief-note">Opens your email app with the brief filled in.</p>
+          </div>
+          <p class="brief-status" role="status" aria-live="polite"></p>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer" data-surface="ink">
+    <div class="fade-stripes" aria-hidden="true"></div>
+    <div class="container">
+      <div class="footer-top">
+        <p class="footer-signoff" data-reveal>Keep<br>scrolling<span class="footer-arrow" aria-hidden="true">↓</span></p>
+        <svg class="footer-mark" viewBox="0 0 40 64" aria-hidden="true">
+          <path d="M6 64V17A14 14 0 0 1 34 17V64" fill="none" stroke="currentColor" stroke-width="5.2" mask="url(#m-fade)"/>
+          <rect class="footer-thumb" x="16.25" y="12" width="7.5" height="19" rx="3.75"/>
+        </svg>
+      </div>
+      <div class="footer-cols">
+        <div>
+          <p class="label">Sitemap</p>
+          <ul>
+            <li><a href="#work">Work</a></li>
+            <li><a href="#agency">Agency</a></li>
+            <li><a href="#process">Process</a></li>
+            <li><a href="#pricing">Pricing</a></li>
+            <li><a href="#contact">Start a project</a></li>
+          </ul>
+        </div>
+        <div>
+          <p class="label">Say hello</p>
+          <ul>
+            <li><a href="mailto:{{email}}">{{email}}</a></li>
+          </ul>
+        </div>
+        {{social}}
+        <div class="footer-meter">
+          <p class="label">This visit</p>
+          <p class="footer-count"><span data-count>0px</span> scrolled</p>
+          <p class="footer-hint">Keep going. The page doesn’t end, it loops.</p>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <svg class="footer-wordmark" viewBox="771 290 3944 722" role="img" aria-label="Scroldev"><use href="#wm" fill="currentColor"/></svg>
+        <p>© {{year}} Scroldev. Websites you’d scroll for eternity.</p>
+        <a class="to-top" href="#top"><span>Back to the top</span><svg class="icon" aria-hidden="true"><use href="#i-arrow-up"/></svg></a>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

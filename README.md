@@ -1,24 +1,32 @@
-# ScrolDev — website portfolio
+# ScrolDev — website and portfolio
 
-The websites **ScrolDev** has designed and built, in one repository, plus a showcase hub that lists them all on one page you can send to prospects.
+**scroldev.com** and the websites ScrolDev has designed and built, in one repository.
 
+- `hub/` is scroldev.com: the agency's own site (idea, work, agency, process, pricing, contact), built from the brand book.
 - Each portfolio site lives in its own folder under `sites/` and keeps whatever stack it was built with (Next.js, plain HTML, anything).
-- Each site has a small `scroldev.json` file describing it (name, summary, live link, cover image).
-- The hub reads those files and builds a static page. It has no dependencies, only Node 20 or newer.
+- Each site has a small `scroldev.json` file describing it (name, summary, live link, cover image). The **Work** section of scroldev.com is generated from these files, so a new site shows up there on the next build.
+- The build has no dependencies, only Node 20 or newer.
 
 ```
 scroldev/
 ├── sites/
 │   └── <site-slug>/          one folder per portfolio site
-│       ├── scroldev.json     how the site appears on the hub
-│       ├── cover.jpg         screenshot shown on the hub card
+│       ├── scroldev.json     how the site appears on scroldev.com
+│       ├── cover.jpg         screenshot shown in the Work section
 │       └── …                 the site's own code
-├── hub/
-│   ├── config.json           agency name, headline, intro, contact email
-│   ├── styles.css            hub design (brand colors are tokens at the top)
-│   ├── build.mjs             validates sites/ and builds dist/
+├── hub/                      scroldev.com
+│   ├── config.json           site URL, contact email, description, social links
+│   ├── template.html         the page: every section and all the copy
+│   ├── 404.html              the not-found page
+│   ├── assets/               copied to the site as-is
+│   │   ├── styles.css        design (brand tokens at the top)
+│   │   ├── main.js           motion and interaction
+│   │   ├── fonts/            Geist and Geist Mono, self-hosted
+│   │   ├── icons/            favicons and app icons from the logo kit
+│   │   └── patterns/         brand pattern tiles
+│   ├── build.mjs             validates sites/ and config, builds dist/
 │   └── new-site.mjs          scaffolds a new site entry
-└── vercel.json               deploys the hub
+└── vercel.json               deploys scroldev.com
 ```
 
 ---
@@ -29,13 +37,13 @@ scroldev/
 npm run new-site -- bella-cucina
 ```
 
-This creates `sites/bella-cucina/scroldev.json` as a **draft** (hidden from the hub). Then:
+This creates `sites/bella-cucina/scroldev.json` as a **draft** (hidden from scroldev.com). Then:
 
 1. Put the site's code in `sites/bella-cucina/`, unless it's already there.
 2. Fill in `scroldev.json` (fields below).
 3. Add a cover screenshot, ideally 1600×1000 (16:10), e.g. `sites/bella-cucina/cover.jpg`, and set `"cover": "cover.jpg"`.
 4. Set `"draft": false`.
-5. Run `npm run build` and open `dist/index.html` to check it.
+5. Run `npm run build` and preview `dist/` (see **Preview locally** below).
 
 Folder names must be lowercase words joined by hyphens. Folders starting with `_` or `.` are ignored, so `sites/_scratch/` is a safe place for experiments.
 
@@ -69,33 +77,53 @@ Folder names must be lowercase words joined by hyphens. Folders starting with `_
 | `cover` | no | Image file inside the site's folder (`.jpg`, `.png`, `.webp`, `.avif`). Without one, the card shows the site name. |
 | `stack` | no | Tools it was built with, shown as tags. |
 | `featured` | no | `true` pins it to the top. |
-| `draft` | no | `true` hides it from the hub and skips validation. |
+| `draft` | no | `true` hides it from scroldev.com and skips validation. |
 
-The hub is sorted by featured first, then newest year, then name.
+The Work section is sorted by featured first, then newest year, then name. It always ends with an empty "Your site, next." frame that links to the contact form.
 
-**Be honest with `type`.** Prospects will assume everything on the hub is real client work unless it says otherwise. Label demo and spec sites `"concept"`. It's still strong proof of skill, and it protects the agency's credibility.
+**Be honest with `type`.** Prospects will assume everything on the site is real client work unless it says otherwise. Label demo and spec sites `"concept"`. It's still strong proof of skill, and it protects the agency's credibility.
 
 ---
 
-## The hub
+## scroldev.com
 
 | Command | What it does |
 | --- | --- |
-| `npm run build` | Validates every `scroldev.json` and builds the hub into `dist/` |
+| `npm run build` | Validates the config and every `scroldev.json`, then builds the site into `dist/` |
 | `npm run check` | Validates only; writes nothing |
 | `npm run new-site -- <slug>` | Creates a draft entry for a new site |
 
-The build fails with a clear message if any published entry is invalid (missing field, broken cover path, bad link), so a broken entry never reaches the live hub.
+The build fails with a clear message if anything published is invalid (missing field, broken cover path, bad link, missing contact email), so a broken entry never reaches the live site.
 
-**Edit the copy** in `hub/config.json`. Set `contactEmail` to show a "Start a project" button in the header and the email in the footer; leave it `""` to hide both.
+### Preview locally
 
-**Change the look** in `hub/styles.css`. Colors are tokens in `:root` (light) and the `prefers-color-scheme: dark` block. `--accent` is the brand color.
+```bash
+npm run build
+npx http-server dist -p 4173
+```
 
-### Deploy the hub (Vercel)
+Open http://localhost:4173. Use a server rather than opening the file directly: the site loads its fonts, styles and script from `/`.
+
+### Edit it
+
+- **Contact email, site URL, description, social links:** `hub/config.json`. `contactEmail` is where the project brief form sends to and is shown in the footer. Social links with an empty `url` are hidden.
+- **Copy and sections:** `hub/template.html`. Placeholders like `{{email}}` and `{{work}}` are filled in by the build; an unknown placeholder fails the build.
+- **Design:** `hub/assets/styles.css`. Colors, type sizes, spacing and the easing curve are tokens in `:root`, straight from the brand book.
+- **Motion:** `hub/assets/main.js`. Everything is scroll-linked through one frame loop and respects reduced motion (fades only, no intro, no loop).
+
+### How the page works
+
+- **Intro:** the logo draws on once per browser session, then dissolves. Click or press any key to skip.
+- **Hero:** the pill grid reacts to the cursor; the arch's thumb scrolls down its track as you leave.
+- **The Endless Thumb:** a pinned section that builds the mark one part at a time: track, thumb, fade.
+- **Contact:** the brief form opens the visitor's email app with the brief filled in, addressed to `contactEmail`. No backend or third-party form service.
+- **The loop:** on desktop a frozen copy of the hero sits after the footer. When it reaches the top of the screen the page jumps back to the real hero, so the scroll never ends. It is off on touch devices and with reduced motion.
+
+### Deploy (Vercel)
 
 1. In Vercel: **Add New → Project**, import this repository.
 2. Leave **Root Directory** as the repo root. `vercel.json` already sets the build command and the `dist` output.
-3. Deploy. Every push to `main` rebuilds the hub.
+3. Deploy, then add `scroldev.com` under **Settings → Domains**. Every push to `main` rebuilds the site.
 
 ## Deploy each portfolio site
 
