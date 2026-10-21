@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" class="no-js" data-loop="{{loop}}">
+<html lang="en" class="no-js">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -129,17 +129,16 @@
   </div>
 
   <div class="hud" aria-hidden="true" data-on="ink">
-    <span class="hud-lap"></span><span class="hud-count" data-count>0px</span><svg class="icon" aria-hidden="true"><use href="#i-arrow-down"/></svg>
+    <span class="hud-count" data-count>0px</span><svg class="icon" aria-hidden="true"><use href="#i-arrow-down"/></svg>
   </div>
 
   <main id="main">
-    <!-- Hero: the animated mark. Scrolling moves it to the centre and dives into its thumb until the screen is Ember.
-         On desktop the stage is cloned after the footer, so the page loops back here without a seam. -->
+    <!-- Hero: the animated mark. Scrolling moves it to the centre and dives into its thumb until the screen is Ember. -->
     <section class="hero" id="top" data-surface="ink" data-hero>
       <div class="hero-stage">
         <canvas class="hero-mark" aria-hidden="true"></canvas>
         <div class="container hero-inner">
-          <p class="label hero-label"><span class="pip" aria-hidden="true"></span>Scroldev · The scroll agency</p>
+          <p class="label hero-label"><span class="pip" aria-hidden="true"></span>Scroldev · Web design &amp; development</p>
           <h1 class="hero-title">
             <span class="line"><span>Websites you’d scroll</span></span>
             <span class="line"><span>for eternity.</span></span>
@@ -292,7 +291,7 @@
     <section class="section agency" id="agency" data-surface="paper">
       <div class="container">
         <h2 class="label section-label" data-reveal><span class="num">03</span> Agency</h2>
-        <p class="statement" data-reveal>For ambitious startups and premium brands whose website is their first impression, Scroldev is <em>the scroll agency</em>. We design and build motion-led websites people keep scrolling, and launch them in weeks, not months.</p>
+        <p class="statement" data-reveal>We design and build motion-led websites for startups and premium brands whose website is their first impression. Sites people <em>keep scrolling</em>, live in weeks, not months.</p>
         <ul class="promises">
           <li data-reveal>
             <p class="label"><span class="num">01</span> Feel</p>
@@ -335,24 +334,40 @@
         </div>
         <ul class="audience-grid">
           <li class="card audience-card" data-reveal>
-            <p class="label">01</p>
+            <div class="audience-top">
+              <span class="audience-icon"><svg class="icon" aria-hidden="true"><use href="#i-speed"/></svg></span>
+              <span class="label">01</span>
+            </div>
             <h3>Startup founders</h3>
             <p>Seed to Series A in SaaS, AI and fintech. Launching, raising or rebranding. The site is their pitch to investors and hires.</p>
+            <ul class="audience-tags"><li>Seed–Series A</li><li>SaaS</li><li>AI</li><li>Fintech</li></ul>
           </li>
           <li class="card audience-card" data-reveal style="--i:1">
-            <p class="label">02</p>
+            <div class="audience-top">
+              <span class="audience-icon"><svg class="icon" aria-hidden="true"><use href="#i-award"/></svg></span>
+              <span class="label">02</span>
+            </div>
             <h3>Premium brands</h3>
             <p>Architecture, hospitality, fashion and DTC. They sell on feel and prestige, and a template would cost them both.</p>
+            <ul class="audience-tags"><li>Architecture</li><li>Hospitality</li><li>Fashion</li><li>DTC</li></ul>
           </li>
           <li class="card audience-card" data-reveal style="--i:2">
-            <p class="label">03</p>
+            <div class="audience-top">
+              <span class="audience-icon"><svg class="icon" aria-hidden="true"><use href="#i-layers"/></svg></span>
+              <span class="label">03</span>
+            </div>
             <h3>Newly branded companies</h3>
             <p>A new identity deserves a site that moves like it. The natural next step after a brand project.</p>
+            <ul class="audience-tags"><li>New identity</li><li>Rebrand</li><li>Relaunch</li></ul>
           </li>
           <li class="card audience-card" data-reveal style="--i:3">
-            <p class="label">04</p>
+            <div class="audience-top">
+              <span class="audience-icon"><svg class="icon" aria-hidden="true"><use href="#i-user"/></svg></span>
+              <span class="label">04</span>
+            </div>
             <h3>Founders and creators</h3>
             <p>Personal brands that need a portfolio or launch page that signals status in one scroll.</p>
+            <ul class="audience-tags"><li>Portfolio</li><li>Launch page</li><li>Personal brand</li></ul>
           </li>
         </ul>
         <div class="say-no" data-reveal>
@@ -662,16 +677,10 @@
     </section>
   </main>
 
+  <!-- The end of the page: the logo draws itself in; its thumb follows the pointer and the letters lift as it passes. -->
   <footer class="footer" data-surface="ink">
     <div class="footer-glow" aria-hidden="true"></div>
     <div class="container">
-      <div class="footer-top">
-        <p class="footer-signoff" data-reveal>Keep<br>scrolling<span class="footer-arrow" aria-hidden="true">↓</span></p>
-        <svg class="footer-mark" viewBox="0 0 40 64" aria-hidden="true">
-          <path d="M6 64V17A14 14 0 0 1 34 17V64" fill="none" stroke="currentColor" stroke-width="5.2" mask="url(#m-fade)"/>
-          <g class="footer-thumb-loop"><rect class="footer-thumb" x="16.25" y="12" width="7.5" height="19" rx="3.75"/></g>
-        </svg>
-      </div>
       <div class="footer-cols">
         <div>
           <p class="label">Sitemap</p>
@@ -693,13 +702,34 @@
         <div class="footer-meter">
           <p class="label">This visit</p>
           <p class="footer-count"><span data-count>0px</span> scrolled</p>
-          <p class="footer-hint">Keep going. The page doesn’t end, it loops.</p>
         </div>
       </div>
       <div class="footer-bottom">
-        <svg class="footer-wordmark" viewBox="771 290 3944 722" role="img" aria-label="Scroldev"><use href="#wm" fill="currentColor"/></svg>
         <p>© {{year}} Scroldev. Websites you’d scroll for eternity.</p>
         <a class="to-top" href="#top"><span>Back to the top</span><svg class="icon" aria-hidden="true"><use href="#i-arrow-up"/></svg></a>
+      </div>
+      <div class="footer-logo">
+        <svg class="footer-logo-svg" viewBox="120 120 4662 994" role="img" aria-label="Scroldev">
+          <defs>
+            <clipPath id="cp-word"><rect x="700" y="250" width="4100" height="790"/></clipPath>
+          </defs>
+          <g transform="translate(66.88 -170)">
+            <g transform="translate(0 283.75) scale(15.625)">
+              <path class="fl-track" d="M6 64V17A14 14 0 0 1 34 17V64" pathLength="1" fill="none" stroke="currentColor" stroke-width="5.2" mask="url(#m-fade)"/>
+              <g class="fl-thumb-wrap"><rect class="fl-thumb" x="16.25" y="12" width="7.5" height="19" rx="3.75"/></g>
+            </g>
+            <g class="fl-word" clip-path="url(#cp-word)" fill="currentColor">
+          <g class="fl-rise" style="--i:0"><path class="fl-letter" d="M1009.875 1012Q893.875 1012 835.875 961.5Q777.875 911 771.875 832L880.875 827Q887.875 871 916.875 897.0Q945.875 923 1009.875 923Q1059.875 923 1086.375 907.0Q1112.875 891 1112.875 856Q1112.875 836 1103.875 823.0Q1094.875 810 1068.875 800.5Q1042.875 791 991.875 782Q913.875 767 870.375 746.5Q826.875 726 808.875 695.5Q790.875 665 790.875 621Q790.875 549 845.875 502.5Q900.875 456 1004.875 456Q1077.875 456 1124.875 480.5Q1171.875 505 1195.875 545.0Q1219.875 585 1224.875 631L1115.875 637Q1112.875 599 1087.375 572.0Q1061.875 545 1002.875 545Q950.875 545 925.875 565.0Q900.875 585 900.875 617Q900.875 652 924.375 669.5Q947.875 687 1012.875 697Q1093.875 710 1139.375 730.5Q1184.875 751 1203.875 781.5Q1222.875 812 1222.875 855Q1222.875 930 1163.875 971.0Q1104.875 1012 1009.875 1012Z"/></g>
+          <g class="fl-rise" style="--i:1"><path class="fl-letter" d="M1548.875 1012Q1472.875 1012 1415.875 977.5Q1358.875 943 1327.875 880.5Q1296.875 818 1296.875 734Q1296.875 650 1327.875 587.5Q1358.875 525 1415.875 490.5Q1472.875 456 1548.875 456Q1645.875 456 1709.875 506.5Q1773.875 557 1786.875 649L1675.875 655Q1667.875 603 1633.875 575.5Q1599.875 548 1548.875 548Q1481.875 548 1444.375 597.5Q1406.875 647 1406.875 734Q1406.875 822 1444.375 871.0Q1481.875 920 1548.875 920Q1599.875 920 1633.875 891.5Q1667.875 863 1675.875 805L1786.875 811Q1773.875 903 1710.375 957.5Q1646.875 1012 1548.875 1012Z"/></g>
+          <g class="fl-rise" style="--i:2"><path class="fl-letter" d="M1880.875 1000V468H1977.875L1980.875 569Q1995.875 517 2027.375 492.5Q2058.875 468 2107.875 468H2158.875V563H2107.875Q2046.875 563 2016.875 593.0Q1986.875 623 1986.875 686V1000Z"/></g>
+          <g class="fl-rise" style="--i:3"><path class="fl-letter" d="M2463.875 1012Q2387.875 1012 2330.875 977.5Q2273.875 943 2242.875 881.0Q2211.875 819 2211.875 734Q2211.875 649 2242.875 587.0Q2273.875 525 2330.875 490.5Q2387.875 456 2463.875 456Q2539.875 456 2596.875 490.5Q2653.875 525 2684.875 587.0Q2715.875 649 2715.875 734Q2715.875 819 2684.875 881.0Q2653.875 943 2596.875 977.5Q2539.875 1012 2463.875 1012ZM2463.875 920Q2531.875 920 2568.875 871.0Q2605.875 822 2605.875 734Q2605.875 647 2568.875 597.5Q2531.875 548 2463.875 548Q2396.875 548 2359.375 597.5Q2321.875 647 2321.875 734Q2321.875 822 2359.375 871.0Q2396.875 920 2463.875 920Z"/></g>
+          <g class="fl-rise" style="--i:4"><path class="fl-letter" d="M2936.875 1000Q2883.875 1000 2852.375 973.0Q2820.875 946 2820.875 887V290H2926.875V877Q2926.875 913 2963.875 913H3005.875V1000Z"/></g>
+          <g class="fl-rise" style="--i:5"><path class="fl-letter" d="M3279.875 1012Q3211.875 1012 3161.875 978.0Q3111.875 944 3084.875 881.5Q3057.875 819 3057.875 734Q3057.875 649 3084.875 586.5Q3111.875 524 3161.875 490.0Q3211.875 456 3279.875 456Q3334.875 456 3377.875 479.0Q3420.875 502 3442.875 543V290H3548.875V1000H3449.875L3446.875 920Q3424.875 964 3380.375 988.0Q3335.875 1012 3279.875 1012ZM3307.875 920Q3372.875 920 3407.875 871.0Q3442.875 822 3442.875 734Q3442.875 645 3407.875 596.5Q3372.875 548 3307.875 548Q3243.875 548 3205.875 597.5Q3167.875 647 3167.875 734Q3167.875 819 3205.875 869.5Q3243.875 920 3307.875 920Z"/></g>
+          <g class="fl-rise" style="--i:6"><path class="fl-letter" d="M3905.875 1012Q3827.875 1012 3771.375 977.5Q3714.875 943 3684.375 880.5Q3653.875 818 3653.875 734Q3653.875 650 3684.375 587.5Q3714.875 525 3770.875 490.5Q3826.875 456 3902.875 456Q3974.875 456 4029.875 489.5Q4084.875 523 4115.375 586.0Q4145.875 649 4145.875 738V765H3763.875Q3767.875 843 3805.375 882.0Q3842.875 921 3906.875 921Q3953.875 921 3984.375 899.5Q4014.875 878 4027.875 840L4137.875 847Q4116.875 922 4055.375 967.0Q3993.875 1012 3905.875 1012ZM3763.875 685H4033.875Q4028.875 614 3992.875 580.0Q3956.875 546 3902.875 546Q3845.875 546 3809.375 581.5Q3772.875 617 3763.875 685Z"/></g>
+          <g class="fl-rise" style="--i:7"><path class="fl-letter" d="M4391.875 1000 4197.875 468H4310.875L4455.875 892L4600.875 468H4714.875L4519.875 1000Z"/></g>
+            </g>
+          </g>
+        </svg>
       </div>
     </div>
   </footer>

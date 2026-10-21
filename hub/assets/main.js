@@ -70,7 +70,7 @@ addEventListener("scroll", schedule, { passive: true });
 
 /* ---------- Layout measurements ---------- */
 
-const layout = { surfaces: [], heroEnd: 0, pageEnd: 1, loopTop: 0, targets: [] };
+const layout = { surfaces: [], heroEnd: 0, pageEnd: 1, targets: [] };
 const header = $(".header");
 const hud = $(".hud");
 const footer = $(".footer");
@@ -87,8 +87,6 @@ function measure() {
   const hero = $("[data-hero]");
   layout.heroEnd = hero ? top(hero) + hero.offsetHeight : innerHeight;
   layout.pageEnd = Math.max(1, top(footer) + footer.offsetHeight - innerHeight);
-  const loop = $(".loop");
-  layout.loopTop = loop ? top(loop) : 0;
   layout.targets = navLinks.map((a) => {
     const el = document.getElementById(a.hash.slice(1));
     return { a, top: el ? top(el) : Infinity };
@@ -117,7 +115,6 @@ function chrome() {
   let travel = 0;
   const thumb = $(".progress-thumb");
   const counts = $$("[data-count]");
-  const lapEl = $(".hud-lap");
   let total = 0;
   let shown = -1;
   let current = null;
@@ -145,12 +142,12 @@ function chrome() {
       current = next;
     }
 
-    // Top progress: the thumb travels the track; the loop's copy of the hero doesn't count.
+    // Top progress: the thumb travels the track.
     const end = layout.pageEnd;
     const p = clamp(y / end);
     thumb.style.setProperty("--x", `${(p * (innerWidth - 96)).toFixed(1)}px`);
 
-    // The live pixel count: every pixel scrolled this visit, laps included.
+    // The live pixel count: every pixel scrolled this visit.
     total += Math.abs(dy);
     const rounded = Math.round(total);
     if (rounded !== shown) {
@@ -163,7 +160,6 @@ function chrome() {
     const pinned = wide.matches && y >= layout.servicesTop - vh * 0.2 && y < layout.servicesEnd - vh * 0.8;
     hud.classList.toggle("is-on", !pinned && y + vh - 44 < layout.contactTop);
     hud.dataset.on = heroState.ember && y + vh - 44 < layout.heroEnd ? "ember" : surfaceAt(y + vh - 44);
-    lapEl.textContent = laps > 1 ? `Lap ${String(laps).padStart(2, "0")} ·` : "";
   });
 }
 
@@ -222,7 +218,7 @@ const START = performance.now();
 const TRACK_LEN = 47 + Math.PI * 14 + 47; // the open arch: left leg, top arc, right leg
 const heroState = { ember: false };
 
-// The thumb at time t (seconds since load). The hero and its copy after the footer share it, so the loop is seamless.
+// The thumb at time t (seconds since load): it arrives, then scrolls down its track and back every five seconds.
 function thumbAt(t) {
   if (calm) return { arrive: 1, y: 12 };
   const arrive = ease(clamp((t - 0.8) / 0.45));
@@ -231,10 +227,10 @@ function thumbAt(t) {
   return { arrive, y: 4 + 8 * arrive + 22 * travel };
 }
 
-function heroStage(stage, frozen = false) {
+function heroStage(stage) {
   const canvas = $(".hero-mark", stage);
   if (!canvas) return;
-  const section = frozen ? null : stage.parentElement;
+  const section = stage.parentElement;
   const ctx = canvas.getContext("2d");
   let w = 0, h = 0, dpr = 1, raf = 0, shown = false, last = "";
   let mx = 0, my = 0, px = 0, py = 0;
@@ -324,7 +320,7 @@ function heroStage(stage, frozen = false) {
     const [left, top] = at(16.25, thumbY + 3.75);
     const [right, bottom] = at(23.75, thumbY + 15.25);
     const ember = left <= 0 && right >= w && top <= 0 && bottom >= h;
-    if (!frozen) heroState.ember = ember;
+    heroState.ember = ember;
     if (ember) {
       emberPage(say);
       return;
@@ -709,14 +705,71 @@ function processTrack() {
   });
 }
 
-/* ---------- Footer: the thumb settles as the page runs out ---------- */
+/* ---------- The end: the logo ----------
+   The page ends on the logo. When it arrives it draws itself in like the logo animation: the track draws, the thumb
+   drops in, the letters rise through their line. Then the thumb follows the pointer up and down its track and the
+   letters lift as the pointer passes over them. Left alone, the thumb scrolls down its track and back. */
 
-function footerMark() {
+function footerLogo() {
+  const wrap = $(".footer-logo");
+  if (!wrap) return;
+  const svg = $("svg", wrap);
+  const thumb = $(".fl-thumb-wrap", wrap);
+  const letters = $$(".fl-letter", wrap);
+  new IntersectionObserver(([e], io) => {
+    if (!e.isIntersecting) return;
+    wrap.classList.add("is-drawn");
+    io.disconnect();
+  }, { threshold: 0.3 }).observe(wrap);
   if (calm) return;
-  whileVisible(footer, (vh) => {
-    const r = footer.getBoundingClientRect();
-    footer.style.setProperty("--ft", `${(clamp((vh - r.top) / r.height) * 18).toFixed(2)}px`);
-  });
+
+  // Each letter's centre, as a share of the logo's width (the SVG's viewBox starts at x 120 and is 4662 wide).
+  // Measured on first use, so the page load doesn't pay for it.
+  let centres = null;
+  const measureLetters = () =>
+    letters.map((l) => {
+      const b = l.getBBox();
+      return (b.x + b.width / 2 + 66.88 - 120) / 4662;
+    });
+  const lifts = letters.map(() => 0);
+  let px = null, py = 0, ty = 0, raf = 0, shown = false;
+  const start = performance.now();
+
+  function tick() {
+    raf = 0;
+    centres ??= measureLetters();
+    const r = svg.getBoundingClientRect();
+    const near = px !== null && py > r.top - 140 && py < r.bottom + 60;
+    const t = (performance.now() - start) / 1000;
+    const cycle = t % 5;
+    const idle = 22 * (ease(clamp((cycle - 1.2) / 0.8)) - ease(clamp((cycle - 2) / 0.8)));
+    const target = near ? clamp((py - r.top) / (r.height * 0.85)) * 22 : idle;
+    ty += (target - ty) * 0.12;
+    thumb.style.transform = `translateY(${ty.toFixed(2)}px)`;
+    letters.forEach((l, i) => {
+      let lift = 0;
+      if (near) {
+        const d = Math.abs(px - (r.left + centres[i] * r.width)) / (r.width * 0.1);
+        lift = d < 1 ? (1 - d) * (1 - d) * (1 + 2 * d) : 0;
+      }
+      lifts[i] += (lift - lifts[i]) * 0.14;
+      l.style.transform = `translateY(${(-lifts[i] * 120).toFixed(1)}px)`;
+    });
+    if (shown) raf = requestAnimationFrame(tick);
+  }
+
+  new IntersectionObserver(([e]) => {
+    shown = e.isIntersecting;
+    if (shown && !raf) raf = requestAnimationFrame(tick);
+  }).observe(wrap);
+  const point = (x, y) => {
+    px = x;
+    py = y;
+  };
+  addEventListener("pointermove", (e) => point(e.clientX, e.clientY), { passive: true });
+  addEventListener("touchmove", (e) => point(e.touches[0].clientX, e.touches[0].clientY), { passive: true });
+  addEventListener("touchend", () => (px = null), { passive: true });
+  document.documentElement.addEventListener("pointerleave", () => (px = null));
 }
 
 /* ---------- 06 Contact: the brief opens as an email ---------- */
@@ -775,47 +828,8 @@ function brief() {
   }
 }
 
-/* ---------- The loop ----------
-   Websites you'd scroll for eternity, taken literally: a frozen copy of the hero sits after the footer.
-   When it reaches the top of the screen the page jumps back to the real hero, which looks identical, so the
-   scroll carries on without a seam. Desktop pointers only; with reduced motion the page simply ends. */
-
-let laps = 1;
-
-function loop() {
-  const hero = $("[data-hero]");
-  if (!hero || calm || !finePointer || root.dataset.loop === "false") return;
-
-  const wrap = document.createElement("div");
-  wrap.className = "loop";
-  wrap.setAttribute("aria-hidden", "true");
-  wrap.inert = true;
-  const copy = $(".hero-stage", hero).cloneNode(true);
-  for (const el of $$("[id]", copy)) el.removeAttribute("id");
-  const title = $("h1", copy);
-  const div = document.createElement("div");
-  div.className = title.className;
-  div.innerHTML = title.innerHTML;
-  title.replaceWith(div);
-  wrap.append(copy);
-  footer.after(wrap);
-  root.classList.add("has-loop");
-
-  heroStage(copy, true);
-
-  always.add(() => {
-    if (!layout.loopTop || state.y < layout.loopTop - 0.5) return;
-    const to = Math.max(0, state.y - layout.loopTop);
-    laps += 1;
-    state.jumped = true;
-    state.y = to;
-    scrollTo({ top: to, behavior: "instant" });
-  });
-}
-
 /* ---------- Start ---------- */
 
-loop();
 services();
 measure();
 chrome();
@@ -826,6 +840,6 @@ pillField($(".pills"));
 manifesto();
 pillars();
 processTrack();
-footerMark();
+footerLogo();
 brief();
 schedule();

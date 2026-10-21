@@ -105,10 +105,9 @@ Open http://localhost:4173. Use a server rather than opening the file directly: 
 ### Edit it
 
 - **Contact email, site URL, description, social links:** `hub/config.json`. `contactEmail` is where the project brief form sends to and is shown in the footer. Social links with an empty `url` are hidden.
-- **The loop:** `"loop": true` in `hub/config.json` makes the page carry on past the footer back to the top (desktop only). Set it to `false` and the page simply ends at the footer.
 - **Copy and sections:** `hub/template.html`. Placeholders like `{{email}}` are filled in by the build; an unknown placeholder fails the build.
 - **Design:** `hub/assets/styles.css`. Colors, type sizes, spacing and the easing curve are tokens in `:root`, straight from the brand book.
-- **Motion:** `hub/assets/main.js`. Everything is scroll-linked through one frame loop and respects reduced motion (fades only, no intro, no loop).
+- **Motion:** `hub/assets/main.js`. Everything is scroll-linked through one frame loop and respects reduced motion (fades only, no scroll dive).
 
 ### How the page works
 
@@ -117,7 +116,7 @@ Open http://localhost:4173. Use a server rather than opening the file directly: 
 - **Glass and light:** the header, cards, demos and the brief form are frosted glass over the pill grid, with soft Ember glows behind the services, pricing and contact sections.
 - **What we build:** on desktop the section pins and five panels slide past sideways; each has a small demo (scroll motion, layout, speed score, CMS edit, package timelines) that plays as it arrives. On phones the panels stack.
 - **Contact:** Ember light rises behind a glass brief form, which opens the visitor's email app with the brief filled in, addressed to `contactEmail`. No backend or third-party form service.
-- **The loop:** on desktop a frozen copy of the hero's first screen sits after the footer. When it reaches the top of the screen the page jumps back to the real hero, so the scroll never ends. It is off on touch devices and with reduced motion.
+- **The end:** the page finishes on the Scroldev logo, full width. It draws itself in when it arrives; then its thumb follows the pointer up and down the track and the letters lift as the pointer passes over them.
 
 ### Deploy (Vercel)
 

@@ -179,7 +179,7 @@ section[data-surface="ink"], footer[data-surface="ink"] { background: transparen
   height: 100lvh;
   pointer-events: none;
 }
-main, .footer, .loop { position: relative; z-index: 1; }
+main, .footer { position: relative; z-index: 1; }
 
 /* The Paper section uses the light tile from the same kit. */
 .agency {
@@ -203,7 +203,7 @@ main, .footer, .loop { position: relative; z-index: 1; }
   font-weight: 400;
 }
 
-.h1, .hero-title, .statement, .manifesto, .contact-title, .footer-signoff, .pillar-title, .plan-amount, .gauge-num {
+.h1, .hero-title, .statement, .manifesto, .contact-title, .pillar-title, .plan-amount, .gauge-num {
   font-weight: 500;
   font-feature-settings: "ss01" 0;
 }
@@ -417,8 +417,6 @@ h3 {
   transition: opacity var(--t-ui) var(--ease), transform var(--t-ui) var(--ease), color var(--t-ui) var(--ease), border-color var(--t-ui) var(--ease), background-color var(--t-ui) var(--ease);
 }
 .hud .icon { width: 16px; height: 16px; color: var(--accent); }
-.hud-lap { color: var(--muted); }
-.hud-lap:empty { display: none; }
 .hud.is-on { opacity: 1; transform: none; }
 .hud[data-on="paper"] { --bg: var(--paper); --fg: var(--ink); --muted: var(--stone); --accent: var(--ember-deep); }
 .hud[data-on="ember"] { --bg: var(--ember-deep); --fg: #fff; --muted: rgb(255 255 255 / 0.8); --accent: #fff; }
@@ -463,7 +461,7 @@ h3 {
 
 .logo { display: block; margin-right: auto; }
 .logo svg { height: 26px; width: auto; aspect-ratio: 4662 / 994; overflow: visible; }
-.logo-thumb, .cue-thumb, .footer-thumb { fill: var(--accent); transition: fill var(--t-ui) var(--ease); }
+.logo-thumb, .cue-thumb { fill: var(--accent); transition: fill var(--t-ui) var(--ease); }
 
 .nav { display: none; gap: 4px; }
 .nav a {
@@ -721,9 +719,6 @@ h3 {
   .hero-actions { margin-top: 24px; }
 }
 
-/* The frozen copy of the stage after the footer, for the loop. */
-.loop .hero-stage { position: relative; }
-.loop .hero-stage * { animation: none !important; }
 
 /* ---------- 01 The idea ---------- */
 
@@ -970,29 +965,40 @@ h3 {
 .audience-card {
   position: relative;
   display: grid;
-  grid-template-rows: auto 1fr auto;
-  gap: 14px;
-  min-height: 260px;
+  grid-template-rows: auto auto 1fr auto;
+  gap: 12px;
   transition: border-color var(--t-ui) var(--ease), background-color var(--t-ui) var(--ease);
 }
-.audience-card .label { color: var(--muted); }
-.audience-card h3 { align-self: end; max-width: 12ch; }
-.audience-card p:last-child { color: var(--muted); font-size: var(--fs-small); line-height: 1.6; }
-.audience-card::after {
-  content: "";
-  position: absolute;
-  top: 26px;
-  right: 26px;
-  width: 5px;
-  height: 14px;
-  border-radius: 3px;
-  background: var(--ember);
-  opacity: 0;
-  transform: translateY(-8px);
-  transition: opacity var(--t-ui) var(--ease), transform var(--t-ui) var(--ease);
+.audience-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 36px; }
+.audience-top .label { color: var(--muted); }
+.audience-icon {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  border: 1px solid var(--glass-edge);
+  border-radius: 16px;
+  background: radial-gradient(circle at 30% 20%, rgb(255 79 26 / 0.3), rgb(255 79 26 / 0.06) 65%), rgb(243 238 230 / 0.04);
+  color: var(--paper);
+  transition: background-color var(--t-ui) var(--ease), border-color var(--t-ui) var(--ease);
+}
+.audience-icon .icon { width: 24px; height: 24px; }
+.audience-card h3 { max-width: 14ch; }
+.audience-card > p { color: var(--muted); font-size: var(--fs-small); line-height: 1.6; }
+.audience-tags { display: flex; flex-wrap: wrap; gap: 6px; align-self: end; margin-top: 12px; padding-top: 18px; border-top: 1px solid var(--line); }
+.audience-tags li {
+  padding: 4px 10px;
+  border: 1px solid rgb(243 238 230 / 0.14);
+  border-radius: 999px;
+  background: rgb(243 238 230 / 0.04);
+  color: var(--fg);
+  font-family: var(--mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 .audience-card:hover { border-color: rgb(243 238 230 / 0.26); background: linear-gradient(155deg, rgb(243 238 230 / 0.14), rgb(243 238 230 / 0.04) 60%); }
-.audience-card:hover::after { opacity: 1; transform: none; }
+.audience-card:hover .audience-icon { border-color: rgb(255 79 26 / 0.6); }
 
 .say-no { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; margin-top: 40px; }
 .say-no .tag { color: var(--muted); }
@@ -1004,7 +1010,7 @@ h3 {
 }
 
 @media (min-width: 640px) { .audience-grid { grid-template-columns: 1fr 1fr; } }
-@media (min-width: 1100px) { .audience-grid { grid-template-columns: repeat(4, 1fr); } .audience-card { min-height: 320px; } }
+@media (min-width: 1100px) { .audience-grid { grid-template-columns: repeat(4, 1fr); } }
 
 /* ---------- Pillars ---------- */
 
@@ -1329,7 +1335,7 @@ details[open]::details-content { block-size: auto; }
 
 /* ---------- Footer ---------- */
 
-.footer { padding-top: clamp(64px, 8vw, 120px); padding-bottom: 32px; overflow: hidden; isolation: isolate; }
+.footer { padding-top: clamp(64px, 8vw, 120px); padding-bottom: clamp(12px, 2vw, 28px); overflow: hidden; isolation: isolate; }
 .footer-glow {
   position: absolute;
   right: -10vw;
@@ -1342,35 +1348,10 @@ details[open]::details-content { block-size: auto; }
   pointer-events: none;
 }
 
-.footer-top {
-  position: relative;
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 24px;
-  padding-top: 24px;
-}
-.footer-signoff {
-  font-size: clamp(4rem, 1.6rem + 10vw, 12.5rem);
-  line-height: 0.88;
-  letter-spacing: -0.055em;
-}
-.footer-arrow { display: inline-block; margin-left: 0.12em; color: var(--stone); font-weight: 400; }
-.footer-mark { flex: none; width: auto; height: clamp(140px, 22vw, 340px); aspect-ratio: 40 / 64; overflow: visible; margin-bottom: -2px; }
-.footer-thumb { transform: translateY(var(--ft, 0px)); }
-/* Like the logo animation: the thumb scrolls down its track and back, then rests. */
-.footer-thumb-loop { animation: thumb-loop 5s var(--ease) infinite; }
-@keyframes thumb-loop {
-  0%, 52%, 100% { transform: none; }
-  68%, 72% { transform: translateY(20px); }
-  88% { transform: none; }
-}
-
 .footer-cols {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 40px var(--gutter);
-  margin-top: clamp(64px, 8vw, 112px);
   padding-top: 40px;
   border-top: 1px solid var(--rule);
 }
@@ -1381,8 +1362,6 @@ details[open]::details-content { block-size: auto; }
 .footer-meter { grid-column: 1 / -1; }
 .footer-count { font-size: var(--fs-h3); font-weight: 500; letter-spacing: -0.015em; }
 .footer-count span { font-family: var(--mono); font-weight: 400; letter-spacing: 0; font-variant-numeric: tabular-nums; }
-.footer-hint { margin-top: 6px; color: var(--muted); font-size: var(--fs-small); }
-html:not(.has-loop) .footer-hint { display: none; }
 
 .footer-bottom {
   display: flex;
@@ -1390,11 +1369,28 @@ html:not(.has-loop) .footer-hint { display: none; }
   align-items: center;
   justify-content: space-between;
   gap: 16px 32px;
-  margin-top: 72px;
+  margin-top: 64px;
+  padding-top: 24px;
+  border-top: 1px solid var(--rule);
   color: var(--muted);
   font-size: 0.875rem;
 }
-.footer-wordmark { height: 20px; width: auto; aspect-ratio: 3944 / 722; color: var(--paper); }
+
+/* The last thing on the page: the logo, full width. It draws itself in, then follows the pointer. */
+.footer-logo { margin-top: clamp(40px, 6vw, 88px); color: var(--paper); }
+.footer-logo-svg { display: block; width: 100%; height: auto; overflow: visible; }
+.fl-thumb { fill: var(--ember); }
+.js .fl-track { stroke-dasharray: 1 2; stroke-dashoffset: 1; transition: stroke-dashoffset 1s var(--ease); }
+.js .fl-thumb { opacity: 0; transform: translateY(-8px); transition: opacity var(--t-ui) var(--ease) 0.75s, transform var(--t-ui) var(--ease) 0.75s; }
+.js .fl-rise {
+  transform-box: fill-box;
+  transform: translateY(115%);
+  transition: transform var(--t-section) var(--ease);
+  transition-delay: calc(0.9s + var(--i) * 60ms);
+}
+.js .footer-logo.is-drawn .fl-track { stroke-dashoffset: 0; }
+.js .footer-logo.is-drawn .fl-thumb { opacity: 1; transform: none; }
+.js .footer-logo.is-drawn .fl-rise { transform: none; }
 .to-top { display: inline-flex; align-items: center; gap: 8px; transition: color var(--t-micro) var(--ease); }
 .to-top:hover { color: var(--paper); }
 .to-top .icon { width: 16px; height: 16px; }
@@ -1427,7 +1423,7 @@ html:not(.has-loop) .footer-hint { display: none; }
   .hero-stage { position: relative; height: auto; min-height: max(100vh, 640px); }
   .hero-inner { transform: none; }
   .hero-dive { display: none; }
-  .footer-thumb-loop { animation: none; }
+  .js .fl-track, .js .fl-thumb, .js .fl-rise { transition: none; }
   .pillar-title { color: var(--paper); }
   .pillar-text { opacity: 1; }
   .step { opacity: 1; }

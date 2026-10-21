@@ -65,7 +65,6 @@ function checkConfig(c) {
     problems.push(`"contactEmail" must be the inbox that receives project briefs, e.g. "teamscroldev@gmail.com"`);
   }
   if (typeof c.description !== "string" || !c.description.trim()) problems.push(`"description" is required (used for search results and link previews)`);
-  if (c.loop !== undefined && typeof c.loop !== "boolean") problems.push(`"loop" must be true or false`);
   if (c.social !== undefined) {
     if (!Array.isArray(c.social)) problems.push(`"social" must be a list of { "label", "url" }`);
     else {
@@ -190,7 +189,6 @@ async function pageTokens() {
   };
 
   return {
-    loop: config.loop === false ? "false" : "true",
     siteUrl: esc(siteUrl),
     description: esc(config.description),
     email: esc(email),
