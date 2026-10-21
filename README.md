@@ -105,6 +105,7 @@ Open http://localhost:4173. Use a server rather than opening the file directly: 
 ### Edit it
 
 - **Contact email, site URL, description, social links:** `hub/config.json`. `contactEmail` is where the project brief form sends to and is shown in the footer. Social links with an empty `url` are hidden.
+- **The Ember film:** `media.emberFilm` in `hub/config.json` holds the `mp4` and `poster` links for the looping molten-glass film (made with Higgsfield, hosted on Higgsfield's CDN). It plays behind the hero's Ember screen and lights the contact section. Remove the entry and the page falls back to gradients.
 - **Copy and sections:** `hub/template.html`. Placeholders like `{{email}}` are filled in by the build; an unknown placeholder fails the build.
 - **Design:** `hub/assets/styles.css`. Colors, type sizes, spacing and the easing curve are tokens in `:root`, straight from the brand book.
 - **Motion:** `hub/assets/main.js`. Everything is scroll-linked through one frame loop and respects reduced motion (fades only, no intro, no loop).
