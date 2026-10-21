@@ -779,6 +779,14 @@ h3 {
   .hero-offer { margin-top: 20px; }
 }
 
+/* Wide, short screens can't give three lines their size (the height runs out first and leaves the width empty), so
+   there the first two beats share a line and the headline grows into the width instead. Squarer screens and phones
+   keep three lines. */
+@media (min-width: 900px) and (min-aspect-ratio: 17/10) {
+  .hero-title { font-size: min(clamp(3.25rem, 1.2rem + 5.4vw, 8rem), 15vh); }
+  .hero-title .line:nth-child(-n + 2) { display: inline-block; }
+}
+
 @media (max-height: 720px) and (max-width: 899px) {
   .hero-title { font-size: clamp(2.375rem, 10.5vw, 3rem); }
   .hero-inner { padding-bottom: 88px; }

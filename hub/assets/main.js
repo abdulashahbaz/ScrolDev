@@ -266,12 +266,15 @@ function heroStage(stage) {
   if (!canvas) return;
   const section = stage.parentElement;
   const ctx = canvas.getContext("2d");
+  const words = $$(".hero-title .line > span, .hero-lede, .hero-actions > *", stage);
   let w = 0, h = 0, dpr = 1, raf = 0, shown = false, last = "";
-  let mx = 0, my = 0, px = 0, py = 0;
+  let mx = 0, my = 0, px = 0, py = 0, textRight = 0;
 
   function resize() {
     w = canvas.clientWidth;
     h = canvas.clientHeight;
+    // How far the hero's words reach, so the mark can stand in the middle of the space they leave.
+    textRight = words.length ? Math.max(...words.map((el) => el.getBoundingClientRect().right)) : w * 0.6;
     dpr = Math.min(devicePixelRatio || 1, 2);
     canvas.width = Math.round(w * dpr);
     canvas.height = Math.round(h * dpr);
@@ -331,7 +334,9 @@ function heroStage(stage) {
     // Where the mark sits: right of the headline on wide screens, top right on phones.
     const wide = w >= 900;
     const k0 = (wide ? Math.min(h * 0.58, 600) : Math.min(h * 0.16, 150)) / 64;
-    const x0 = wide ? w * 0.8 : w * 0.8;
+    const edge = Math.min(80, Math.max(20, w * 0.056)); // the page margin
+    const half = 20 * k0; // half the mark's width
+    const x0 = wide ? Math.min(w - edge - half, Math.max((textRight + w - edge) / 2, textRight + half + 32)) : w * 0.8;
     const y0 = wide ? h * 0.53 : h * 0.18;
     const k1 = (h * 0.74) / 64;
     const kEnd = 1.3 * Math.max(w / 7.5, h / 11.5);
@@ -458,6 +463,7 @@ function heroStage(stage) {
   }
 
   new ResizeObserver(resize).observe(canvas);
+  document.fonts?.ready.then(resize);
   new IntersectionObserver(([e]) => {
     shown = e.isIntersecting;
     wake();
