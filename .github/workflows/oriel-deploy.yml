@@ -1,0 +1,40 @@
+name: Oriel deploy
+# Ships sites/oriel-estates to Vercel production. Needs one repository secret,
+# VERCEL_TOKEN (vercel.com/account/tokens); without it the run is skipped.
+on:
+  push:
+    branches:
+      - main
+      - claude/friendly-faraday-e9p8oy
+    paths:
+      - sites/oriel-estates/**
+      - .github/workflows/oriel-deploy.yml
+  workflow_dispatch:
+concurrency:
+  group: oriel-deploy
+  cancel-in-progress: true
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: sites/oriel-estates
+    env:
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Deploy to Vercel
+        run: |
+          if [ -z "$VERCEL_TOKEN" ]; then
+            echo "::notice::No VERCEL_TOKEN secret yet; add it under Settings > Secrets and variables > Actions, then re-run."
+            exit 0
+          fi
+          # links to the "oriel-estates" project in the token's account; if that
+          # fails, deploy --yes sets the project up from the folder name instead
+          npx --yes vercel@latest link --yes --project oriel-estates --token "$VERCEL_TOKEN" || true
+          url=$(npx --yes vercel@latest deploy --prod --yes --token "$VERCEL_TOKEN")
+          echo "Deployed: $url"
+          echo "### Oriel is live: $url" >> "$GITHUB_STEP_SUMMARY"
