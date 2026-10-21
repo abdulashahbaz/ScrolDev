@@ -1,0 +1,13 @@
+{
+  "name": "fonds",
+  "client": "",
+  "category": "Fashion · Headwear",
+  "summary": "A scroll-driven store front for a headwear label: the model's head follows your cursor through the hero film, then a black gallery of caps and hats rises over it, each piece scaling in and out as you scroll.",
+  "type": "concept",
+  "year": 2026,
+  "url": "",
+  "cover": "cover.jpg",
+  "stack": ["React", "TypeScript", "Vite", "Tailwind CSS", "GSAP", "Motion"],
+  "featured": true,
+  "draft": false
+}
