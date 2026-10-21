@@ -404,7 +404,7 @@ h3 {
 
 .btn--primary {
   background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 82%, #fff), var(--accent) 52%, color-mix(in srgb, var(--accent) 90%, #000));
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.28), 0 1px 2px rgb(0 0 0 / 0.3), 0 10px 18px -12px color-mix(in srgb, var(--accent) 80%, transparent);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.28), 0 1px 2px rgb(0 0 0 / 0.3), 0 8px 14px -10px color-mix(in srgb, var(--accent) 55%, transparent);
   color: var(--ink);
 }
 .btn--primary:hover { background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 70%, #fff), color-mix(in srgb, var(--accent) 92%, #fff)); }
@@ -785,6 +785,24 @@ h3 {
 @media (min-width: 900px) and (min-aspect-ratio: 17/10) {
   .hero-title { font-size: min(clamp(3.25rem, 1.2rem + 5.4vw, 8rem), 15vh); }
   .hero-title .line:nth-child(-n + 2) { display: inline-block; }
+}
+
+/* Phones: Display at 56 (the brand book's mobile size), and the copy sits low so the mark has the top of the screen. */
+@media (max-width: 899px) {
+  .hero-title { font-size: clamp(2.75rem, 14.4vw, 3.5rem); }
+  .hero-inner { padding-bottom: 92px; }
+  .hero-label { margin-bottom: 20px; }
+  .hero-lede { margin-top: 20px; }
+  .hero-actions { margin-top: 24px; }
+  .hero-offer { margin-top: 20px; }
+  /* Both calls to action share one row on a standard phone. */
+  .hero-actions { gap: 10px; }
+  .hero-actions .btn { --h: 50px; gap: 8px; padding: 0 18px 0 20px; font-size: 1rem; }
+  .hero-actions .btn .icon { width: 18px; height: 18px; }
+}
+/* Tablets in portrait use the phone layout with room to spare: the headline grows into it. */
+@media (min-width: 600px) and (max-width: 899px) {
+  .hero-title { font-size: clamp(3.5rem, 10vw, 5.5rem); }
 }
 
 @media (max-height: 720px) and (max-width: 899px) {

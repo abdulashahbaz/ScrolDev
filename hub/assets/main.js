@@ -267,14 +267,25 @@ function heroStage(stage) {
   const section = stage.parentElement;
   const ctx = canvas.getContext("2d");
   const words = $$(".hero-title .line > span, .hero-lede, .hero-actions > *", stage);
+  const label = $(".hero-label", stage);
   let w = 0, h = 0, dpr = 1, raf = 0, shown = false, last = "";
-  let mx = 0, my = 0, px = 0, py = 0, textRight = 0;
+  let mx = 0, my = 0, px = 0, py = 0, textRight = 0, labelTop = 0;
 
   function resize() {
     w = canvas.clientWidth;
     h = canvas.clientHeight;
     // How far the hero's words reach, so the mark can stand in the middle of the space they leave.
     textRight = words.length ? Math.max(...words.map((el) => el.getBoundingClientRect().right)) : w * 0.6;
+    // On phones the mark stands above the words, so it needs to know where they start (offsetTop ignores the
+    // scroll-linked drift on the copy).
+    labelTop = h * 0.45;
+    if (label) for (let el = label, top = 0; el; el = el.offsetParent) {
+      top += el.offsetTop;
+      if (el.offsetParent === stage) {
+        labelTop = top;
+        break;
+      }
+    }
     dpr = Math.min(devicePixelRatio || 1, 2);
     canvas.width = Math.round(w * dpr);
     canvas.height = Math.round(h * dpr);
@@ -333,12 +344,19 @@ function heroStage(stage) {
 
     // Where the mark sits: right of the headline on wide screens, top right on phones.
     const wide = w >= 900;
-    const k0 = (wide ? Math.min(h * 0.58, 600) : Math.min(h * 0.16, 150)) / 64;
     const edge = Math.min(80, Math.max(20, w * 0.056)); // the page margin
-    const half = 20 * k0; // half the mark's width
-    const x0 = wide ? Math.min(w - edge - half, Math.max((textRight + w - edge) / 2, textRight + half + 32)) : w * 0.8;
-    const y0 = wide ? h * 0.53 : h * 0.18;
     const k1 = (h * 0.74) / 64;
+    // Phones: the mark stands right-aligned in the band between the header and the words. A phone too short for that
+    // band doesn't show it at rest; it fades in at the centre as the words dissolve.
+    const bandTop = 84, bandBottom = labelTop - 32;
+    const roomy = wide || bandBottom - bandTop >= 100;
+    const k0 = wide ? Math.min(h * 0.58, 600) / 64 : roomy ? Math.min(bandBottom - bandTop, h * 0.34, 280) / 64 : k1 * 0.8;
+    const half = 20 * k0; // half the mark's width
+    const x0 = wide
+      ? Math.min(w - edge - half, Math.max((textRight + w - edge) / 2, textRight + half + 32))
+      : roomy ? w - edge - half : w / 2;
+    const y0 = wide ? h * 0.53 : roomy ? (bandTop + bandBottom) / 2 : h / 2;
+    const presence = roomy ? 1 : ease(clamp(out * 1.25));
     const kEnd = 1.3 * Math.max(w / 7.5, h / 11.5);
     const drift = 1 - move;
     let k = k0 + (k1 - k0) * move;
@@ -370,8 +388,8 @@ function heroStage(stage) {
     const [gx, gy] = at(20, 34);
     const radius = Math.min(k * 40, Math.max(w, h));
     const light = ctx.createRadialGradient(gx, gy, 0, gx, gy, radius);
-    light.addColorStop(0, `rgba(255, 79, 26, ${0.14 * thumb.arrive})`);
-    light.addColorStop(0.5, `rgba(232, 64, 12, ${0.056 * thumb.arrive})`);
+    light.addColorStop(0, `rgba(255, 79, 26, ${0.14 * thumb.arrive * presence})`);
+    light.addColorStop(0.5, `rgba(232, 64, 12, ${0.056 * thumb.arrive * presence})`);
     light.addColorStop(1, "rgba(232, 64, 12, 0)");
     ctx.fillStyle = light;
     ctx.fillRect(gx - radius, gy - radius, radius * 2, radius * 2);
@@ -383,6 +401,7 @@ function heroStage(stage) {
     fade.addColorStop(1, "rgba(243, 238, 230, 0)");
     ctx.strokeStyle = fade;
     ctx.lineWidth = 5.2;
+    ctx.globalAlpha = presence;
     ctx.setLineDash([TRACK_LEN * draw, TRACK_LEN]);
     ctx.beginPath();
     ctx.moveTo(6, 64);
@@ -391,12 +410,13 @@ function heroStage(stage) {
     ctx.lineTo(34, 64);
     ctx.stroke();
     ctx.setLineDash([]);
+    ctx.globalAlpha = 1;
 
     if (thumb.arrive > 0) {
       const fill = ctx.createLinearGradient(0, thumbY, 0, thumbY + 19);
       fill.addColorStop(0, "#FF6533");
       fill.addColorStop(1, "#E8400C");
-      ctx.globalAlpha = thumb.arrive;
+      ctx.globalAlpha = thumb.arrive * presence;
       ctx.fillStyle = fill;
       ctx.beginPath();
       ctx.roundRect(16.25, thumbY, 7.5, 19, 3.75);
