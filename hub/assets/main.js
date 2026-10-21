@@ -485,7 +485,8 @@ function pillField(canvas) {
   const ctx = canvas.getContext("2d");
   const GAP = 15, LEN = 5, WIDTH = 2, RADIUS = 120, SHADES = 16, PEAK = 0.62;
   const DRIFT = 0.18; // the grid's share of the scroll
-  const cool = [46, 42, 38], ember = [255, 79, 26];
+  // The resting grid sits just above Ink: texture you notice, never louder than the words over it.
+  const cool = [33, 30, 27], ember = [255, 79, 26];
   const shade = Array.from({ length: SHADES + 1 }, (_, i) =>
     `rgb(${cool.map((c, j) => Math.round(c + (ember[j] - c) * (i / SHADES) * PEAK)).join(",")})`,
   );
