@@ -111,36 +111,6 @@ new ResizeObserver(() => measure()).observe(document.body);
 document.fonts?.ready.then(measure);
 addEventListener("load", measure);
 
-/* ---------- Intro (first visit per session) ---------- */
-
-function intro() {
-  const el = $(".intro");
-  if (!el || !root.classList.contains("has-intro")) {
-    el?.remove();
-    return;
-  }
-  root.classList.add("is-locked");
-  let finished = false;
-  const done = () => {
-    if (finished) return;
-    finished = true;
-    el.remove();
-    root.classList.remove("is-locked");
-    try {
-      sessionStorage.setItem("sd-intro", "1");
-    } catch {}
-    measure();
-  };
-  const skip = () => {
-    root.style.setProperty("--intro-delay", "0s");
-    el.classList.add("is-skipped");
-  };
-  el.addEventListener("animationend", (e) => e.target === el && done());
-  el.addEventListener("pointerdown", skip);
-  addEventListener("keydown", skip, { once: true });
-  setTimeout(done, 3200);
-}
-
 /* ---------- Header, progress, counter ---------- */
 
 function chrome() {
@@ -161,7 +131,7 @@ function chrome() {
     else if (travel > 56 && y > vh * 0.6) header.classList.add("is-hidden");
     header.classList.toggle("is-scrolled", y > 24);
     header.classList.toggle("is-past-hero", y > layout.heroEnd - vh * 0.35);
-    header.dataset.on = surfaceAt(y + 36);
+    header.dataset.on = heroState.ember ? "ember" : surfaceAt(y + 36);
 
     // Which nav section are we in?
     let next = null;
@@ -191,7 +161,7 @@ function chrome() {
     // contact section arrives; the footer carries its own count.
     const pinned = wide.matches && y >= layout.servicesTop - vh * 0.2 && y < layout.servicesEnd - vh * 0.8;
     hud.classList.toggle("is-on", !pinned && y + vh - 44 < layout.contactTop);
-    hud.dataset.on = surfaceAt(y + vh - 44);
+    hud.dataset.on = heroState.ember ? "ember" : surfaceAt(y + vh - 44);
     lapEl.textContent = laps > 1 ? `Lap ${String(laps).padStart(2, "0")} ·` : "";
   });
 }
@@ -242,14 +212,163 @@ function reveals() {
   for (const el of $$("[data-reveal]")) io.observe(el);
 }
 
-/* ---------- Hero: the thumb scrolls down its track, the content dissolves downward ---------- */
+/* ---------- Hero: the animated mark ----------
+   The logo mark, drawn on a canvas so it stays sharp at any size. It draws itself on load, then its thumb scrolls
+   down its track and back, like the logo animation. Scrolling pins the stage: the text dissolves downward, the mark
+   moves to the centre and grows, and the view dives into the thumb until the screen is Ember. */
 
-function heroScroll(hero) {
-  if (!hero || calm) return;
-  whileVisible(hero, () => {
-    const r = hero.getBoundingClientRect();
-    hero.style.setProperty("--p", clamp(-r.top / r.height).toFixed(4));
-  });
+const START = performance.now();
+const TRACK_LEN = 47 + Math.PI * 14 + 47; // the open arch: left leg, top arc, right leg
+const heroState = { ember: false };
+
+// The thumb at time t (seconds since load). The hero and its copy after the footer share it, so the loop is seamless.
+function thumbAt(t) {
+  if (calm) return { arrive: 1, y: 12 };
+  const arrive = ease(clamp((t - 0.8) / 0.45));
+  const cycle = t < 2.6 ? -1 : (t - 2.6) % 5;
+  const travel = cycle < 0 ? 0 : ease(clamp(cycle / 0.8)) - ease(clamp((cycle - 0.8) / 0.8));
+  return { arrive, y: 4 + 8 * arrive + 22 * travel };
+}
+
+function heroStage(stage, frozen = false) {
+  const canvas = $(".hero-mark", stage);
+  if (!canvas) return;
+  const section = frozen ? null : stage.parentElement;
+  const ctx = canvas.getContext("2d");
+  let w = 0, h = 0, dpr = 1, raf = 0, shown = false, last = "";
+  let mx = 0, my = 0, px = 0, py = 0;
+
+  function resize() {
+    w = canvas.clientWidth;
+    h = canvas.clientHeight;
+    dpr = Math.min(devicePixelRatio || 1, 2);
+    canvas.width = Math.round(w * dpr);
+    canvas.height = Math.round(h * dpr);
+    last = "";
+    tick();
+  }
+
+  function progress() {
+    if (!section || calm) return 0;
+    const r = section.getBoundingClientRect();
+    return clamp(-r.top / Math.max(1, r.height - h));
+  }
+
+  function tick() {
+    raf = 0;
+    if (shown && !calm) raf = requestAnimationFrame(tick);
+    if (!w || !h) return;
+    const t = (performance.now() - START) / 1000;
+    const p = progress();
+
+    const out = clamp(p / 0.16); // the text dissolves
+    const move = ease(clamp((p - 0.06) / 0.34)); // the mark comes to the centre and grows
+    const dive = clamp((p - 0.4) / 0.32); // then the view dives into the thumb
+    const say = ease(clamp((p - 0.76) / 0.14)); // and the Ember line arrives
+
+    px += (mx - px) * 0.08;
+    py += (my - py) * 0.08;
+    const thumb = thumbAt(t);
+    const rest = 1 - clamp(p / 0.05);
+    const thumbY = 12 + (thumb.y - 12) * rest;
+    const draw = calm ? 1 : ease(clamp((t - 0.1) / 0.8));
+
+    const key = [p, thumbY, thumb.arrive, draw, px, py, w, h].map((v) => v.toFixed(3)).join();
+    if (key === last) return;
+    last = key;
+
+    stage.style.setProperty("--out", out.toFixed(3));
+    stage.style.setProperty("--say", say.toFixed(3));
+    stage.classList.toggle("is-out", out > 0.6);
+
+    // Where the mark sits: right of the headline on wide screens, top right on phones.
+    const wide = w >= 900;
+    const k0 = (wide ? Math.min(h * 0.58, 600) : Math.min(h * 0.16, 150)) / 64;
+    const x0 = wide ? w * 0.8 : w * 0.8;
+    const y0 = wide ? h * 0.53 : h * 0.18;
+    const k1 = (h * 0.74) / 64;
+    const kEnd = 1.3 * Math.max(w / 7.5, h / 11.5);
+    const drift = 1 - move;
+    let k = k0 + (k1 - k0) * move;
+    const sx = x0 + (w / 2 - x0) * move + px * 18 * drift;
+    const sy = y0 + (h / 2 - y0) * move + py * 12 * drift;
+    let ay = 32;
+    if (dive > 0) {
+      k = k1 * Math.pow(kEnd / k1, ease(dive));
+      ay = 32 + (thumbY + 9.5 - 32) * ease(clamp(dive * 1.8));
+    }
+    const at = (ux, uy) => [sx + (ux - 20) * k, sy + (uy - ay) * k];
+
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    // Once the thumb covers the screen it is the screen: an Ember field, lit from the centre.
+    const [left, top] = at(16.25, thumbY + 3.75);
+    const [right, bottom] = at(23.75, thumbY + 15.25);
+    const ember = left <= 0 && right >= w && top <= 0 && bottom >= h;
+    if (!frozen) heroState.ember = ember;
+    if (ember) {
+      const g = ctx.createRadialGradient(w / 2, h * 0.45, 0, w / 2, h * 0.45, Math.max(w, h) * 0.75);
+      g.addColorStop(0, "#FF5A26");
+      g.addColorStop(1, "#E8400C");
+      ctx.fillStyle = g;
+      ctx.fillRect(0, 0, w, h);
+      return;
+    }
+
+    // A warm glow behind the mark.
+    const [gx, gy] = at(20, thumbY + 9.5);
+    const radius = Math.min(k * 34, Math.max(w, h));
+    const glow = ctx.createRadialGradient(gx, gy, 0, gx, gy, radius);
+    glow.addColorStop(0, `rgba(255, 79, 26, ${0.2 * thumb.arrive})`);
+    glow.addColorStop(1, "rgba(255, 79, 26, 0)");
+    ctx.fillStyle = glow;
+    ctx.fillRect(0, 0, w, h);
+
+    // The mark, in its own 40 × 64 units.
+    ctx.setTransform(dpr * k, 0, 0, dpr * k, dpr * (sx - 20 * k), dpr * (sy - ay * k));
+    const fade = ctx.createLinearGradient(0, 0, 0, 64);
+    fade.addColorStop(0.42, "rgba(243, 238, 230, 1)");
+    fade.addColorStop(1, "rgba(243, 238, 230, 0)");
+    ctx.strokeStyle = fade;
+    ctx.lineWidth = 5.2;
+    ctx.setLineDash([TRACK_LEN * draw, TRACK_LEN]);
+    ctx.beginPath();
+    ctx.moveTo(6, 64);
+    ctx.lineTo(6, 17);
+    ctx.arc(20, 17, 14, Math.PI, 0);
+    ctx.lineTo(34, 64);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    if (thumb.arrive > 0) {
+      const fill = ctx.createLinearGradient(0, thumbY, 0, thumbY + 19);
+      fill.addColorStop(0, "#FF6533");
+      fill.addColorStop(1, "#E8400C");
+      ctx.globalAlpha = thumb.arrive;
+      ctx.shadowColor = "rgba(255, 79, 26, 0.55)";
+      ctx.shadowBlur = k < k1 * 2 ? 28 * dpr : 0;
+      ctx.fillStyle = fill;
+      ctx.beginPath();
+      ctx.roundRect(16.25, thumbY, 7.5, 19, 3.75);
+      ctx.fill();
+      ctx.shadowBlur = 0;
+      ctx.globalAlpha = 1;
+    }
+  }
+
+  new ResizeObserver(resize).observe(canvas);
+  new IntersectionObserver(([e]) => {
+    shown = e.isIntersecting;
+    if (shown && !raf) tick();
+  }).observe(stage);
+  if (finePointer && !calm) {
+    addEventListener("pointermove", (e) => {
+      mx = (e.clientX / innerWidth - 0.5) * 2;
+      my = (e.clientY / innerHeight - 0.5) * 2;
+    }, { passive: true });
+  }
 }
 
 /* ---------- The pill grid ----------
@@ -260,10 +379,10 @@ function heroScroll(hero) {
 function pillField(canvas) {
   if (!canvas) return;
   const ctx = canvas.getContext("2d");
-  const GAP = 15, LEN = 5, WIDTH = 2, RADIUS = 150, SHADES = 16;
+  const GAP = 15, LEN = 5, WIDTH = 2, RADIUS = 120, SHADES = 16, PEAK = 0.62;
   const cool = [46, 42, 38], ember = [255, 79, 26];
   const shade = Array.from({ length: SHADES + 1 }, (_, i) =>
-    `rgb(${cool.map((c, j) => Math.round(c + (ember[j] - c) * (i / SHADES))).join(",")})`,
+    `rgb(${cool.map((c, j) => Math.round(c + (ember[j] - c) * (i / SHADES) * PEAK)).join(",")})`,
   );
   let w = 0, h = 0, dpr = 1, n = 0;
   let xs, ys, as, heat;
@@ -293,7 +412,7 @@ function pillField(canvas) {
   }
 
   function pill(i) {
-    const half = (LEN / 2) * (1 + heat[i] * 0.8) - WIDTH / 2;
+    const half = (LEN / 2) * (1 + heat[i] * 0.5) - WIDTH / 2;
     const dx = Math.sin(as[i]) * half, dy = Math.cos(as[i]) * half;
     ctx.moveTo(xs[i] - dx, ys[i] - dy);
     ctx.lineTo(xs[i] + dx, ys[i] + dy);
@@ -343,7 +462,7 @@ function pillField(canvas) {
       }
       // Warm up quickly, cool down slowly: things fade, they don't stop.
       const hv = heat[i];
-      heat[i] = k > hv ? hv + (k - hv) * 0.35 : hv * 0.975;
+      heat[i] = k > hv ? hv + (k - hv) * 0.3 : hv * 0.965;
       if (heat[i] < 0.01) heat[i] = 0;
       // Pills are symmetric, so turn the short way round (angles repeat every half turn).
       let diff = (target - as[i]) % Math.PI;
@@ -599,9 +718,7 @@ function loop() {
   wrap.className = "loop";
   wrap.setAttribute("aria-hidden", "true");
   wrap.inert = true;
-  const copy = hero.cloneNode(true);
-  copy.removeAttribute("id");
-  copy.removeAttribute("data-hero");
+  const copy = $(".hero-stage", hero).cloneNode(true);
   for (const el of $$("[id]", copy)) el.removeAttribute("id");
   const title = $("h1", copy);
   const div = document.createElement("div");
@@ -612,7 +729,7 @@ function loop() {
   footer.after(wrap);
   root.classList.add("has-loop");
 
-  heroScroll(copy);
+  heroStage(copy, true);
 
   always.add(() => {
     if (!layout.loopTop || state.y < layout.loopTop - 0.5) return;
@@ -626,14 +743,13 @@ function loop() {
 
 /* ---------- Start ---------- */
 
-intro();
 loop();
 services();
 measure();
 chrome();
 menu();
 reveals();
-heroScroll($("[data-hero]"));
+heroStage($(".hero-stage"));
 pillField($(".pills"));
 manifesto();
 pillars();

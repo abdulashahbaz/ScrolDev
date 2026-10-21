@@ -111,12 +111,12 @@ Open http://localhost:4173. Use a server rather than opening the file directly: 
 
 ### How the page works
 
-- **Intro:** the logo draws on once per browser session, then dissolves. Click or press any key to skip.
-- **Pill grid:** the brand's pill-grid tile is drawn live in one fixed layer behind every dark section (the Paper and Ember sections use the matching light and Ember tiles). Pills near the cursor warm to Ember, curve around it and cool slowly behind it, leaving an orange trail. On phones the trail follows the finger.
-- **Hero:** as you scroll away, the arches echo outward and the thumb runs down its track.
+- **Hero:** the logo mark, drawn live on a canvas so it stays sharp at any size. It draws itself on load and its thumb scrolls down its track and back, like the logo animation. Scrolling pins the hero: the copy dissolves, the mark moves to the centre and grows, and the view dives into the thumb until the screen is Ember and reads "Every scroll earns the next."
+- **Pill grid:** the brand's pill-grid tile is drawn live in one fixed layer behind every dark section (the Paper section uses the light tile). Pills near the cursor warm toward Ember, curve around it and cool slowly behind it, leaving a soft orange trail. On phones the trail follows the finger.
+- **Glass and light:** the header, cards, demos and the brief form are frosted glass over the pill grid, with soft Ember glows behind the services, pricing and contact sections.
 - **What we build:** on desktop the section pins and five panels slide past sideways; each has a small demo (scroll motion, layout, speed score, CMS edit, package timelines) that plays as it arrives. On phones the panels stack.
-- **Contact:** the brief form opens the visitor's email app with the brief filled in, addressed to `contactEmail`. No backend or third-party form service.
-- **The loop:** on desktop a frozen copy of the hero sits after the footer. When it reaches the top of the screen the page jumps back to the real hero, so the scroll never ends. It is off on touch devices and with reduced motion.
+- **Contact:** Ember light rises behind a glass brief form, which opens the visitor's email app with the brief filled in, addressed to `contactEmail`. No backend or third-party form service.
+- **The loop:** on desktop a frozen copy of the hero's first screen sits after the footer. When it reaches the top of the screen the page jumps back to the real hero, so the scroll never ends. It is off on touch devices and with reduced motion.
 
 ### Deploy (Vercel)
 

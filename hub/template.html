@@ -30,17 +30,13 @@
   <link rel="stylesheet" href="styles.css?v={{version}}">
 
   <script>
-    // Runs before first paint: turns on the motion layer, and plays the logo intro once per session.
+    // Runs before first paint: turns on the motion layer.
     (function () {
       var d = document.documentElement;
       d.classList.remove("no-js");
       d.classList.add("js");
       // If the motion layer never loads, show everything rather than leave it waiting to be revealed.
       setTimeout(function () { if (!d.classList.contains("ready")) d.classList.add("no-motion"); }, 3000);
-      try {
-        var calm = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-        if (!calm && !sessionStorage.getItem("sd-intro")) d.classList.add("has-intro");
-      } catch (e) {}
     })();
   </script>
   <script type="module" src="main.js?v={{version}}"></script>
@@ -80,19 +76,6 @@
     <symbol id="i-infinite" viewBox="0 0 24 24"><path d="M12 12c-2-2.7-3.6-4-5.5-4a4 4 0 0 0 0 8c1.9 0 3.5-1.3 5.5-4s3.6-4 5.5-4a4 4 0 0 1 0 8c-1.9 0-3.5-1.3-5.5-4z"/></symbol>
   </svg>
 
-  <!-- First visit only: the mark draws on, the thumb arrives, the wordmark scrolls up, then it all dissolves downward. -->
-  <div class="intro" aria-hidden="true">
-    <svg class="intro-logo" viewBox="120 120 4662 994">
-      <g transform="translate(66.88 -170)">
-        <g transform="translate(0 283.75) scale(15.625)">
-          <path class="intro-track" d="M6 64V17A14 14 0 0 1 34 17V64" pathLength="1" fill="none" stroke="currentColor" stroke-width="5.2" mask="url(#m-fade)"/>
-          <rect class="intro-thumb" x="16.25" y="12" width="7.5" height="19" rx="3.75"/>
-        </g>
-        <g class="intro-word"><use href="#wm" fill="currentColor"/></g>
-      </g>
-    </svg>
-  </div>
-
   <a class="skip" href="#main">Skip to content</a>
 
   <!-- The brand's pill grid, drawn live behind every dark section. Pills near the pointer warm to Ember. -->
@@ -101,7 +84,8 @@
   <div class="progress" aria-hidden="true"><span class="progress-thumb"></span></div>
 
   <header class="header" data-on="ink">
-    <div class="container header-inner">
+    <div class="container">
+      <div class="header-inner">
       <a class="logo" href="#top" aria-label="Scroldev, back to top">
         <svg viewBox="120 120 4662 994" aria-hidden="true">
           <g transform="translate(66.88 -170)">
@@ -125,6 +109,7 @@
         <svg class="icon icon-open" aria-hidden="true"><use href="#i-menu"/></svg>
         <svg class="icon icon-close" aria-hidden="true"><use href="#i-close"/></svg>
       </button>
+      </div>
     </div>
   </header>
 
@@ -148,52 +133,35 @@
   </div>
 
   <main id="main">
-    <!-- Hero. On desktop it is cloned after the footer, so the page loops back here without a seam. -->
+    <!-- Hero: the animated mark. Scrolling moves it to the centre and dives into its thumb until the screen is Ember.
+         On desktop the stage is cloned after the footer, so the page loops back here without a seam. -->
     <section class="hero" id="top" data-surface="ink" data-hero>
-      <svg class="hero-arches" viewBox="0 0 1600 1000" aria-hidden="true" preserveAspectRatio="xMidYMax meet">
-        <defs>
-          <linearGradient id="ae0" x1="0" y1="760" x2="0" y2="1000" gradientUnits="userSpaceOnUse"><stop offset="0.62" stop-color="#F3EEE6"/><stop offset="1" stop-color="#F3EEE6" stop-opacity="0"/></linearGradient>
-          <linearGradient id="ae1" x1="0" y1="660" x2="0" y2="1000" gradientUnits="userSpaceOnUse"><stop offset="0.62" stop-color="#9A9289" stop-opacity="0.49"/><stop offset="1" stop-color="#9A9289" stop-opacity="0"/></linearGradient>
-          <linearGradient id="ae2" x1="0" y1="560" x2="0" y2="1000" gradientUnits="userSpaceOnUse"><stop offset="0.62" stop-color="#9A9289" stop-opacity="0.43"/><stop offset="1" stop-color="#9A9289" stop-opacity="0"/></linearGradient>
-          <linearGradient id="ae3" x1="0" y1="460" x2="0" y2="1000" gradientUnits="userSpaceOnUse"><stop offset="0.62" stop-color="#9A9289" stop-opacity="0.37"/><stop offset="1" stop-color="#9A9289" stop-opacity="0"/></linearGradient>
-          <linearGradient id="ae4" x1="0" y1="360" x2="0" y2="1000" gradientUnits="userSpaceOnUse"><stop offset="0.62" stop-color="#9A9289" stop-opacity="0.31"/><stop offset="1" stop-color="#9A9289" stop-opacity="0"/></linearGradient>
-          <linearGradient id="ae5" x1="0" y1="260" x2="0" y2="1000" gradientUnits="userSpaceOnUse"><stop offset="0.62" stop-color="#9A9289" stop-opacity="0.25"/><stop offset="1" stop-color="#9A9289" stop-opacity="0"/></linearGradient>
-          <linearGradient id="ae6" x1="0" y1="160" x2="0" y2="1000" gradientUnits="userSpaceOnUse"><stop offset="0.62" stop-color="#9A9289" stop-opacity="0.19"/><stop offset="1" stop-color="#9A9289" stop-opacity="0"/></linearGradient>
-        </defs>
-        <g class="arches">
-          <path style="--i:6" d="M80 1000V880A720 720 0 0 1 1520 880V1000" stroke="url(#ae6)" stroke-width="2" fill="none"/>
-          <path style="--i:5" d="M180 1000V880A620 620 0 0 1 1420 880V1000" stroke="url(#ae5)" stroke-width="2" fill="none"/>
-          <path style="--i:4" d="M280 1000V880A520 520 0 0 1 1320 880V1000" stroke="url(#ae4)" stroke-width="2" fill="none"/>
-          <path style="--i:3" d="M380 1000V880A420 420 0 0 1 1220 880V1000" stroke="url(#ae3)" stroke-width="2" fill="none"/>
-          <path style="--i:2" d="M480 1000V880A320 320 0 0 1 1120 880V1000" stroke="url(#ae2)" stroke-width="2" fill="none"/>
-          <path style="--i:1" d="M580 1000V880A220 220 0 0 1 1020 880V1000" stroke="url(#ae1)" stroke-width="2" fill="none"/>
-          <path style="--i:0" d="M680 1000V880A120 120 0 0 1 920 880V1000" stroke="url(#ae0)" stroke-width="3" fill="none"/>
-        </g>
-        <g class="hero-thumb-wrap"><rect class="hero-thumb" x="787" y="806" width="26" height="70" rx="13"/></g>
-      </svg>
-
-      <div class="container hero-inner">
-        <p class="label hero-label"><span class="pip" aria-hidden="true"></span>Scroldev · The scroll agency</p>
-        <h1 class="hero-title">
-          <span class="line"><span>Websites you’d scroll</span></span>
-          <span class="line"><span>for eternity.</span></span>
-        </h1>
-        <p class="hero-lede">We design and build motion-led websites for startups and premium brands. Live in weeks, not months.</p>
-        <div class="hero-actions">
-          <a class="btn btn--primary" href="#contact"><span class="btn-label"><span>Start a project</span></span><svg class="icon" aria-hidden="true"><use href="#i-arrow-up-right"/></svg></a>
-          <a class="btn btn--secondary" href="#pricing"><span class="btn-label"><span>See pricing</span></span><svg class="icon" aria-hidden="true"><use href="#i-arrow-right"/></svg></a>
+      <div class="hero-stage">
+        <canvas class="hero-mark" aria-hidden="true"></canvas>
+        <div class="container hero-inner">
+          <p class="label hero-label"><span class="pip" aria-hidden="true"></span>Scroldev · The scroll agency</p>
+          <h1 class="hero-title">
+            <span class="line"><span>Websites you’d scroll</span></span>
+            <span class="line"><span>for eternity.</span></span>
+          </h1>
+          <p class="hero-lede">We design and build motion-led websites for startups and premium brands. Live in weeks, not months.</p>
+          <div class="hero-actions">
+            <a class="btn btn--primary" href="#contact"><span class="btn-label"><span>Start a project</span></span><svg class="icon" aria-hidden="true"><use href="#i-arrow-up-right"/></svg></a>
+            <a class="btn btn--secondary" href="#pricing"><span class="btn-label"><span>See pricing</span></span><svg class="icon" aria-hidden="true"><use href="#i-arrow-right"/></svg></a>
+          </div>
+          <p class="label hero-offer">From $1,000 · Live in as little as 7 days</p>
         </div>
-        <p class="label hero-offer">From $1,000 · Live in as little as 7 days</p>
-      </div>
 
-      <div class="container hero-foot">
-        <a class="cue" href="#idea">
-          <svg class="cue-mark" viewBox="0 0 40 64" aria-hidden="true">
-            <path d="M6 64V17A14 14 0 0 1 34 17V64" fill="none" stroke="currentColor" stroke-width="5.2" mask="url(#m-fade)"/>
-            <rect class="cue-thumb" x="16.25" y="12" width="7.5" height="19" rx="3.75"/>
-          </svg>
-          <span class="label">Keep scrolling</span>
-        </a>
+        <div class="container hero-foot">
+          <a class="cue" href="#idea">
+            <svg class="cue-mark" viewBox="0 0 40 64" aria-hidden="true">
+              <path d="M6 64V17A14 14 0 0 1 34 17V64" fill="none" stroke="currentColor" stroke-width="5.2" mask="url(#m-fade)"/>
+              <rect class="cue-thumb" x="16.25" y="12" width="7.5" height="19" rx="3.75"/>
+            </svg>
+            <span class="label">Keep scrolling</span>
+          </a>
+        </div>
+        <p class="hero-dive"><span>Every scroll</span> <span>earns the next.</span></p>
       </div>
     </section>
 
@@ -613,8 +581,9 @@
       </div>
     </section>
 
-    <!-- 06 Contact, on Ember: everything here goes white, long text stays Ink. -->
-    <section class="section contact" id="contact" data-surface="ember">
+    <!-- 06 Contact: Ember light rising behind a glass form. -->
+    <section class="section contact" id="contact" data-surface="ink">
+      <div class="contact-glow" aria-hidden="true"></div>
       <div class="container">
         <p class="label section-label" data-reveal><span class="num">06</span> Start a project</p>
         <h2 class="contact-title" data-reveal>Your site has three seconds to earn the next scroll.</h2>
@@ -622,6 +591,11 @@
       <div class="container contact-grid">
         <div class="contact-copy">
           <p class="contact-sub" data-reveal style="--i:1">Tell us what you’re launching. We’ll come back with the package that fits, a timeline and the first questions for kickoff.</p>
+          <ol class="next-steps" data-reveal style="--i:2">
+            <li><span class="label">01</span>Send the brief</li>
+            <li><span class="label">02</span>Get a package, price and timeline</li>
+            <li><span class="label">03</span>Kickoff call, then motion in the first round</li>
+          </ol>
           <div class="contact-direct" data-reveal style="--i:2">
             <p class="label">Prefer email?</p>
             <p class="contact-email">
@@ -681,13 +655,13 @@
   </main>
 
   <footer class="footer" data-surface="ink">
-    <div class="fade-stripes" aria-hidden="true"></div>
+    <div class="footer-glow" aria-hidden="true"></div>
     <div class="container">
       <div class="footer-top">
         <p class="footer-signoff" data-reveal>Keep<br>scrolling<span class="footer-arrow" aria-hidden="true">↓</span></p>
         <svg class="footer-mark" viewBox="0 0 40 64" aria-hidden="true">
           <path d="M6 64V17A14 14 0 0 1 34 17V64" fill="none" stroke="currentColor" stroke-width="5.2" mask="url(#m-fade)"/>
-          <rect class="footer-thumb" x="16.25" y="12" width="7.5" height="19" rx="3.75"/>
+          <g class="footer-thumb-loop"><rect class="footer-thumb" x="16.25" y="12" width="7.5" height="19" rx="3.75"/></g>
         </svg>
       </div>
       <div class="footer-cols">
