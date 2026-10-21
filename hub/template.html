@@ -95,6 +95,9 @@
 
   <a class="skip" href="#main">Skip to content</a>
 
+  <!-- The brand's pill grid, drawn live behind every dark section. Pills near the pointer warm to Ember. -->
+  <canvas class="pills" aria-hidden="true"></canvas>
+
   <div class="progress" aria-hidden="true"><span class="progress-thumb"></span></div>
 
   <header class="header" data-on="ink">
@@ -111,7 +114,7 @@
         </svg>
       </a>
       <nav class="nav" aria-label="Main">
-        <a href="#work">Work</a>
+        <a href="#services">Services</a>
         <a href="#agency">Agency</a>
         <a href="#process">Process</a>
         <a href="#pricing">Pricing</a>
@@ -128,7 +131,7 @@
   <div class="menu" id="menu" hidden>
     <nav class="container menu-inner" aria-label="Menu">
       <ol class="menu-links">
-        <li><a href="#work"><span class="label">02</span>Work</a></li>
+        <li><a href="#services"><span class="label">02</span>Services</a></li>
         <li><a href="#agency"><span class="label">03</span>Agency</a></li>
         <li><a href="#process"><span class="label">04</span>Process</a></li>
         <li><a href="#pricing"><span class="label">05</span>Pricing</a></li>
@@ -147,7 +150,6 @@
   <main id="main">
     <!-- Hero. On desktop it is cloned after the footer, so the page loops back here without a seam. -->
     <section class="hero" id="top" data-surface="ink" data-hero>
-      <canvas class="hero-grid" aria-hidden="true"></canvas>
       <svg class="hero-arches" viewBox="0 0 1600 1000" aria-hidden="true" preserveAspectRatio="xMidYMax meet">
         <defs>
           <linearGradient id="ae0" x1="0" y1="760" x2="0" y2="1000" gradientUnits="userSpaceOnUse"><stop offset="0.62" stop-color="#F3EEE6"/><stop offset="1" stop-color="#F3EEE6" stop-opacity="0"/></linearGradient>
@@ -179,7 +181,7 @@
         <p class="hero-lede">We design and build motion-led websites for startups and premium brands. Live in weeks, not months.</p>
         <div class="hero-actions">
           <a class="btn btn--primary" href="#contact"><span class="btn-label"><span>Start a project</span></span><svg class="icon" aria-hidden="true"><use href="#i-arrow-up-right"/></svg></a>
-          <a class="btn btn--secondary" href="#work"><span class="btn-label"><span>See the work</span></span><svg class="icon" aria-hidden="true"><use href="#i-arrow-right"/></svg></a>
+          <a class="btn btn--secondary" href="#pricing"><span class="btn-label"><span>See pricing</span></span><svg class="icon" aria-hidden="true"><use href="#i-arrow-right"/></svg></a>
         </div>
         <p class="label hero-offer">From $1,000 · Live in as little as 7 days</p>
       </div>
@@ -207,53 +209,106 @@
       </div>
     </section>
 
-    <!-- The Endless Thumb: a pinned walk through the mark, one part at a time. -->
-    <section class="mark-story" id="mark" data-surface="ink" aria-labelledby="mark-title">
-      <div class="mark-sticky">
-        <div class="container mark-grid">
-          <div class="mark-visual" aria-hidden="true">
-            <svg class="mark-svg" viewBox="-6 -2 52 70">
-              <defs>
-                <linearGradient id="g-story" x1="0" y1="0" x2="0" y2="64" gradientUnits="userSpaceOnUse">
-                  <stop class="story-stop" offset="1" stop-color="#fff"/>
-                  <stop offset="1" stop-color="#fff" stop-opacity="0"/>
-                </linearGradient>
-                <mask id="m-story" maskUnits="userSpaceOnUse" x="-6" y="-2" width="52" height="70">
-                  <rect x="-6" y="-2" width="52" height="70" fill="url(#g-story)"/>
-                </mask>
-              </defs>
-              <path class="story-guide" d="M6 64V17A14 14 0 0 1 34 17V64" fill="none" stroke-width="0.25"/>
-              <path class="story-track" d="M6 64V17A14 14 0 0 1 34 17V64" pathLength="1" fill="none" stroke-width="5.2" mask="url(#m-story)"/>
-              <rect class="story-thumb" x="16.25" y="12" width="7.5" height="19" rx="3.75"/>
-            </svg>
-            <p class="label story-count"><span data-story-count>0</span>%</p>
+    <!-- 02 What we build: pinned on desktop, the panels slide past sideways and each demo plays as it arrives. -->
+    <section class="services" id="services" data-surface="ink" aria-labelledby="services-title">
+      <div class="services-pin">
+        <div class="container services-head">
+          <div class="services-intro">
+            <p class="label section-label" data-reveal><span class="num">02</span> What we build</p>
+            <h2 class="h1" id="services-title" data-reveal>What goes into a Scroldev site.</h2>
           </div>
-          <div class="mark-copy">
-            <p class="label section-label"><span class="pip" aria-hidden="true"></span>The Endless Thumb</p>
-            <h2 class="h1" id="mark-title">A track that hides its length.</h2>
-            <p class="mark-lede">Our mark is a scroll thumb inside a track that fades out before you can see where it ends. On a great website you never check how much is left. You just keep going.</p>
-            <ol class="mark-steps">
-              <li class="is-active"><span class="label">Track</span><span>The page. Rounded at the top, open at the bottom.</span></li>
-              <li><span class="label">Thumb</span><span>You, scrolling. Narrow, centered, always the accent.</span></li>
-              <li><span class="label">Fade</span><span>The feeling. You never see the end coming.</span></li>
-            </ol>
+          <div class="services-meter" aria-hidden="true">
+            <span class="label"><span data-services-index>01</span> / 05</span>
+            <span class="meter-track"><span class="meter-thumb"></span></span>
           </div>
         </div>
-      </div>
-    </section>
-
-    <!-- 02 Work: generated from sites/*/scroldev.json by hub/build.mjs -->
-    <section class="section work" id="work" data-surface="ink">
-      <div class="container">
-        <div class="section-head">
-          <p class="label section-label" data-reveal><span class="num">02</span> Work</p>
-          <h2 class="h1" data-reveal>Proof over promises.</h2>
-          <p class="section-intro" data-reveal style="--i:1">We show the work, not adjectives. Every site here was designed and built by Scroldev.</p>
-          <p class="label section-count" data-reveal style="--i:2">{{workCount}}</p>
+        <div class="services-viewport">
+          <ol class="services-track">
+            <li class="service">
+              <div class="service-demo demo-motion" aria-hidden="true">
+                <div class="mini-bar"><i></i><i></i><i></i><span></span></div>
+                <div class="mini-view">
+                  <div class="mini-page">
+                    <div class="mini-hero"><b></b><b></b><s></s><em></em></div>
+                    <div class="mini-row" style="--t:0.18"><span></span><span></span><span></span></div>
+                    <div class="mini-arch" style="--t:0.38"></div>
+                    <div class="mini-row" style="--t:0.58"><span></span><span></span></div>
+                    <div class="mini-lines" style="--t:0.74"><b></b><b></b><b></b></div>
+                  </div>
+                  <div class="mini-scroll"><span></span></div>
+                </div>
+              </div>
+              <div class="service-copy">
+                <p class="label tag"><span class="pip" aria-hidden="true"></span>All packages</p>
+                <h3>Motion that follows the scroll.</h3>
+                <p>Sections move with the reader on one smooth curve, so every scroll reveals something worth the next one.</p>
+              </div>
+            </li>
+            <li class="service">
+              <div class="service-demo demo-design" aria-hidden="true">
+                <div class="blueprint"></div>
+                <span class="piece piece-h1" style="--t:0.05;--ox:-60px;--oy:0px"></span>
+                <span class="piece piece-h2" style="--t:0.2;--ox:-40px;--oy:0px"></span>
+                <span class="piece piece-text" style="--t:0.35;--ox:0px;--oy:30px"><b></b><b></b><b></b></span>
+                <span class="piece piece-arch" style="--t:0.5;--ox:60px;--oy:0px"></span>
+                <span class="piece piece-btn" style="--t:0.68;--ox:0px;--oy:24px"></span>
+                <span class="label demo-caption">12 columns · 80px margins</span>
+              </div>
+              <div class="service-copy">
+                <p class="label tag"><span class="pip pip--muted" aria-hidden="true"></span>All packages</p>
+                <h3>Designed from a blank page.</h3>
+                <p>No templates, ever. Your layout, type and motion are designed for your brand, homepage first, then every page follows the system.</p>
+              </div>
+            </li>
+            <li class="service">
+              <div class="service-demo demo-speed" aria-hidden="true">
+                <svg class="gauge" viewBox="0 0 200 116">
+                  <path class="gauge-track" d="M16 108A84 84 0 0 1 184 108" pathLength="1"/>
+                  <path class="gauge-fill" d="M16 108A84 84 0 0 1 184 108" pathLength="1"/>
+                </svg>
+                <p class="gauge-num"><span data-gauge>0</span><small>+</small></p>
+                <p class="label gauge-label">Speed score we build to</p>
+              </div>
+              <div class="service-copy">
+                <p class="label tag"><span class="pip pip--muted" aria-hidden="true"></span>Studio and Flagship</p>
+                <h3>Fast on every phone.</h3>
+                <p>Built to a 90+ speed score and tested on real phones and laptops. A slow site loses the visitor before the first scroll.</p>
+              </div>
+            </li>
+            <li class="service">
+              <div class="service-demo demo-cms" aria-hidden="true">
+                <div class="cms">
+                  <div class="cms-top"><span class="label">Homepage · Hero</span><span class="label cms-status" data-cms-status>Draft</span></div>
+                  <span class="label cms-label">Headline</span>
+                  <p class="cms-field"><span data-cms-text="Launch day is Thursday."></span><i class="caret"></i></p>
+                  <span class="label cms-label">Button</span>
+                  <p class="cms-field cms-field--short">Join the waitlist</p>
+                  <span class="cms-publish">Publish</span>
+                </div>
+              </div>
+              <div class="service-copy">
+                <p class="label tag"><span class="pip pip--muted" aria-hidden="true"></span>Studio and Flagship</p>
+                <h3>Yours to edit.</h3>
+                <p>A CMS you can use and a training video, so changing a headline never waits on a developer.</p>
+              </div>
+            </li>
+            <li class="service">
+              <div class="service-demo demo-weeks" aria-hidden="true">
+                <div class="weeks-axis label"><span>Week 1</span><span>Week 2</span><span>Week 3</span><span>Week 4</span></div>
+                <div class="weeks-bars">
+                  <div class="bar" style="--len:0.357;--t:0.05"><p class="label"><span>Launch</span><span>7–10 days</span></p><span class="bar-track"><span class="bar-fill"></span></span></div>
+                  <div class="bar" style="--len:0.75;--t:0.3"><p class="label"><span>Studio</span><span>2–3 weeks</span></p><span class="bar-track"><span class="bar-fill"></span></span></div>
+                  <div class="bar" style="--len:1;--t:0.55"><p class="label"><span>Flagship</span><span>3–4 weeks</span></p><span class="bar-track"><span class="bar-fill"></span></span></div>
+                </div>
+              </div>
+              <div class="service-copy">
+                <p class="label tag"><span class="pip pip--muted" aria-hidden="true"></span>7 days to 4 weeks</p>
+                <h3>Live in weeks, not months.</h3>
+                <p>Fixed scope and short feedback loops. You see motion in the first design round, not at the end.</p>
+              </div>
+            </li>
+          </ol>
         </div>
-        <div class="projects">{{work}}
-        </div>
-        {{conceptNote}}
       </div>
     </section>
 
@@ -371,7 +426,7 @@
       </div>
     </section>
 
-    <!-- 04 Process, on the blueprint grid -->
+    <!-- 04 Process -->
     <section class="section process" id="process" data-surface="ink">
       <div class="container">
         <div class="section-head section-head--split">
@@ -639,7 +694,7 @@
         <div>
           <p class="label">Sitemap</p>
           <ul>
-            <li><a href="#work">Work</a></li>
+            <li><a href="#services">Services</a></li>
             <li><a href="#agency">Agency</a></li>
             <li><a href="#process">Process</a></li>
             <li><a href="#pricing">Pricing</a></li>

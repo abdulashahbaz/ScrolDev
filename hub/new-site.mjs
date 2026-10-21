@@ -43,10 +43,10 @@ try {
   process.exit(1);
 }
 
-console.log(`Created sites/${slug}/scroldev.json (draft, hidden from scroldev.com).
+console.log(`Created sites/${slug}/scroldev.json (draft).
 
 Next:
   1. Put the site's code in sites/${slug}/ if it isn't there yet.
   2. Fill in category, summary and type ("client" or "concept") in scroldev.json.
   3. Add a cover screenshot (e.g. sites/${slug}/cover.jpg) and set "cover": "cover.jpg".
-  4. Set "draft": false, then run npm run build to see it in the Work section.`);
+  4. Set "draft": false, then run npm run check to validate it.`);

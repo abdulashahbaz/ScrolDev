@@ -1,9 +1,9 @@
-// Builds scroldev.com: renders hub/template.html with the work from sites/*/scroldev.json, copies
-// hub/assets/, and writes the static site to dist/. No dependencies; run with `npm run build`.
-// `npm run check` validates the config and the site metadata without writing anything.
+// Builds scroldev.com: renders hub/template.html with hub/config.json, copies hub/assets/, and writes the
+// static site to dist/. No dependencies; run with `npm run build`.
+// `npm run check` validates the config and the portfolio metadata in sites/*/scroldev.json, writing nothing.
 
 import { createHash } from "node:crypto";
-import { copyFile, cp, mkdir, readdir, readFile, rm, stat, writeFile } from "node:fs/promises";
+import { cp, readdir, readFile, rm, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -20,11 +20,18 @@ const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const LINK = /^https:\/\/[^\s]+$/;
 
 const config = JSON.parse(await readFile(path.join(hubDir, "config.json"), "utf8"));
-const configErrors = checkConfig(config);
-const { sites, errors, warnings } = await loadSites();
-errors.unshift(...configErrors);
+const errors = checkConfig(config);
 
-for (const w of warnings) console.warn(`warning: ${w}`);
+// The portfolio isn't shown on scroldev.com right now, so its metadata only gates `npm run check`,
+// never a website deploy.
+let sites = [];
+if (checkOnly) {
+  const loaded = await loadSites();
+  sites = loaded.sites;
+  errors.push(...loaded.errors);
+  for (const w of loaded.warnings) console.warn(`warning: ${w}`);
+}
+
 if (errors.length) {
   for (const e of errors) console.error(`error: ${e}`);
   console.error(`\n${errors.length} problem(s). Fix them and run again.`);
@@ -32,18 +39,12 @@ if (errors.length) {
 }
 
 if (checkOnly) {
-  console.log(`OK: config is valid, ${sites.length} published site(s).`);
+  console.log(`OK: config is valid, ${sites.length} published portfolio site(s).`);
 } else {
   await rm(distDir, { recursive: true, force: true });
   await cp(path.join(hubDir, "assets"), distDir, { recursive: true });
-  await mkdir(path.join(distDir, "covers"), { recursive: true });
-  for (const site of sites) {
-    if (!site.coverSrc) continue;
-    site.coverHref = `covers/${site.slug}${path.extname(site.coverSrc).toLowerCase()}`;
-    await copyFile(site.coverSrc, path.join(distDir, site.coverHref));
-  }
 
-  const tokens = await pageTokens(sites);
+  const tokens = await pageTokens();
   const template = await readFile(path.join(hubDir, "template.html"), "utf8");
   await writeFile(path.join(distDir, "index.html"), fill(template, tokens, "hub/template.html"));
   const notFound = await readFile(path.join(hubDir, "404.html"), "utf8");
@@ -54,7 +55,7 @@ if (checkOnly) {
     `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n  <url><loc>${tokens.siteUrl}/</loc></url>\n</urlset>\n`,
   );
   await writeFile(path.join(distDir, "site.webmanifest"), JSON.stringify(manifest(), null, 2) + "\n");
-  console.log(`Built dist/ with ${sites.length} published site(s).`);
+  console.log("Built dist/.");
 }
 
 function checkConfig(c) {
@@ -166,69 +167,10 @@ function fill(template, tokens, file) {
   });
 }
 
-function pad(n) {
-  return String(n).padStart(2, "0");
-}
-
-function arrow(name) {
-  return `<svg class="icon" aria-hidden="true"><use href="#i-${name}"/></svg>`;
-}
-
-function renderProject(site, i) {
-  const meta = [site.client, site.category].filter(Boolean).map((s) => `<span>${esc(s)}</span>`).join("");
-  const concept =
-    site.type === "concept"
-      ? `<span class="tag" title="Self-initiated design, not client work"><span class="pip pip--muted" aria-hidden="true"></span>Concept</span>`
-      : "";
-  const cover = site.coverHref
-    ? `<img src="${esc(site.coverHref)}" alt="${esc(site.name)} home page" loading="lazy" decoding="async">`
-    : `<span class="frame-empty">${esc(site.name)}</span>`;
-  const stack = site.stack.length
-    ? `<ul class="stack" aria-label="Built with">${site.stack.map((s) => `<li>${esc(s)}</li>`).join("")}</ul>`
-    : "";
-  const link = site.url
-    ? `<a class="btn btn--secondary btn--sm project-link" href="${esc(site.url)}" target="_blank" rel="noopener"><span class="btn-label"><span>Visit the site</span></span>${arrow("arrow-up-right")}<span class="visually-hidden">(${esc(site.name)}, opens in a new tab)</span></a>`
-    : "";
-
-  return `
-          <article class="project" data-reveal>
-            <div class="project-head">
-              <p class="label project-index">${pad(i + 1)}</p>
-              <h3 class="project-name">${esc(site.name)}</h3>
-              <p class="label project-meta">${meta}<span>${site.year}</span>${concept}</p>
-            </div>
-            <div class="frame">${cover}</div>
-            <div class="project-body">
-              <p class="project-summary">${esc(site.summary)}</p>
-              <div class="project-side">${stack}${link}</div>
-            </div>
-          </article>`;
-}
-
-function renderNext(i) {
-  return `
-          <a class="project project--next" href="#contact" data-reveal>
-            <div class="project-head">
-              <p class="label project-index">${pad(i + 1)}</p>
-              <h3 class="project-name">Your site, next.</h3>
-              <p class="label project-meta"><span>Start a project</span>${arrow("arrow-up-right")}</p>
-            </div>
-            <div class="frame"><svg class="frame-cross icon" aria-hidden="true"><use href="#i-plus"/></svg></div>
-          </a>`;
-}
-
-async function pageTokens(sites) {
+async function pageTokens() {
   const siteUrl = config.siteUrl.replace(/\/+$/, "");
   const email = config.contactEmail.trim();
   const social = (config.social ?? []).filter((s) => s.url);
-
-  const work = sites.length
-    ? sites.map(renderProject).join("") + renderNext(sites.length)
-    : `
-          <div class="empty-work"><p>Our first projects are being polished. Check back soon.</p></div>` + renderNext(0);
-  const conceptNote = sites.some((s) => s.type === "concept")
-    ? `<p class="concept-note"><span class="label tag"><span class="pip pip--muted" aria-hidden="true"></span>Concept</span>marks a self-initiated design, not client work.</p>`
-    : "";
 
   // Cache-busting: the version changes whenever the stylesheet or script does.
   const hash = createHash("sha256");
@@ -252,9 +194,6 @@ async function pageTokens(sites) {
     email: esc(email),
     version: hash.digest("hex").slice(0, 10),
     jsonLd: JSON.stringify(jsonLd).replaceAll("<", "\\u003c"),
-    work,
-    workCount: sites.length === 1 ? "01 project" : `${pad(sites.length)} projects`,
-    conceptNote,
     social: social.length
       ? `<div>
           <p class="label">Elsewhere</p>

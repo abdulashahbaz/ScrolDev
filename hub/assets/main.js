@@ -77,6 +77,7 @@ const footer = $(".footer");
 const navLinks = $$(".nav a");
 
 function measure() {
+  for (const fn of servicesSizing) fn();
   const y = scrollY;
   const top = (el) => el.getBoundingClientRect().top + y;
   layout.surfaces = $$("[data-surface]").map((el) => {
@@ -94,6 +95,9 @@ function measure() {
   });
   const contact = document.getElementById("contact");
   layout.contactTop = contact ? top(contact) : Infinity;
+  const services = $(".services");
+  layout.servicesTop = services ? top(services) : 0;
+  layout.servicesEnd = services ? layout.servicesTop + services.offsetHeight : 0;
   schedule();
 }
 
@@ -183,8 +187,10 @@ function chrome() {
       const text = `${rounded.toLocaleString("en-US")}px`;
       for (const c of counts) c.textContent = text;
     }
-    // The counter rests once the contact section arrives; the footer carries its own count.
-    hud.classList.toggle("is-on", y > vh * 0.55 && y + vh - 44 < layout.contactTop);
+    // The counter steps aside while the services section is pinned (it has its own meter) and rests once the
+    // contact section arrives; the footer carries its own count.
+    const pinned = wide.matches && y >= layout.servicesTop - vh * 0.2 && y < layout.servicesEnd - vh * 0.8;
+    hud.classList.toggle("is-on", !pinned && y + vh - 44 < layout.contactTop);
     hud.dataset.on = surfaceAt(y + vh - 44);
     lapEl.textContent = laps > 1 ? `Lap ${String(laps).padStart(2, "0")} ·` : "";
   });
@@ -246,42 +252,51 @@ function heroScroll(hero) {
   });
 }
 
-/* ---------- Hero: the pill grid ----------
-   The brand's base texture, drawn live. Near the cursor the pills turn to circle it, so the pointer leaves
-   an echo of arches in the grid. The pills never brighten; only their angle changes. */
+/* ---------- The pill grid ----------
+   The brand's pill-grid tile (2 × 5px pills every 15px), drawn live in one fixed layer behind every dark section.
+   Ember is kept for the pointer: pills near it warm to Ember and turn to circle it, then cool slowly once it moves
+   on, so it leaves a fading orange trail. On touch screens the trail follows the finger. */
 
-function pillGrid(canvas) {
+function pillField(canvas) {
   if (!canvas) return;
   const ctx = canvas.getContext("2d");
-  const GAP = 15, LEN = 5, WIDTH = 2, RADIUS = 190;
+  const GAP = 15, LEN = 5, WIDTH = 2, RADIUS = 150, SHADES = 16;
+  const cool = [46, 42, 38], ember = [255, 79, 26];
+  const shade = Array.from({ length: SHADES + 1 }, (_, i) =>
+    `rgb(${cool.map((c, j) => Math.round(c + (ember[j] - c) * (i / SHADES))).join(",")})`,
+  );
   let w = 0, h = 0, dpr = 1, n = 0;
-  let xs, ys, as, ss;
-  let px = -1e5, py = -1e5, cx = -1e5, cy = -1e5;
-  let running = 0, inView = false;
-  const interactive = finePointer && !calm;
+  let xs, ys, as, heat;
+  let px = -1e5, py = -1e5;
+  let running = 0;
 
   function build() {
-    const rect = canvas.getBoundingClientRect();
-    w = rect.width;
-    h = rect.height;
+    w = canvas.clientWidth;
+    h = canvas.clientHeight;
     if (!w || !h) return;
     dpr = Math.min(devicePixelRatio || 1, 2);
     canvas.width = Math.round(w * dpr);
     canvas.height = Math.round(h * dpr);
-    const cols = Math.ceil(w / GAP) + 1, rows = Math.ceil(h / GAP) + 1;
-    const ox = (w - (cols - 1) * GAP) / 2, oy = (h - (rows - 1) * GAP) / 2;
+    const cols = Math.ceil(w / GAP), rows = Math.ceil(h / GAP);
     n = cols * rows;
     xs = new Float32Array(n);
     ys = new Float32Array(n);
     as = new Float32Array(n);
-    ss = new Float32Array(n).fill(1);
+    heat = new Float32Array(n);
     for (let r = 0, i = 0; r < rows; r++) {
       for (let c = 0; c < cols; c++, i++) {
-        xs[i] = ox + c * GAP;
-        ys[i] = oy + r * GAP;
+        xs[i] = GAP / 2 + c * GAP;
+        ys[i] = GAP / 2 + r * GAP;
       }
     }
     draw();
+  }
+
+  function pill(i) {
+    const half = (LEN / 2) * (1 + heat[i] * 0.8) - WIDTH / 2;
+    const dx = Math.sin(as[i]) * half, dy = Math.cos(as[i]) * half;
+    ctx.moveTo(xs[i] - dx, ys[i] - dy);
+    ctx.lineTo(xs[i] + dx, ys[i] + dy);
   }
 
   function draw() {
@@ -289,69 +304,76 @@ function pillGrid(canvas) {
     ctx.clearRect(0, 0, w, h);
     ctx.lineWidth = WIDTH;
     ctx.lineCap = "round";
-    ctx.strokeStyle = "#2E2A26";
+    // One stroke per shade: the cold grid in a single pass, then the warm pills from dim to Ember.
+    const warm = [];
     ctx.beginPath();
     for (let i = 0; i < n; i++) {
-      const half = (LEN / 2) * ss[i] - WIDTH / 2;
-      const dx = Math.sin(as[i]) * half, dy = Math.cos(as[i]) * half;
-      ctx.moveTo(xs[i] - dx, ys[i] - dy);
-      ctx.lineTo(xs[i] + dx, ys[i] + dy);
+      const level = Math.round(heat[i] * SHADES);
+      if (level) warm.push(i, level);
+      else pill(i);
     }
+    ctx.strokeStyle = shade[0];
     ctx.stroke();
+    for (let level = 1; level <= SHADES; level++) {
+      ctx.beginPath();
+      let any = false;
+      for (let j = 0; j < warm.length; j += 2) {
+        if (warm[j + 1] !== level) continue;
+        pill(warm[j]);
+        any = true;
+      }
+      if (!any) continue;
+      ctx.strokeStyle = shade[level];
+      ctx.stroke();
+    }
   }
 
   function step() {
     running = 0;
-    const rect = canvas.getBoundingClientRect();
-    cx = px - rect.left;
-    cy = py - rect.top;
-    let moving = false;
+    let busy = false;
     const R2 = RADIUS * RADIUS;
     for (let i = 0; i < n; i++) {
-      const dx = cx - xs[i], dy = cy - ys[i];
+      const dx = px - xs[i], dy = py - ys[i];
       const d2 = dx * dx + dy * dy;
-      let target = 0, scale = 1;
+      let k = 0, target = 0;
       if (d2 < R2) {
         const f = 1 - Math.sqrt(d2) / RADIUS;
-        const k = f * f * (3 - 2 * f);
+        k = f * f * (3 - 2 * f);
         target = (Math.atan2(dx, dy) + Math.PI / 2) * k;
-        scale = 1 + k * 0.9;
       }
+      // Warm up quickly, cool down slowly: things fade, they don't stop.
+      const hv = heat[i];
+      heat[i] = k > hv ? hv + (k - hv) * 0.35 : hv * 0.975;
+      if (heat[i] < 0.01) heat[i] = 0;
       // Pills are symmetric, so turn the short way round (angles repeat every half turn).
       let diff = (target - as[i]) % Math.PI;
       if (diff > Math.PI / 2) diff -= Math.PI;
       else if (diff < -Math.PI / 2) diff += Math.PI;
-      const ds = scale - ss[i];
-      if (Math.abs(diff) > 0.002 || Math.abs(ds) > 0.002) moving = true;
-      as[i] += diff * 0.14;
-      ss[i] += ds * 0.14;
+      as[i] += diff * (k ? 0.16 : 0.06);
+      if (heat[i] || Math.abs(diff) > 0.003) busy = true;
     }
     draw();
-    if (moving && inView) running = requestAnimationFrame(step);
+    if (busy) running = requestAnimationFrame(step);
   }
 
   const kick = () => {
-    if (!running && inView && interactive) running = requestAnimationFrame(step);
+    if (!running) running = requestAnimationFrame(step);
   };
+  const point = (x, y) => {
+    px = x;
+    py = y;
+    kick();
+  };
+  const away = () => point(-1e5, -1e5);
 
-  new IntersectionObserver(([e]) => {
-    inView = e.isIntersecting;
-    if (inView) kick();
-  }).observe(canvas);
   new ResizeObserver(build).observe(canvas);
-
-  if (interactive) {
-    addEventListener("pointermove", (e) => {
-      px = e.clientX;
-      py = e.clientY;
-      kick();
-    }, { passive: true });
-    document.addEventListener("pointerleave", () => {
-      px = py = -1e5;
-      kick();
-    });
-    addEventListener("scroll", kick, { passive: true });
-  }
+  if (calm) return;
+  addEventListener("pointermove", (e) => point(e.clientX, e.clientY), { passive: true });
+  addEventListener("touchstart", (e) => point(e.touches[0].clientX, e.touches[0].clientY), { passive: true });
+  addEventListener("touchmove", (e) => point(e.touches[0].clientX, e.touches[0].clientY), { passive: true });
+  addEventListener("touchend", away, { passive: true });
+  document.documentElement.addEventListener("pointerleave", away);
+  addEventListener("blur", away);
 }
 
 /* ---------- 01 The idea: the manifesto lights up word by word as you read down ---------- */
@@ -380,67 +402,72 @@ function manifesto() {
   });
 }
 
-/* ---------- The Endless Thumb: track, then thumb, then fade ---------- */
+/* ---------- 02 What we build ----------
+   On desktop the section pins and its panels slide past sideways at scroll speed. Each panel's demo is driven by
+   --d (0 → 1) as the panel arrives; on phones the panels stack and play as they scroll up into view. */
 
-function markStory() {
-  const section = $(".mark-story");
+const servicesSizing = [];
+
+function services() {
+  const section = $(".services");
   if (!section) return;
-  const track = $(".story-track", section);
-  const guide = $(".story-guide", section);
-  const thumb = $(".story-thumb", section);
-  const stop = $(".story-stop", section);
-  const steps = $$(".mark-steps li", section);
-  const count = $("[data-story-count]", section);
+  const track = $(".services-track", section);
+  const panels = $$(".service", section);
+  const index = $("[data-services-index]", section);
+  const meter = $(".meter-track", section);
+  const meterThumb = $(".meter-thumb", section);
+  const gauge = $("[data-gauge]", section);
+  const cms = $(".cms", section);
+  const cmsText = $("[data-cms-text]", section);
+  const cmsStatus = $("[data-cms-status]", section);
+  const headline = cmsText.dataset.cmsText;
+  const horizontal = () => wide.matches && !calm;
+  let distance = 0;
+  let current = -1;
 
-  if (calm) {
-    stop.setAttribute("offset", "0.42");
-    steps.forEach((s) => s.classList.add("is-active"));
-    count.textContent = "100";
-    return;
-  }
+  if (calm) return; // the markup's resting state is every demo finished
 
-  let active = 0;
-  whileVisible(section, (vh) => {
-    const r = section.getBoundingClientRect();
-    const p = clamp(-r.top / (r.height - vh));
-
-    // 1 · Track: the page draws itself, rounded top first.
-    const draw = ease(clamp(p / 0.3));
-    track.style.strokeDashoffset = (1 - draw).toFixed(4);
-    guide.style.opacity = (1 - draw).toFixed(3);
-
-    // 2 · Thumb: arrives, then scrolls down its track and back, like the loader.
-    const arrive = ease(clamp((p - 0.34) / 0.1));
-    const t = clamp((p - 0.44) / 0.22);
-    const travel = t < 0.5 ? ease(t * 2) : ease((1 - t) * 2);
-    thumb.style.opacity = arrive.toFixed(3);
-    thumb.style.transform = `translateY(${(-8 * (1 - arrive) + 18 * travel).toFixed(3)}px)`;
-
-    // 3 · Fade: the bottom of the track dissolves, so you never see where it ends.
-    stop.setAttribute("offset", (1 - 0.58 * ease(clamp((p - 0.7) / 0.22))).toFixed(4));
-
-    const next = p < 0.34 ? 0 : p < 0.68 ? 1 : 2;
-    if (next !== active) {
-      steps[active].classList.remove("is-active");
-      steps[next].classList.add("is-active");
-      active = next;
+  servicesSizing.push(() => {
+    if (horizontal()) {
+      distance = Math.max(0, track.scrollWidth - innerWidth);
+      const height = `${Math.round(innerHeight + distance)}px`;
+      if (section.style.height !== height) section.style.height = height;
+    } else {
+      distance = 0;
+      section.style.height = "";
+      track.style.transform = "";
     }
-    count.textContent = String(Math.round(p * 100));
   });
-}
 
-/* ---------- 02 Work: screenshots drift inside their frames ---------- */
-
-function work() {
-  if (calm) return;
-  for (const img of $$(".frame img")) {
-    const frameEl = img.parentElement;
-    whileVisible(frameEl, (vh) => {
-      const r = frameEl.getBoundingClientRect();
-      const p = clamp((vh - r.top) / (vh + r.height));
-      img.style.setProperty("--py", `${(p * -0.09 * r.height).toFixed(1)}px`);
+  whileVisible(section, (vh) => {
+    const vw = innerWidth;
+    let p = 0;
+    if (horizontal()) {
+      const r = section.getBoundingClientRect();
+      p = clamp(-r.top / Math.max(1, r.height - vh));
+      track.style.transform = `translate3d(${(-p * distance).toFixed(1)}px, 0, 0)`;
+      meterThumb.style.setProperty("--mx", `${(p * (meter.offsetWidth - meterThumb.offsetWidth)).toFixed(1)}px`);
+    }
+    let lead = 0;
+    panels.forEach((panel, i) => {
+      const r = panel.getBoundingClientRect();
+      const d = horizontal() ? clamp((vw * 0.94 - r.left) / (vw * 0.5)) : clamp((vh * 0.95 - r.top) / (vh * 0.6));
+      panel.style.setProperty("--d", d.toFixed(3));
+      if (d > 0.55) lead = i;
+      if (i === 2) gauge.textContent = String(Math.round(ease(d) * 90));
+      if (i === 3) {
+        const typed = clamp((d - 0.1) / 0.6);
+        cmsText.textContent = headline.slice(0, Math.round(typed * headline.length));
+        const live = d > 0.9;
+        cms.classList.toggle("is-published", live);
+        cmsStatus.textContent = live ? "Published" : "Draft";
+      }
     });
-  }
+    if (lead !== current) {
+      current = lead;
+      index.textContent = String(lead + 1).padStart(2, "0");
+    }
+  });
 }
 
 /* ---------- Pillars: the row nearest the middle of the screen is lit ---------- */
@@ -585,7 +612,6 @@ function loop() {
   footer.after(wrap);
   root.classList.add("has-loop");
 
-  pillGrid($("canvas", copy));
   heroScroll(copy);
 
   always.add(() => {
@@ -602,15 +628,14 @@ function loop() {
 
 intro();
 loop();
+services();
 measure();
 chrome();
 menu();
 reveals();
 heroScroll($("[data-hero]"));
-pillGrid($(".hero-grid"));
+pillField($(".pills"));
 manifesto();
-markStory();
-work();
 pillars();
 processTrack();
 footerMark();

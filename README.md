@@ -2,17 +2,17 @@
 
 **scroldev.com** and the websites ScrolDev has designed and built, in one repository.
 
-- `hub/` is scroldev.com: the agency's own site (idea, work, agency, process, pricing, contact), built from the brand book.
+- `hub/` is scroldev.com: the agency's own site (idea, what we build, agency, process, pricing, contact), built from the brand book.
 - Each portfolio site lives in its own folder under `sites/` and keeps whatever stack it was built with (Next.js, plain HTML, anything).
-- Each site has a small `scroldev.json` file describing it (name, summary, live link, cover image). The **Work** section of scroldev.com is generated from these files, so a new site shows up there on the next build.
+- Each site has a small `scroldev.json` file describing it (name, summary, live link, cover image). scroldev.com doesn't show the portfolio right now; `npm run check` keeps the metadata valid so it's ready when a Work section comes back.
 - The build has no dependencies, only Node 20 or newer.
 
 ```
 scroldev/
 ├── sites/
 │   └── <site-slug>/          one folder per portfolio site
-│       ├── scroldev.json     how the site appears on scroldev.com
-│       ├── cover.jpg         screenshot shown in the Work section
+│       ├── scroldev.json     name, summary, link and cover for the site
+│       ├── cover.jpg         cover screenshot
 │       └── …                 the site's own code
 ├── hub/                      scroldev.com
 │   ├── config.json           site URL, contact email, description, social links
@@ -37,13 +37,13 @@ scroldev/
 npm run new-site -- bella-cucina
 ```
 
-This creates `sites/bella-cucina/scroldev.json` as a **draft** (hidden from scroldev.com). Then:
+This creates `sites/bella-cucina/scroldev.json` as a **draft**. Then:
 
 1. Put the site's code in `sites/bella-cucina/`, unless it's already there.
 2. Fill in `scroldev.json` (fields below).
 3. Add a cover screenshot, ideally 1600×1000 (16:10), e.g. `sites/bella-cucina/cover.jpg`, and set `"cover": "cover.jpg"`.
 4. Set `"draft": false`.
-5. Run `npm run build` and preview `dist/` (see **Preview locally** below).
+5. Run `npm run check` to validate it.
 
 Folder names must be lowercase words joined by hyphens. Folders starting with `_` or `.` are ignored, so `sites/_scratch/` is a safe place for experiments.
 
@@ -77,11 +77,9 @@ Folder names must be lowercase words joined by hyphens. Folders starting with `_
 | `cover` | no | Image file inside the site's folder (`.jpg`, `.png`, `.webp`, `.avif`). Without one, the card shows the site name. |
 | `stack` | no | Tools it was built with, shown as tags. |
 | `featured` | no | `true` pins it to the top. |
-| `draft` | no | `true` hides it from scroldev.com and skips validation. |
+| `draft` | no | `true` marks it unpublished and skips validation. |
 
-The Work section is sorted by featured first, then newest year, then name. It always ends with an empty "Your site, next." frame that links to the contact form.
-
-**Be honest with `type`.** Prospects will assume everything on the site is real client work unless it says otherwise. Label demo and spec sites `"concept"`. It's still strong proof of skill, and it protects the agency's credibility.
+**Be honest with `type`.** Prospects will assume any portfolio piece is real client work unless it says otherwise. Label demo and spec sites `"concept"`. It's still strong proof of skill, and it protects the agency's credibility.
 
 ---
 
@@ -89,11 +87,11 @@ The Work section is sorted by featured first, then newest year, then name. It al
 
 | Command | What it does |
 | --- | --- |
-| `npm run build` | Validates the config and every `scroldev.json`, then builds the site into `dist/` |
-| `npm run check` | Validates only; writes nothing |
+| `npm run build` | Validates `hub/config.json` and builds the site into `dist/` |
+| `npm run check` | Validates the config and every `scroldev.json`; writes nothing |
 | `npm run new-site -- <slug>` | Creates a draft entry for a new site |
 
-The build fails with a clear message if anything published is invalid (missing field, broken cover path, bad link, missing contact email), so a broken entry never reaches the live site.
+Both fail with a clear message on a problem (missing contact email, bad link, missing field, broken cover path). Portfolio metadata never blocks a website deploy: only `npm run check` reads it.
 
 ### Preview locally
 
@@ -107,15 +105,16 @@ Open http://localhost:4173. Use a server rather than opening the file directly: 
 ### Edit it
 
 - **Contact email, site URL, description, social links:** `hub/config.json`. `contactEmail` is where the project brief form sends to and is shown in the footer. Social links with an empty `url` are hidden.
-- **Copy and sections:** `hub/template.html`. Placeholders like `{{email}}` and `{{work}}` are filled in by the build; an unknown placeholder fails the build.
+- **Copy and sections:** `hub/template.html`. Placeholders like `{{email}}` are filled in by the build; an unknown placeholder fails the build.
 - **Design:** `hub/assets/styles.css`. Colors, type sizes, spacing and the easing curve are tokens in `:root`, straight from the brand book.
 - **Motion:** `hub/assets/main.js`. Everything is scroll-linked through one frame loop and respects reduced motion (fades only, no intro, no loop).
 
 ### How the page works
 
 - **Intro:** the logo draws on once per browser session, then dissolves. Click or press any key to skip.
-- **Hero:** the pill grid reacts to the cursor; the arch's thumb scrolls down its track as you leave.
-- **The Endless Thumb:** a pinned section that builds the mark one part at a time: track, thumb, fade.
+- **Pill grid:** the brand's pill-grid tile is drawn live in one fixed layer behind every dark section (the Paper and Ember sections use the matching light and Ember tiles). Pills near the cursor warm to Ember, curve around it and cool slowly behind it, leaving an orange trail. On phones the trail follows the finger.
+- **Hero:** as you scroll away, the arches echo outward and the thumb runs down its track.
+- **What we build:** on desktop the section pins and five panels slide past sideways; each has a small demo (scroll motion, layout, speed score, CMS edit, package timelines) that plays as it arrives. On phones the panels stack.
 - **Contact:** the brief form opens the visitor's email app with the brief filled in, addressed to `contactEmail`. No backend or third-party form service.
 - **The loop:** on desktop a frozen copy of the hero sits after the footer. When it reaches the top of the screen the page jumps back to the real hero, so the scroll never ends. It is off on touch devices and with reduced motion.
 
