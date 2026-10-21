@@ -360,17 +360,16 @@ function heroStage(stage) {
       return;
     }
 
-    // A warm glow behind the mark, and a tighter one around the thumb.
-    const [gx, gy] = at(20, thumbY + 9.5);
-    const glowAt = (radius, alpha) => {
-      const g = ctx.createRadialGradient(gx, gy, 0, gx, gy, radius);
-      g.addColorStop(0, `rgba(255, 79, 26, ${alpha})`);
-      g.addColorStop(1, "rgba(255, 79, 26, 0)");
-      ctx.fillStyle = g;
-      ctx.fillRect(gx - radius, gy - radius, radius * 2, radius * 2);
-    };
-    glowAt(Math.min(k * 34, Math.max(w, h)), 0.2 * thumb.arrive);
-    if (k < k1 * 2) glowAt(k * 11, 0.38 * thumb.arrive);
+    // The mark stands in a soft pool of Ember light, the same light as every section's, centred on the arch rather
+    // than ringing the thumb. It comes up as the thumb arrives.
+    const [gx, gy] = at(20, 34);
+    const radius = Math.min(k * 40, Math.max(w, h));
+    const light = ctx.createRadialGradient(gx, gy, 0, gx, gy, radius);
+    light.addColorStop(0, `rgba(255, 79, 26, ${0.14 * thumb.arrive})`);
+    light.addColorStop(0.5, `rgba(232, 64, 12, ${0.056 * thumb.arrive})`);
+    light.addColorStop(1, "rgba(232, 64, 12, 0)");
+    ctx.fillStyle = light;
+    ctx.fillRect(gx - radius, gy - radius, radius * 2, radius * 2);
 
     // The mark, in its own 40 × 64 units.
     ctx.setTransform(dpr * k, 0, 0, dpr * k, dpr * (sx - 20 * k), dpr * (sy - ay * k));
