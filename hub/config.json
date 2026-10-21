@@ -4,7 +4,19 @@
   "contactEmail": "teamscroldev@gmail.com",
   "description": "Scroldev designs and builds scroll-led websites people don’t want to stop scrolling. Motion-led sites for startups and premium brands, live in weeks. Packages from $1,000.",
   "social": [
-    { "label": "LinkedIn", "url": "" },
-    { "label": "Instagram", "url": "" }
-  ]
+    {
+      "label": "LinkedIn",
+      "url": ""
+    },
+    {
+      "label": "Instagram",
+      "url": ""
+    }
+  ],
+  "media": {
+    "emberFilm": {
+      "mp4": "https://d2ol7oe51mr4n9.cloudfront.net/user_3DigAGHsL7XlpG98dcFNpat7g9G/e3f00acb-0656-49cc-81d3-e084334e8256.mp4",
+      "poster": "https://d2ol7oe51mr4n9.cloudfront.net/user_3DigAGHsL7XlpG98dcFNpat7g9G/62ff03af-4c5d-462c-89a7-e6c285490f2b.jpg"
+    }
+  }
 }

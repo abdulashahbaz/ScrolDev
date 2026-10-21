@@ -131,7 +131,8 @@ function chrome() {
     else if (travel > 56 && y > vh * 0.6) header.classList.add("is-hidden");
     header.classList.toggle("is-scrolled", y > 24);
     header.classList.toggle("is-past-hero", y > layout.heroEnd - vh * 0.35);
-    header.dataset.on = heroState.ember ? "ember" : surfaceAt(y + 36);
+    // The hero's Ember screen only counts while it is still under the bar or the counter.
+    header.dataset.on = heroState.ember && y + 36 < layout.heroEnd ? "ember" : surfaceAt(y + 36);
 
     // Which nav section are we in?
     let next = null;
@@ -161,7 +162,7 @@ function chrome() {
     // contact section arrives; the footer carries its own count.
     const pinned = wide.matches && y >= layout.servicesTop - vh * 0.2 && y < layout.servicesEnd - vh * 0.8;
     hud.classList.toggle("is-on", !pinned && y + vh - 44 < layout.contactTop);
-    hud.dataset.on = heroState.ember ? "ember" : surfaceAt(y + vh - 44);
+    hud.dataset.on = heroState.ember && y + vh - 44 < layout.heroEnd ? "ember" : surfaceAt(y + vh - 44);
     lapEl.textContent = laps > 1 ? `Lap ${String(laps).padStart(2, "0")} ·` : "";
   });
 }
@@ -235,6 +236,9 @@ function heroStage(stage, frozen = false) {
   if (!canvas) return;
   const section = frozen ? null : stage.parentElement;
   const ctx = canvas.getContext("2d");
+  const film = frozen || calm ? null : $(".hero-film video", stage);
+  let filmLoaded = false;
+  film?.addEventListener("playing", () => film.parentElement.classList.add("is-ready"), { once: true });
   let w = 0, h = 0, dpr = 1, raf = 0, shown = false, last = "";
   let mx = 0, my = 0, px = 0, py = 0;
 
@@ -265,6 +269,21 @@ function heroStage(stage, frozen = false) {
     const move = ease(clamp((p - 0.06) / 0.34)); // the mark comes to the centre and grows
     const dive = clamp((p - 0.4) / 0.32); // then the view dives into the thumb
     const say = ease(clamp((p - 0.76) / 0.14)); // and the Ember line arrives
+
+    // The Ember film loads once the dive is near, and plays only while the screen is Ember.
+    if (film) {
+      if (!filmLoaded && p > 0.2) {
+        filmLoaded = true;
+        for (const [type, src] of [["video/webm", film.dataset.webm], ["video/mp4", film.dataset.mp4]]) {
+          if (src) film.append(Object.assign(document.createElement("source"), { src, type }));
+        }
+        film.load();
+      }
+      const show = clamp((dive - 0.8) / 0.16);
+      stage.style.setProperty("--film", show.toFixed(3));
+      if (show > 0 && film.paused) film.play().catch(() => {});
+      else if (show === 0 && !film.paused) film.pause();
+    }
 
     px += (mx - px) * 0.08;
     py += (my - py) * 0.08;
