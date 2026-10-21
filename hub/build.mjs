@@ -39,7 +39,7 @@ if (checkOnly) {
   await mkdir(path.join(distDir, "covers"), { recursive: true });
   for (const site of sites) {
     if (!site.coverSrc) continue;
-    site.coverHref = `/covers/${site.slug}${path.extname(site.coverSrc).toLowerCase()}`;
+    site.coverHref = `covers/${site.slug}${path.extname(site.coverSrc).toLowerCase()}`;
     await copyFile(site.coverSrc, path.join(distDir, site.coverHref));
   }
 
@@ -61,7 +61,7 @@ function checkConfig(c) {
   const problems = [];
   if (typeof c.siteUrl !== "string" || !LINK.test(c.siteUrl)) problems.push(`"siteUrl" must be a full link starting with https://`);
   if (typeof c.contactEmail !== "string" || !EMAIL.test(c.contactEmail.trim())) {
-    problems.push(`"contactEmail" must be the inbox that receives project briefs, e.g. "hello@scroldev.com"`);
+    problems.push(`"contactEmail" must be the inbox that receives project briefs, e.g. "teamscroldev@gmail.com"`);
   }
   if (typeof c.description !== "string" || !c.description.trim()) problems.push(`"description" is required (used for search results and link previews)`);
   if (c.social !== undefined) {

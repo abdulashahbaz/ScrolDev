@@ -2,10 +2,10 @@
    Built from the brand book: Ink, Paper and one Ember signal; Geist for words, Geist Mono for counts;
    one easing curve; things fade, they don't stop. */
 
-@font-face { font-family: "Geist"; src: url("/fonts/Geist-Regular.woff2") format("woff2"); font-weight: 400; font-display: swap; }
-@font-face { font-family: "Geist"; src: url("/fonts/Geist-Medium.woff2") format("woff2"); font-weight: 500; font-display: swap; }
-@font-face { font-family: "Geist Mono"; src: url("/fonts/GeistMono-Regular.woff2") format("woff2"); font-weight: 400; font-display: swap; }
-@font-face { font-family: "Geist Mono"; src: url("/fonts/GeistMono-Medium.woff2") format("woff2"); font-weight: 500; font-display: swap; }
+@font-face { font-family: "Geist"; src: url("fonts/Geist-Regular.woff2") format("woff2"); font-weight: 400; font-display: swap; }
+@font-face { font-family: "Geist"; src: url("fonts/Geist-Medium.woff2") format("woff2"); font-weight: 500; font-display: swap; }
+@font-face { font-family: "Geist Mono"; src: url("fonts/GeistMono-Regular.woff2") format("woff2"); font-weight: 400; font-display: swap; }
+@font-face { font-family: "Geist Mono"; src: url("fonts/GeistMono-Medium.woff2") format("woff2"); font-weight: 500; font-display: swap; }
 
 :root {
   /* Palette (brand book · color) */
@@ -74,6 +74,7 @@
 *, *::before, *::after { box-sizing: border-box; }
 
 html {
+  color-scheme: dark;
   background: var(--ink);
   color: var(--paper);
   scroll-behavior: smooth;
@@ -1004,7 +1005,7 @@ h3 {
 .process {
   background:
     linear-gradient(var(--ink), transparent 22%, transparent 78%, var(--ink)),
-    url("/patterns/pattern-blueprint-grid-tile-dark.svg") center top / 240px 240px repeat,
+    url("patterns/pattern-blueprint-grid-tile-dark.svg") center top / 240px 240px repeat,
     var(--ink);
 }
 
@@ -1128,7 +1129,7 @@ details[open]::details-content { block-size: auto; }
 
 .contact {
   background:
-    url("/patterns/pattern-pill-grid-tile-ember.svg") center / 240px 240px repeat,
+    url("patterns/pattern-pill-grid-tile-ember.svg") center / 240px 240px repeat,
     var(--ember);
 }
 .contact::before {
@@ -1268,7 +1269,7 @@ details[open]::details-content { block-size: auto; }
 .footer { padding-bottom: 32px; overflow: hidden; }
 .fade-stripes {
   height: clamp(120px, 16vw, 240px);
-  background: url("/patterns/fade-stripes-dark.svg") center top / 100% 100% no-repeat;
+  background: url("patterns/fade-stripes-dark.svg") center top / 100% 100% no-repeat;
 }
 
 .footer-top {
