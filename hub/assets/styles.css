@@ -421,7 +421,7 @@ h3 {
 .hud-lap:empty { display: none; }
 .hud.is-on { opacity: 1; transform: none; }
 .hud[data-on="paper"] { --bg: var(--paper); --fg: var(--ink); --muted: var(--stone); --accent: var(--ember-deep); }
-.hud[data-on="ember"] { --bg: var(--ink); --fg: #fff; --muted: rgb(255 255 255 / 0.7); --accent: #fff; }
+.hud[data-on="ember"] { --bg: var(--ember-deep); --fg: #fff; --muted: rgb(255 255 255 / 0.8); --accent: #fff; }
 
 @media (min-width: 900px) {
   .js .hud { display: inline-flex; }
@@ -440,7 +440,7 @@ h3 {
 }
 .header.is-hidden { transform: translateY(-130%); }
 .header[data-on="paper"] { --bg: var(--paper); --fg: var(--ink); --accent: var(--ember-deep); }
-.header[data-on="ember"] { --bg: var(--ink); --fg: #fff; --accent: var(--ember); }
+.header[data-on="ember"] { --bg: var(--ember-deep); --fg: #fff; --accent: #fff; }
 .menu-open .header { --bg: var(--ink); --fg: var(--paper); --accent: var(--ember); transform: none; }
 
 .header-inner {
@@ -581,17 +581,6 @@ h3 {
 .no-js .hero-stage { position: relative; }
 
 .hero-mark { position: absolute; inset: 0; z-index: -1; width: 100%; height: 100%; }
-/* Shown only once the film is actually playing; until then the canvas's Ember gradient stands in. */
-.hero-film { position: absolute; inset: 0; z-index: -1; opacity: 0; pointer-events: none; }
-.hero-film.is-ready { opacity: var(--film, 0); }
-.hero-film video, .hero-film img { width: 100%; height: 100%; object-fit: cover; }
-.hero-film::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(ellipse 62% 48% at 50% 50%, rgb(13 12 11 / 0.5), rgb(13 12 11 / 0.18) 62%, rgb(13 12 11 / 0.4));
-}
-
 @keyframes fade-in { to { opacity: 1; } }
 @keyframes rise { from { transform: translateY(105%); } to { transform: none; } }
 @keyframes rise-fade { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: none; } }
@@ -685,36 +674,40 @@ h3 {
   100% { transform: none; opacity: 1; }
 }
 
-/* Inside the thumb: the Ember screen and its one line. */
+/* Inside the thumb: an Ember chapter page, white on Ember like the brand book's openers. The mark is on the canvas. */
 .hero-dive {
   position: absolute;
   inset: 0;
-  display: grid;
-  place-content: center;
-  padding-inline: var(--margin);
+  display: flex;
   color: #fff;
-  font-size: clamp(2.75rem, 1.2rem + 6.2vw, 8rem);
-  font-weight: 500;
-  line-height: 0.98;
-  letter-spacing: -0.045em;
-  text-align: center;
-  text-wrap: balance;
-  isolation: isolate;
   opacity: var(--say);
-  transform: translateY(calc((1 - var(--say)) * 40px));
   pointer-events: none;
 }
-.hero-dive { text-shadow: 0 2px 48px rgb(13 12 11 / 0.35); }
-/* A soft shade behind the line keeps it readable on flat Ember and on the film alike. */
-.hero-dive::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  background: radial-gradient(ellipse 58% 42% at 50% 50%, rgb(13 12 11 / 0.3), rgb(13 12 11 / 0.1) 60%, transparent 85%);
+.hero-dive-inner {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 100%;
+  padding-top: 112px;
+  padding-bottom: clamp(48px, 9vh, 96px);
 }
-.hero-dive span { display: block; }
-.hero-dive span + span { color: #ffe3d6; }
+.hero-dive-label { display: flex; align-items: center; gap: 12px; color: rgb(255 255 255 / 0.88); }
+.hero-dive-label .pip { background: #fff; }
+.hero-dive-line {
+  max-width: 11ch;
+  font-size: clamp(3.25rem, 1rem + 7vw, 9rem);
+  font-weight: 500;
+  line-height: 0.94;
+  letter-spacing: -0.05em;
+  transform: translateY(calc((1 - var(--say)) * 48px));
+}
+.hero-dive-line span { display: block; }
+.hero-dive-sub {
+  margin-top: 28px;
+  color: rgb(255 255 255 / 0.92);
+  font-size: clamp(1.125rem, 1rem + 0.5vw, 1.5rem);
+  transform: translateY(calc((1 - var(--say)) * 24px));
+}
 .no-js .hero-dive { display: none; }
 
 @media (min-width: 900px) {
@@ -744,7 +737,7 @@ h3 {
   letter-spacing: -0.04em;
   text-wrap: pretty;
 }
-.manifesto .w { color: rgb(243 238 230 / 0.3); transition: color var(--t-micro) linear; }
+.manifesto .w { color: rgb(243 238 230 / 0.45); transition: color var(--t-micro) linear; }
 .manifesto .w.is-lit { color: var(--paper); }
 
 .idea-foot {
@@ -1192,16 +1185,6 @@ details[open]::details-content { block-size: auto; }
 /* ---------- 06 Contact: Ember light behind glass ---------- */
 
 .contact { overflow: hidden; isolation: isolate; padding-bottom: clamp(120px, 14vw, 200px); }
-.contact-film {
-  position: absolute;
-  inset: 0;
-  z-index: -2;
-  background: var(--poster) 70% 70% / cover no-repeat;
-  opacity: 0.75;
-  -webkit-mask-image: radial-gradient(ellipse 70% 62% at 80% 82%, #000 22%, transparent 78%);
-  mask-image: radial-gradient(ellipse 70% 62% at 80% 82%, #000 22%, transparent 78%);
-  pointer-events: none;
-}
 .contact-glow {
   position: absolute;
   inset: 0;

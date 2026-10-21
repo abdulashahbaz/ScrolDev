@@ -105,14 +105,14 @@ Open http://localhost:4173. Use a server rather than opening the file directly: 
 ### Edit it
 
 - **Contact email, site URL, description, social links:** `hub/config.json`. `contactEmail` is where the project brief form sends to and is shown in the footer. Social links with an empty `url` are hidden.
-- **The Ember film:** `media.emberFilm` in `hub/config.json` holds the `mp4` and `poster` links for the looping molten-glass film (made with Higgsfield, hosted on Higgsfield's CDN). It plays behind the hero's Ember screen and lights the contact section. Remove the entry and the page falls back to gradients.
+- **The loop:** `"loop": true` in `hub/config.json` makes the page carry on past the footer back to the top (desktop only). Set it to `false` and the page simply ends at the footer.
 - **Copy and sections:** `hub/template.html`. Placeholders like `{{email}}` are filled in by the build; an unknown placeholder fails the build.
 - **Design:** `hub/assets/styles.css`. Colors, type sizes, spacing and the easing curve are tokens in `:root`, straight from the brand book.
 - **Motion:** `hub/assets/main.js`. Everything is scroll-linked through one frame loop and respects reduced motion (fades only, no intro, no loop).
 
 ### How the page works
 
-- **Hero:** the logo mark, drawn live on a canvas so it stays sharp at any size. It draws itself on load and its thumb scrolls down its track and back, like the logo animation. Scrolling pins the hero: the copy dissolves, the mark moves to the centre and grows, and the view dives into the thumb until the screen is Ember and reads "Every scroll earns the next."
+- **Hero:** the logo mark, drawn live on a canvas so it stays sharp at any size. It draws itself on load and its thumb scrolls down its track and back, like the logo animation. Scrolling pins the hero: the copy dissolves, the mark moves to the centre and grows, and the view dives into the thumb until the screen is Ember: a page in the style of the brand book's chapter openers, with the all-white mark drawing itself in beside "Every scroll earns the next."
 - **Pill grid:** the brand's pill-grid tile is drawn live in one fixed layer behind every dark section (the Paper section uses the light tile). Pills near the cursor warm toward Ember, curve around it and cool slowly behind it, leaving a soft orange trail. On phones the trail follows the finger.
 - **Glass and light:** the header, cards, demos and the brief form are frosted glass over the pill grid, with soft Ember glows behind the services, pricing and contact sections.
 - **What we build:** on desktop the section pins and five panels slide past sideways; each has a small demo (scroll motion, layout, speed score, CMS edit, package timelines) that plays as it arrives. On phones the panels stack.
@@ -124,6 +124,17 @@ Open http://localhost:4173. Use a server rather than opening the file directly: 
 1. In Vercel: **Add New → Project**, import this repository.
 2. Leave **Root Directory** as the repo root. `vercel.json` already sets the build command and the `dist` output.
 3. Deploy, then add `scroldev.com` under **Settings → Domains**. Every push to `main` rebuilds the site.
+
+### Launch checklist
+
+1. Merge this branch into `main` (Vercel deploys `main`).
+2. In Vercel: **Add New → Project**, import the repository, leave **Root Directory** as the repo root, and deploy. `vercel.json` sets the build, the output folder, security headers and caching.
+3. Under **Settings → Domains**, add `scroldev.com` and `www.scroldev.com` (redirect `www` to the bare domain), then point your DNS where Vercel tells you.
+4. Open the live site and send yourself a test brief from the contact form; it should open your email app addressed to `contactEmail`.
+5. Add your LinkedIn and Instagram links in `hub/config.json` when they're ready.
+6. Optional: add the site to Google Search Console and submit `https://scroldev.com/sitemap.xml`.
+
+Before launch the site was checked with Lighthouse (mobile: performance 99, accessibility 100, best practices 100, SEO 100; desktop: 100 across the board), html-validate, and a link and asset check of `dist/`.
 
 ## Deploy each portfolio site
 

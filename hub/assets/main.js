@@ -236,9 +236,6 @@ function heroStage(stage, frozen = false) {
   if (!canvas) return;
   const section = frozen ? null : stage.parentElement;
   const ctx = canvas.getContext("2d");
-  const film = frozen || calm ? null : $(".hero-film video", stage);
-  let filmLoaded = false;
-  film?.addEventListener("playing", () => film.parentElement.classList.add("is-ready"), { once: true });
   let w = 0, h = 0, dpr = 1, raf = 0, shown = false, last = "";
   let mx = 0, my = 0, px = 0, py = 0;
 
@@ -258,9 +255,25 @@ function heroStage(stage, frozen = false) {
     return clamp(-r.top / Math.max(1, r.height - h));
   }
 
+  // Frames run only while something moves (the intro, a thumb loop, the pointer drift); scrolling wakes a frame,
+  // and between loops a timer wakes it for the next one. A still page costs nothing.
+  let timer = 0;
+  const wake = () => {
+    if (!raf && shown) raf = requestAnimationFrame(tick);
+  };
   function tick() {
     raf = 0;
-    if (shown && !calm) raf = requestAnimationFrame(tick);
+    frame();
+    if (!shown || calm) return;
+    const t = (performance.now() - START) / 1000;
+    const cycle = t < 2.6 ? -1 : (t - 2.6) % 5;
+    const moving = t < 2.7 || (cycle >= 0 && cycle < 1.7) || Math.abs(mx - px) > 0.002 || Math.abs(my - py) > 0.002;
+    clearTimeout(timer);
+    if (moving) raf = requestAnimationFrame(tick);
+    else timer = setTimeout(wake, (cycle < 0 ? 2.6 - t : 5 - cycle) * 1000);
+  }
+
+  function frame() {
     if (!w || !h) return;
     const t = (performance.now() - START) / 1000;
     const p = progress();
@@ -269,21 +282,6 @@ function heroStage(stage, frozen = false) {
     const move = ease(clamp((p - 0.06) / 0.34)); // the mark comes to the centre and grows
     const dive = clamp((p - 0.4) / 0.32); // then the view dives into the thumb
     const say = ease(clamp((p - 0.76) / 0.14)); // and the Ember line arrives
-
-    // The Ember film loads once the dive is near, and plays only while the screen is Ember.
-    if (film) {
-      if (!filmLoaded && p > 0.2) {
-        filmLoaded = true;
-        for (const [type, src] of [["video/webm", film.dataset.webm], ["video/mp4", film.dataset.mp4]]) {
-          if (src) film.append(Object.assign(document.createElement("source"), { src, type }));
-        }
-        film.load();
-      }
-      const show = clamp((dive - 0.8) / 0.16);
-      stage.style.setProperty("--film", show.toFixed(3));
-      if (show > 0 && film.paused) film.play().catch(() => {});
-      else if (show === 0 && !film.paused) film.pause();
-    }
 
     px += (mx - px) * 0.08;
     py += (my - py) * 0.08;
@@ -322,28 +320,27 @@ function heroStage(stage, frozen = false) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-    // Once the thumb covers the screen it is the screen: an Ember field, lit from the centre.
+    // Once the thumb covers the screen it is the screen: an Ember page.
     const [left, top] = at(16.25, thumbY + 3.75);
     const [right, bottom] = at(23.75, thumbY + 15.25);
     const ember = left <= 0 && right >= w && top <= 0 && bottom >= h;
     if (!frozen) heroState.ember = ember;
     if (ember) {
-      const g = ctx.createRadialGradient(w / 2, h * 0.45, 0, w / 2, h * 0.45, Math.max(w, h) * 0.75);
-      g.addColorStop(0, "#FF5A26");
-      g.addColorStop(1, "#E8400C");
-      ctx.fillStyle = g;
-      ctx.fillRect(0, 0, w, h);
+      emberPage(say);
       return;
     }
 
-    // A warm glow behind the mark.
+    // A warm glow behind the mark, and a tighter one around the thumb.
     const [gx, gy] = at(20, thumbY + 9.5);
-    const radius = Math.min(k * 34, Math.max(w, h));
-    const glow = ctx.createRadialGradient(gx, gy, 0, gx, gy, radius);
-    glow.addColorStop(0, `rgba(255, 79, 26, ${0.2 * thumb.arrive})`);
-    glow.addColorStop(1, "rgba(255, 79, 26, 0)");
-    ctx.fillStyle = glow;
-    ctx.fillRect(0, 0, w, h);
+    const glowAt = (radius, alpha) => {
+      const g = ctx.createRadialGradient(gx, gy, 0, gx, gy, radius);
+      g.addColorStop(0, `rgba(255, 79, 26, ${alpha})`);
+      g.addColorStop(1, "rgba(255, 79, 26, 0)");
+      ctx.fillStyle = g;
+      ctx.fillRect(gx - radius, gy - radius, radius * 2, radius * 2);
+    };
+    glowAt(Math.min(k * 34, Math.max(w, h)), 0.2 * thumb.arrive);
+    if (k < k1 * 2) glowAt(k * 11, 0.38 * thumb.arrive);
 
     // The mark, in its own 40 × 64 units.
     ctx.setTransform(dpr * k, 0, 0, dpr * k, dpr * (sx - 20 * k), dpr * (sy - ay * k));
@@ -366,13 +363,67 @@ function heroStage(stage, frozen = false) {
       fill.addColorStop(0, "#FF6533");
       fill.addColorStop(1, "#E8400C");
       ctx.globalAlpha = thumb.arrive;
-      ctx.shadowColor = "rgba(255, 79, 26, 0.55)";
-      ctx.shadowBlur = k < k1 * 2 ? 28 * dpr : 0;
       ctx.fillStyle = fill;
       ctx.beginPath();
       ctx.roundRect(16.25, thumbY, 7.5, 19, 3.75);
       ctx.fill();
-      ctx.shadowBlur = 0;
+      ctx.globalAlpha = 1;
+    }
+  }
+
+  // Inside the thumb, a page in the style of the brand book's Ember chapter openers: flat Ember, the pill grid in
+  // white, and the mark in its on-Ember version (all white), drawing itself in on the right as the line arrives.
+  function emberPage(say) {
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const base = ctx.createLinearGradient(0, 0, w, h);
+    base.addColorStop(0, "#FF5824");
+    base.addColorStop(1, "#F44A15");
+    ctx.fillStyle = base;
+    ctx.fillRect(0, 0, w, h);
+
+    if (say > 0) {
+      ctx.globalAlpha = 0.16 * say;
+      ctx.strokeStyle = "#fff";
+      ctx.lineWidth = 2;
+      ctx.lineCap = "round";
+      ctx.beginPath();
+      for (let y = 7.5; y < h; y += 15) {
+        for (let x = 7.5; x < w; x += 15) {
+          ctx.moveTo(x, y - 1.5);
+          ctx.lineTo(x, y + 1.5);
+        }
+      }
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+    }
+
+    const wide = w >= 900;
+    const k = (wide ? h * 1.05 : Math.min(h * 0.4, w * 0.9)) / 64;
+    const cx = wide ? w * 0.77 : w * 0.74;
+    const top = wide ? h * 0.12 : h * 0.1;
+    const draw = ease(clamp(say * 1.25));
+    const arrive = ease(clamp((say - 0.45) / 0.45));
+    ctx.setTransform(dpr * k, 0, 0, dpr * k, dpr * (cx - 20 * k), dpr * top);
+    const fade = ctx.createLinearGradient(0, 0, 0, 64);
+    fade.addColorStop(0.35, "rgba(255, 255, 255, 1)");
+    fade.addColorStop(0.95, "rgba(255, 255, 255, 0)");
+    ctx.strokeStyle = fade;
+    ctx.lineWidth = 5.2;
+    ctx.lineCap = "butt";
+    ctx.setLineDash([TRACK_LEN * draw, TRACK_LEN]);
+    ctx.beginPath();
+    ctx.moveTo(6, 64);
+    ctx.lineTo(6, 17);
+    ctx.arc(20, 17, 14, Math.PI, 0);
+    ctx.lineTo(34, 64);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    if (arrive > 0) {
+      ctx.globalAlpha = arrive;
+      ctx.fillStyle = "#fff";
+      ctx.beginPath();
+      ctx.roundRect(16.25, 4 + 8 * arrive, 7.5, 19, 3.75);
+      ctx.fill();
       ctx.globalAlpha = 1;
     }
   }
@@ -380,12 +431,14 @@ function heroStage(stage, frozen = false) {
   new ResizeObserver(resize).observe(canvas);
   new IntersectionObserver(([e]) => {
     shown = e.isIntersecting;
-    if (shown && !raf) tick();
+    wake();
   }).observe(stage);
+  addEventListener("scroll", wake, { passive: true });
   if (finePointer && !calm) {
     addEventListener("pointermove", (e) => {
       mx = (e.clientX / innerWidth - 0.5) * 2;
       my = (e.clientY / innerHeight - 0.5) * 2;
+      wake();
     }, { passive: true });
   }
 }
@@ -731,7 +784,7 @@ let laps = 1;
 
 function loop() {
   const hero = $("[data-hero]");
-  if (!hero || calm || !finePointer) return;
+  if (!hero || calm || !finePointer || root.dataset.loop === "false") return;
 
   const wrap = document.createElement("div");
   wrap.className = "loop";

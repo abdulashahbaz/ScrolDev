@@ -65,12 +65,7 @@ function checkConfig(c) {
     problems.push(`"contactEmail" must be the inbox that receives project briefs, e.g. "teamscroldev@gmail.com"`);
   }
   if (typeof c.description !== "string" || !c.description.trim()) problems.push(`"description" is required (used for search results and link previews)`);
-  const film = c.media?.emberFilm;
-  if (film !== undefined) {
-    for (const key of ["mp4", "webm", "poster"]) {
-      if (film[key] && !LINK.test(film[key])) problems.push(`"media.emberFilm.${key}" must be a full link starting with https://`);
-    }
-  }
+  if (c.loop !== undefined && typeof c.loop !== "boolean") problems.push(`"loop" must be true or false`);
   if (c.social !== undefined) {
     if (!Array.isArray(c.social)) problems.push(`"social" must be a list of { "label", "url" }`);
     else {
@@ -194,17 +189,8 @@ async function pageTokens() {
     ...(social.length ? { sameAs: social.map((s) => s.url) } : {}),
   };
 
-  // The Ember film: plays behind the hero's Ember screen and lights the contact section. Optional; without it the
-  // page draws the same moments as gradients.
-  const film = config.media?.emberFilm ?? {};
-  const emberFilm = film.mp4 || film.webm
-    ? `<div class="hero-film" aria-hidden="true"><video muted loop playsinline preload="none"${film.poster ? ` poster="${esc(film.poster)}"` : ""}${film.webm ? ` data-webm="${esc(film.webm)}"` : ""}${film.mp4 ? ` data-mp4="${esc(film.mp4)}"` : ""}></video></div>`
-    : "";
-  const contactFilm = film.poster ? `<div class="contact-film" aria-hidden="true" style="--poster: url('${esc(film.poster)}')"></div>` : "";
-
   return {
-    emberFilm,
-    contactFilm,
+    loop: config.loop === false ? "false" : "true",
     siteUrl: esc(siteUrl),
     description: esc(config.description),
     email: esc(email),

@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" class="no-js">
+<html lang="en" class="no-js" data-loop="{{loop}}">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -138,7 +138,6 @@
     <section class="hero" id="top" data-surface="ink" data-hero>
       <div class="hero-stage">
         <canvas class="hero-mark" aria-hidden="true"></canvas>
-        {{emberFilm}}
         <div class="container hero-inner">
           <p class="label hero-label"><span class="pip" aria-hidden="true"></span>Scroldev · The scroll agency</p>
           <h1 class="hero-title">
@@ -162,7 +161,15 @@
             <span class="label">Keep scrolling</span>
           </a>
         </div>
-        <p class="hero-dive"><span>Every scroll</span> <span>earns the next.</span></p>
+        <div class="hero-dive">
+          <div class="container hero-dive-inner">
+            <p class="label hero-dive-label"><span class="pip" aria-hidden="true"></span>The promise</p>
+            <div>
+              <p class="hero-dive-line"><span>Every scroll</span> <span>earns the next.</span></p>
+              <p class="hero-dive-sub">So nobody wants to stop.</p>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -584,7 +591,6 @@
 
     <!-- 06 Contact: Ember light rising behind a glass form. -->
     <section class="section contact" id="contact" data-surface="ink">
-      {{contactFilm}}
       <div class="contact-glow" aria-hidden="true"></div>
       <div class="container">
         <p class="label section-label" data-reveal><span class="num">06</span> Start a project</p>
