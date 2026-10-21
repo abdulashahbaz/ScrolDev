@@ -125,7 +125,7 @@ Open http://localhost:4173. Use a server rather than opening the file directly: 
 ### Deploy (Vercel)
 
 1. In Vercel: **Add New → Project**, import this repository.
-2. Leave **Root Directory** as the repo root. `vercel.json` already sets the build command and the `dist` output.
+2. Leave **Root Directory** empty (`./`, the repo root). Vercel may offer one of the apps in `sites/` instead; don't pick it, or Vercel builds that portfolio site rather than scroldev.com. `vercel.json` sets the framework (none: a static site), the build command and the `dist` output, whatever the dashboard says.
 3. Deploy, then add `scroldev.com` under **Settings → Domains**. Every push to `main` rebuilds the site.
 
 ### Launch checklist
