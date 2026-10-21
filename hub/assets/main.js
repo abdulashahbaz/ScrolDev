@@ -193,9 +193,43 @@ function menu() {
   wide.addEventListener("change", (e) => e.matches && !panel.hidden && close());
 }
 
-/* ---------- Reveals ---------- */
+/* ---------- Reveals ----------
+   Blocks fade up as they arrive. Headlines go further: each word rises through its line, like the hero's. Screen
+   readers get the headline whole, from a hidden copy; the split words are only for the eye. */
+
+function splitWords(el) {
+  const copy = Object.assign(document.createElement("span"), {
+    className: "visually-hidden",
+    textContent: el.textContent.trim().replace(/\s+/g, " "),
+  });
+  const shown = document.createElement("span");
+  shown.setAttribute("aria-hidden", "true");
+  shown.append(...el.childNodes);
+  let n = 0;
+  const walk = (node) => {
+    for (const child of [...node.childNodes]) {
+      if (child.nodeType === Node.ELEMENT_NODE) walk(child);
+      if (child.nodeType !== Node.TEXT_NODE) continue;
+      const parts = child.textContent.split(/(\s+)/).filter(Boolean);
+      child.replaceWith(
+        ...parts.map((part) => {
+          if (/^\s+$/.test(part)) return " ";
+          const word = Object.assign(document.createElement("span"), { className: "word" });
+          const inner = Object.assign(document.createElement("span"), { textContent: part });
+          inner.style.setProperty("--w", n++);
+          word.append(inner);
+          return word;
+        }),
+      );
+    }
+  };
+  walk(shown);
+  el.append(copy, shown);
+  el.classList.add("split");
+}
 
 function reveals() {
+  if (!calm) for (const el of $$(".h1[data-reveal], .statement[data-reveal], .contact-title[data-reveal]")) splitWords(el);
   const io = new IntersectionObserver(
     (entries) => {
       for (const e of entries) {
@@ -442,20 +476,41 @@ function heroStage(stage) {
 /* ---------- The pill grid ----------
    The brand's pill-grid tile (2 × 5px pills every 15px), drawn live in one fixed layer behind every dark section.
    Ember is kept for the pointer: pills near it warm to Ember and turn to circle it, then cool slowly once it moves
-   on, so it leaves a fading orange trail. On touch screens the trail follows the finger. */
+   on, so it leaves a fading orange trail. On touch screens the trail follows the finger. The grid also answers the
+   scroll: it drifts up at a fraction of the page's speed, so it reads as a layer behind, and its pills stretch with
+   scroll speed, then settle back. */
 
 function pillField(canvas) {
   if (!canvas) return;
   const ctx = canvas.getContext("2d");
   const GAP = 15, LEN = 5, WIDTH = 2, RADIUS = 120, SHADES = 16, PEAK = 0.62;
+  const DRIFT = 0.18; // the grid's share of the scroll
   const cool = [46, 42, 38], ember = [255, 79, 26];
   const shade = Array.from({ length: SHADES + 1 }, (_, i) =>
     `rgb(${cool.map((c, j) => Math.round(c + (ember[j] - c) * (i / SHADES) * PEAK)).join(",")})`,
   );
-  let w = 0, h = 0, dpr = 1, n = 0;
+  let w = 0, h = 0, dpr = 1, n = 0, cols = 0;
   let xs, ys, as, heat;
   let px = -1e5, py = -1e5;
   let running = 0;
+  let row = 0, offset = 0, stretch = 0, lastY = scrollY;
+  const travel = () => (calm ? 0 : scrollY * DRIFT);
+
+  // Where the grid sits for the current scroll. It is drawn one row taller than the screen and nudged up by the
+  // part of a row it has drifted; each whole row it drifts, the warmth and turn move up a row with their pills.
+  function place() {
+    const next = Math.floor(travel() / GAP);
+    offset = travel() - next * GAP;
+    const k = next - row;
+    row = next;
+    if (!k || !n) return;
+    const by = Math.abs(k) * cols;
+    for (const values of [heat, as]) {
+      if (by >= n) values.fill(0);
+      else if (k > 0) values.copyWithin(0, by).fill(0, n - by);
+      else values.copyWithin(by, 0, n - by).fill(0, 0, by);
+    }
+  }
 
   function build() {
     w = canvas.clientWidth;
@@ -464,7 +519,8 @@ function pillField(canvas) {
     dpr = Math.min(devicePixelRatio || 1, 2);
     canvas.width = Math.round(w * dpr);
     canvas.height = Math.round(h * dpr);
-    const cols = Math.ceil(w / GAP), rows = Math.ceil(h / GAP);
+    cols = Math.ceil(w / GAP);
+    const rows = Math.ceil(h / GAP) + 1;
     n = cols * rows;
     xs = new Float32Array(n);
     ys = new Float32Array(n);
@@ -476,19 +532,22 @@ function pillField(canvas) {
         ys[i] = GAP / 2 + r * GAP;
       }
     }
+    row = Math.floor(travel() / GAP);
+    place();
     draw();
   }
 
   function pill(i) {
-    const half = (LEN / 2) * (1 + heat[i] * 0.5) - WIDTH / 2;
+    const half = (LEN / 2) * (1 + heat[i] * 0.5 + stretch * 1.2) - WIDTH / 2;
     const dx = Math.sin(as[i]) * half, dy = Math.cos(as[i]) * half;
     ctx.moveTo(xs[i] - dx, ys[i] - dy);
     ctx.lineTo(xs[i] + dx, ys[i] + dy);
   }
 
   function draw() {
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    ctx.clearRect(0, 0, w, h);
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, -offset * dpr);
     ctx.lineWidth = WIDTH;
     ctx.lineCap = "round";
     // One stroke per shade: the cold grid in a single pass, then the warm pills from dim to Ember.
@@ -517,10 +576,17 @@ function pillField(canvas) {
 
   function step() {
     running = 0;
-    let busy = false;
+    place();
+    // Fast scrolling stretches the pills, like a long exposure; they settle back once the page slows.
+    const y = scrollY;
+    const speed = Math.min(1, Math.abs(y - lastY) / 50);
+    lastY = y;
+    stretch += (speed - stretch) * (speed > stretch ? 0.35 : 0.1);
+    if (stretch < 0.005) stretch = 0;
+    let busy = stretch > 0;
     const R2 = RADIUS * RADIUS;
     for (let i = 0; i < n; i++) {
-      const dx = px - xs[i], dy = py - ys[i];
+      const dx = px - xs[i], dy = py - (ys[i] - offset);
       const d2 = dx * dx + dy * dy;
       let k = 0, target = 0;
       if (d2 < R2) {
@@ -555,6 +621,7 @@ function pillField(canvas) {
 
   new ResizeObserver(build).observe(canvas);
   if (calm) return;
+  addEventListener("scroll", kick, { passive: true });
   addEventListener("pointermove", (e) => point(e.clientX, e.clientY), { passive: true });
   addEventListener("touchstart", (e) => point(e.touches[0].clientX, e.touches[0].clientY), { passive: true });
   addEventListener("touchmove", (e) => point(e.touches[0].clientX, e.touches[0].clientY), { passive: true });
@@ -772,6 +839,64 @@ function footerLogo() {
   document.documentElement.addEventListener("pointerleave", () => (px = null));
 }
 
+/* ---------- Light and pull ----------
+   With a mouse, glass catches the light: an Ember glint follows the pointer across a card's edge and surface. Buttons
+   lean toward the pointer and their labels lean a little further, then settle back when it leaves. */
+
+function pointerCraft() {
+  if (!finePointer || calm) return;
+  addEventListener("pointermove", (e) => {
+    const card = e.target.closest?.(".card, .brief");
+    if (!card) return;
+    const r = card.getBoundingClientRect();
+    card.style.setProperty("--mx", `${Math.round(e.clientX - r.left)}px`);
+    card.style.setProperty("--my", `${Math.round(e.clientY - r.top)}px`);
+  }, { passive: true });
+
+  for (const btn of $$(".btn:not(.plan-cta)")) {
+    btn.addEventListener("pointermove", (e) => {
+      const r = btn.getBoundingClientRect();
+      btn.style.setProperty("--pull-x", `${(((e.clientX - r.left) / r.width - 0.5) * 12).toFixed(1)}px`);
+      btn.style.setProperty("--pull-y", `${(((e.clientY - r.top) / r.height - 0.5) * 10).toFixed(1)}px`);
+    });
+    btn.addEventListener("pointerleave", () => {
+      btn.style.removeProperty("--pull-x");
+      btn.style.removeProperty("--pull-y");
+    });
+  }
+}
+
+/* ---------- 03 Agency: the Paper page rises as a sheet, growing to full width as it arrives ---------- */
+
+function sheet() {
+  const el = $(".agency");
+  if (!el || calm) return;
+  let last = -1;
+  whileVisible(el, (vh) => {
+    // Scaled from its top edge, so its top (and every measurement taken from it) never moves.
+    const p = clamp((vh - el.getBoundingClientRect().top) / (vh * 0.7));
+    const s = Math.round((0.94 + 0.06 * ease(p)) * 1000) / 1000;
+    if (s === last) return;
+    last = s;
+    el.style.scale = s === 1 ? "" : String(s);
+  });
+}
+
+/* ---------- Small things: the tab and the console ---------- */
+
+function signature() {
+  const title = document.title;
+  document.addEventListener("visibilitychange", () => {
+    document.title = document.hidden ? "Keep scrolling ↓ · Scroldev" : title;
+  });
+  const email = $("#brief")?.dataset.email;
+  console.log(
+    `%cScroldev%c\nWebsites you’d scroll for eternity. Designed and built by hand, no templates.${email ? `\nLike what you see under the hood? ${email}` : ""}`,
+    "font: 500 22px/1.6 Geist, system-ui, sans-serif; color: #ff4f1a",
+    "font: 12px/1.7 'Geist Mono', ui-monospace, monospace; color: #b8b0a6",
+  );
+}
+
 /* ---------- 06 Contact: the brief opens as an email ---------- */
 
 function brief() {
@@ -840,6 +965,9 @@ pillField($(".pills"));
 manifesto();
 pillars();
 processTrack();
+sheet();
+pointerCraft();
 footerLogo();
 brief();
+signature();
 schedule();

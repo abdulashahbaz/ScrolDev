@@ -112,11 +112,15 @@ Open http://localhost:4173. Use a server rather than opening the file directly: 
 ### How the page works
 
 - **Hero:** the logo mark, drawn live on a canvas so it stays sharp at any size. It draws itself on load and its thumb scrolls down its track and back, like the logo animation. Scrolling pins the hero: the copy dissolves, the mark moves to the centre and grows, and the view dives into the thumb until the screen is Ember: a page in the style of the brand book's chapter openers, with the all-white mark drawing itself in beside "Every scroll earns the next."
-- **Pill grid:** the brand's pill-grid tile is drawn live in one fixed layer behind every dark section (the Paper section uses the light tile). Pills near the cursor warm toward Ember, curve around it and cool slowly behind it, leaving a soft orange trail. On phones the trail follows the finger.
-- **Glass and light:** the header, cards, demos and the brief form are frosted glass over the pill grid, with soft Ember glows behind the services, pricing and contact sections.
+- **Pill grid:** the brand's pill-grid tile is drawn live in one fixed layer behind every dark section (the Paper section uses the light tile). Pills near the cursor warm toward Ember, curve around it and cool slowly behind it, leaving a soft orange trail. On phones the trail follows the finger. The grid also answers the scroll: it drifts up at a fraction of the page's speed, so it reads as a layer behind, and its pills stretch with scroll speed like a long exposure, then settle.
+- **Glass and light:** the header, cards, demos and the brief form are frosted glass over the pill grid, with soft Ember glows behind the services, pricing and contact sections. With a mouse, an Ember glint follows the pointer across each card's edge and surface, and buttons lean toward the pointer.
+- **Headlines:** each section headline rises word by word through its line as it arrives, like the hero's. Screen readers get the headline whole.
+- **Agency:** the Paper section is a rounded sheet laid over the Ink, growing to full width as it rises.
 - **What we build:** on desktop the section pins and five panels slide past sideways; each has a small demo (scroll motion, layout, speed score, CMS edit, package timelines) that plays as it arrives. On phones the panels stack.
 - **Contact:** Ember light rises behind a glass brief form, which opens the visitor's email app with the brief filled in, addressed to `contactEmail`. No backend or third-party form service.
 - **The end:** the page finishes on the Scroldev logo, full width. It draws itself in when it arrives; then its thumb follows the pointer up and down the track and the letters lift as the pointer passes over them.
+- **Small things:** leave the tab and its title asks you to keep scrolling; open the browser console and there's a note from the studio. Links shared on social media show `og-image.png`, the mark glowing Ember over the pill grid.
+- **Reduced motion:** with the system setting on, all of the above is still: no pinning, drifting, rising or leaning, only fades.
 
 ### Deploy (Vercel)
 
@@ -133,7 +137,7 @@ Open http://localhost:4173. Use a server rather than opening the file directly: 
 5. Add your LinkedIn and Instagram links in `hub/config.json` when they're ready.
 6. Optional: add the site to Google Search Console and submit `https://scroldev.com/sitemap.xml`.
 
-Before launch the site was checked with Lighthouse (mobile: performance 99, accessibility 100, best practices 100, SEO 100; desktop: 100 across the board), html-validate, and a link and asset check of `dist/`.
+Before launch the site was checked with Lighthouse (mobile: performance 96–99 depending on the run, accessibility 100, best practices 100, SEO 100; desktop: 100 across the board), html-validate, and a link and asset check of `dist/`.
 
 ## Deploy each portfolio site
 
