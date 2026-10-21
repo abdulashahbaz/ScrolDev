@@ -335,6 +335,9 @@ h3 {
    fades to nothing at its own edge and nothing clips it, so light passes from one section into the next without a
    seam. A section sets where its pool sits (--gx, --gy) and, rarely, its size or strength (--gs, --ga). */
 .idea, .services-pin, .audience, .pillars, .process, .pricing, .contact, .footer { isolation: isolate; }
+/* Pools spill up and down into the next section, never sideways: the page stays exactly as wide as the screen, so a
+   phone never zooms out to fit the light. (Clip, unlike hidden, keeps the vertical spill and the services pin.) */
+.idea, .services, .audience, .pillars, .process, .pricing, .contact { overflow-x: clip; }
 .idea::before, .services-pin::before, .audience::before, .pillars::before, .process::before, .pricing::before,
 .contact-glow, .footer-glow {
   content: "";
