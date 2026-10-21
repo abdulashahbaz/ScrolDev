@@ -22,7 +22,7 @@
   /* Type */
   --sans: "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   --mono: "Geist Mono", ui-monospace, "SF Mono", Menlo, monospace;
-  --fs-display: clamp(3.25rem, 1.2rem + 5.4vw, 7rem);
+  --fs-display: clamp(2.75rem, 1rem + 8vw, 8.75rem); /* the hero's three short lines */
   --fs-h1: clamp(2.5rem, 1.7rem + 3vw, 4.5rem);
   --fs-h2: clamp(1.75rem, 1.3rem + 1.6vw, 2.5rem);
   --fs-h3: 1.5rem;
@@ -335,6 +335,9 @@ h3 {
    fades to nothing at its own edge and nothing clips it, so light passes from one section into the next without a
    seam. A section sets where its pool sits (--gx, --gy) and, rarely, its size or strength (--gs, --ga). */
 .idea, .services-pin, .audience, .pillars, .process, .pricing, .contact, .footer { isolation: isolate; }
+/* Pools spill up and down into the next section, never sideways: the page stays exactly as wide as the screen, so a
+   phone never zooms out to fit the light. (Clip, unlike hidden, keeps the vertical spill and the services pin.) */
+.idea, .services, .audience, .pillars, .process, .pricing, .contact { overflow-x: clip; }
 .idea::before, .services-pin::before, .audience::before, .pillars::before, .process::before, .pricing::before,
 .contact-glow, .footer-glow {
   content: "";
@@ -656,14 +659,16 @@ h3 {
 }
 
 .hero-title {
-  font-size: var(--fs-display);
+  /* Three beats, one per line, as big as the width allows and never taller than the screen can hold. */
+  font-size: min(var(--fs-display), 13vh);
   line-height: 0.98;
   letter-spacing: -0.045em;
 }
 .hero-title .line { display: block; overflow: hidden; padding-bottom: 0.08em; margin-bottom: -0.08em; }
 .hero-title .line > span { display: inline-block; animation: rise 1s var(--ease) both; animation-delay: calc(var(--intro-delay) + 0.08s); }
-.hero-title .line + .line > span {
-  animation-delay: calc(var(--intro-delay) + 0.2s);
+.hero-title .line:nth-child(2) > span { animation-delay: calc(var(--intro-delay) + 0.2s); }
+.hero-title .line:nth-child(3) > span {
+  animation-delay: calc(var(--intro-delay) + 0.32s);
   /* "for eternity." warms toward Ember, the way the track fades. */
   background: linear-gradient(95deg, var(--paper) 35%, #ffb594 72%, var(--ember));
   -webkit-background-clip: text;
@@ -765,11 +770,20 @@ h3 {
   .hero-inner { padding-bottom: 128px; }
 }
 
-@media (max-height: 720px) and (max-width: 899px) {
-  .hero-title { font-size: clamp(2.75rem, 11vw, 3.25rem); }
-  .hero-inner { padding-bottom: 104px; }
+/* Short laptop screens: the three-line headline steps down and the hero tightens, so it clears the header. */
+@media (min-width: 900px) and (max-height: 820px) {
+  .hero-title { font-size: min(var(--fs-display), 12vh); }
+  .hero-inner { padding-bottom: 96px; }
   .hero-lede { margin-top: 20px; }
-  .hero-actions { margin-top: 24px; }
+  .hero-actions { margin-top: 26px; }
+  .hero-offer { margin-top: 20px; }
+}
+
+@media (max-height: 720px) and (max-width: 899px) {
+  .hero-title { font-size: clamp(2.375rem, 10.5vw, 3rem); }
+  .hero-inner { padding-bottom: 88px; }
+  .hero-lede { margin-top: 16px; }
+  .hero-actions { margin-top: 20px; }
 }
 
 
