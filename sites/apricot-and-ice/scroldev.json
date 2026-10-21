@@ -6,7 +6,12 @@
   "year": 2026,
   "url": "",
   "cover": "cover.jpg",
-  "stack": ["Next.js", "TypeScript", "Tailwind CSS", "SVG"],
-  "featured": true,
-  "draft": false
+  "stack": [
+    "Next.js",
+    "TypeScript",
+    "Tailwind CSS",
+    "SVG"
+  ],
+  "featured": false,
+  "draft": true
 }

@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en" class="no-js">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Page not found · Scroldev</title>
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#0D0C0B">
+  <link rel="icon" href="/icons/favicon.ico" sizes="48x48">
+  <link rel="icon" href="/icons/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/styles.css?v={{version}}">
+</head>
+<body>
+  <svg class="sprite" aria-hidden="true" focusable="false">
+    <defs>
+      <linearGradient id="g-fade" x1="0" y1="0" x2="0" y2="64" gradientUnits="userSpaceOnUse">
+        <stop offset="0.42" stop-color="#fff"/>
+        <stop offset="1" stop-color="#fff" stop-opacity="0"/>
+      </linearGradient>
+      <mask id="m-fade" maskUnits="userSpaceOnUse" x="-4" y="-4" width="48" height="72">
+        <rect x="-4" y="-4" width="48" height="72" fill="url(#g-fade)"/>
+      </mask>
+    </defs>
+  </svg>
+  <main class="lost" data-surface="ink">
+    <div class="container lost-inner">
+      <svg class="lost-mark" viewBox="0 0 40 64" aria-hidden="true">
+        <path d="M6 64V17A14 14 0 0 1 34 17V64" fill="none" stroke="currentColor" stroke-width="5.2" mask="url(#m-fade)"/>
+        <rect class="lost-thumb" x="16.25" y="12" width="7.5" height="19" rx="3.75"/>
+      </svg>
+      <p class="label">404 · Page not found</p>
+      <h1 class="h1">This page scrolled off the end.</h1>
+      <p class="lost-text">The link may be old, or the page moved. Everything we do is one scroll away from the start.</p>
+      <a class="btn btn--primary" href="/"><span class="btn-label"><span>Back to scroldev.com</span></span></a>
+    </div>
+  </main>
+</body>
+</html>

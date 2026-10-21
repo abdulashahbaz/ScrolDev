@@ -1,9 +1,16 @@
 {
-  "name": "ScrolDev",
-  "pageTitle": "Work",
-  "tagline": "Website design & development",
-  "headline": "Websites we've designed and built.",
-  "intro": "A selection of sites ScrolDev has taken from first sketch to launch: designed, developed and shipped.",
-  "contactEmail": "",
-  "ctaLabel": "Start a project"
+  "name": "Scroldev",
+  "siteUrl": "https://scroldev.com",
+  "contactEmail": "teamscroldev@gmail.com",
+  "description": "Scroldev designs and builds scroll-led websites people don’t want to stop scrolling. Motion-led sites for startups and premium brands, live in weeks. Packages from $1,000.",
+  "social": [
+    {
+      "label": "LinkedIn",
+      "url": ""
+    },
+    {
+      "label": "Instagram",
+      "url": ""
+    }
+  ]
 }
