@@ -96,6 +96,9 @@ function measure() {
   const services = $(".services");
   layout.servicesTop = services ? top(services) : 0;
   layout.servicesEnd = services ? layout.servicesTop + services.offsetHeight : 0;
+  const flowEl = $(".flow");
+  layout.flowTop = flowEl ? top(flowEl) : Infinity;
+  layout.flowEnd = flowEl ? layout.flowTop + flowEl.offsetHeight : -Infinity;
   schedule();
 }
 
@@ -155,10 +158,12 @@ function chrome() {
       const text = `${rounded.toLocaleString("en-US")}px`;
       for (const c of counts) c.textContent = text;
     }
-    // The counter steps aside while the services section is pinned (it has its own meter) and rests once the
-    // contact section arrives; the footer carries its own count.
+    // The counter steps aside while the services section is pinned (it has its own meter) and while it would sit over
+    // the process demos' stage (which has its own too), and rests once the contact section arrives; the footer
+    // carries its own count.
     const pinned = wide.matches && y >= layout.servicesTop - vh * 0.2 && y < layout.servicesEnd - vh * 0.8;
-    hud.classList.toggle("is-on", !pinned && y + vh - 44 < layout.contactTop);
+    const staging = staged.matches && y + vh - 44 > layout.flowTop && y + vh - 64 < layout.flowEnd;
+    hud.classList.toggle("is-on", !pinned && !staging && y + vh - 44 < layout.contactTop);
     hud.dataset.on = heroState.ember && y + vh - 44 < layout.heroEnd ? "ember" : surfaceAt(y + vh - 44);
   });
 }
