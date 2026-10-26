@@ -419,40 +419,135 @@
       </div>
     </section>
 
-    <!-- 04 Process -->
-    <section class="section process" id="process" data-surface="ink">
+    <!-- 04 How Scroldev works: each step plays a small demo of that part of the work. On desktop the demos share one
+         pinned stage and the step being read drives it; on phones each demo sits under its step. -->
+    <section class="section process" id="process" data-surface="ink" aria-labelledby="process-title">
       <div class="container">
         <div class="section-head section-head--split">
           <div>
-            <p class="label section-label" data-reveal><span class="num">04</span> Process</p>
-            <h2 class="h1" data-reveal>From first call to live.</h2>
+            <p class="label section-label" data-reveal><span class="num">04</span> How Scroldev works</p>
+            <h2 class="h1" id="process-title" data-reveal>From first call to live.</h2>
           </div>
           <p class="section-intro" data-reveal style="--i:1">One team, four steps, short feedback loops. You see motion early, not at the end.</p>
         </div>
-        <div class="steps-wrap">
-          <div class="steps-track" aria-hidden="true"><span class="steps-thumb"></span></div>
-          <ol class="steps">
-            <li class="step">
-              <p class="label">01</p>
-              <h3>Discover</h3>
-              <p>Kickoff call. Goals, audience and references. We agree the sitemap and the one action the site must drive.</p>
-            </li>
-            <li class="step">
-              <p class="label">02</p>
-              <h3>Design</h3>
-              <p>Homepage direction first, with motion. Once it’s right, every other page follows the same system.</p>
-            </li>
-            <li class="step">
-              <p class="label">03</p>
-              <h3>Build</h3>
-              <p>Production code, scroll motion and CMS. Tested on real phones and laptops, tuned for speed.</p>
-            </li>
-            <li class="step">
-              <p class="label">04</p>
-              <h3>Launch</h3>
-              <p>Domain, SEO and analytics. A handover video so you can edit it yourself, then support after launch.</p>
-            </li>
-          </ol>
+
+        <div class="flow">
+          <div class="flow-stage" aria-hidden="true">
+            <div class="flow-meter"><span class="label"><span data-flow-index>01</span> / 04</span><span class="meter-track"><span class="meter-thumb"></span></span></div>
+          </div>
+
+          <div class="flow-step">
+            <p class="label flow-num">01</p>
+            <h3>Discover</h3>
+            <p>Kickoff call. Goals, audience and references. We agree the sitemap and the one action the site must drive.</p>
+            <p class="label flow-meta"><span class="pip" aria-hidden="true"></span>You leave with a sitemap and one key action</p>
+          </div>
+          <div class="flow-demo demo-brief" aria-hidden="true">
+            <div class="ui">
+              <div class="ui-head"><p class="ui-title"><svg class="icon"><use href="#i-mail"/></svg>Project brief</p><span class="label">Kickoff call</span></div>
+              <p class="ui-field"><span data-type>We launch next month. The site has to explain the product in one scroll and get people onto the waitlist.</span><i class="caret"></i></p>
+            </div>
+            <ol class="brief-out">
+              <li style="--t:0.56"><span class="label">Goal</span><span>Launch, then grow the waitlist</span></li>
+              <li style="--t:0.64"><span class="label">Audience</span><span>Founders, investors, early users</span></li>
+              <li style="--t:0.72"><span class="label">References</span><span>Three sites, saved to the board</span></li>
+              <li style="--t:0.8"><span class="label">Sitemap</span><span class="chips"><b>Home</b><b>Product</b><b>Pricing</b><b>About</b><b>Contact</b></span></li>
+              <li class="is-key" style="--t:0.88"><span class="label">One action</span><span>Join the waitlist</span></li>
+            </ol>
+          </div>
+
+          <div class="flow-step">
+            <p class="label flow-num">02</p>
+            <h3>Design</h3>
+            <p>Homepage direction first, with motion. Once it’s right, every other page follows the same system.</p>
+            <p class="label flow-meta"><span class="pip" aria-hidden="true"></span>You see motion in the first round</p>
+          </div>
+          <div class="flow-demo demo-board" aria-hidden="true">
+            <div class="ui">
+              <div class="ui-head"><p class="ui-title">Homepage · Direction</p><span class="label swap"><span>In design</span><span>Approved</span></span></div>
+              <div class="board">
+                <span class="blk blk-nav" style="--t:0.04;--ox:0px;--oy:-14px"></span>
+                <span class="blk blk-h1" style="--t:0.1;--ox:-40px;--oy:0px"></span>
+                <span class="blk blk-h2" style="--t:0.16;--ox:-28px;--oy:0px"></span>
+                <span class="blk blk-text" style="--t:0.22;--ox:0px;--oy:18px"><b></b><b></b><b></b></span>
+                <span class="blk blk-btn" style="--t:0.28;--ox:0px;--oy:18px"></span>
+                <span class="blk blk-arch" style="--t:0.34;--ox:44px;--oy:0px"></span>
+                <span class="blk blk-row" style="--t:0.42;--ox:0px;--oy:22px"><i></i><i></i><i></i></span>
+              </div>
+            </div>
+            <p class="label system-label">Every page follows the system</p>
+            <ol class="pages">
+              <li style="--t:0.66"><span class="page"><b></b><i></i><i></i></span><span class="label">Product</span></li>
+              <li style="--t:0.72"><span class="page page--arch"><b></b><s></s></span><span class="label">Pricing</span></li>
+              <li style="--t:0.78"><span class="page"><b></b><s></s><i></i></span><span class="label">About</span></li>
+              <li style="--t:0.84"><span class="page page--form"><b></b><i></i><u></u></span><span class="label">Contact</span></li>
+            </ol>
+          </div>
+
+          <div class="flow-step">
+            <p class="label flow-num">03</p>
+            <h3>Build</h3>
+            <p>Production code, scroll motion and CMS. Tested on real phones and laptops, tuned for speed.</p>
+            <p class="label flow-meta"><span class="pip" aria-hidden="true"></span>Built to a 90+ speed score</p>
+          </div>
+          <div class="flow-demo demo-build" aria-hidden="true">
+            <div class="ui ui-window">
+              <div class="win-bar"><span class="win-dots"><i></i><i></i><i></i></span><span class="label">Studio · 5 pages</span><span class="label swap status"><span>Building</span><span>Ready</span></span></div>
+              <div class="win-body">
+                <div class="run">
+                  <p class="run-title">Production build</p>
+                  <span class="run-bar"><span></span></span>
+                  <ol class="run-steps">
+                    <li style="--a:0.04;--b:0.2"><span class="tick"></span><span>Pages coded</span><span class="label">5 of 5</span></li>
+                    <li style="--a:0.2;--b:0.38"><span class="tick"></span><span>Scroll motion on every page</span><span class="label">1 curve</span></li>
+                    <li style="--a:0.38;--b:0.56"><span class="tick"></span><span>CMS connected</span><span class="label">Editable</span></li>
+                    <li style="--a:0.56;--b:0.74"><span class="tick"></span><span>Tested on real phones and laptops</span></li>
+                    <li style="--a:0.74;--b:0.9"><span class="tick"></span><span>Tuned for speed</span><span class="label">90+</span></li>
+                  </ol>
+                </div>
+                <div class="log">
+                  <p class="label">Activity</p>
+                  <ol>
+                    <li style="--t:0.1"><b>build</b>pages → 5 / 5</li>
+                    <li style="--t:0.28"><b>motion</b>hero, sections ✓</li>
+                    <li style="--t:0.46"><b>cms</b>fields → editable</li>
+                    <li style="--t:0.64"><b>test</b>phone, laptop ✓</li>
+                    <li style="--t:0.82"><b>speed</b>score 90+ ✓</li>
+                    <li style="--t:0.93"><b>ready</b>ready for launch</li>
+                  </ol>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="flow-step">
+            <p class="label flow-num">04</p>
+            <h3>Launch</h3>
+            <p>Domain, SEO and analytics. A handover video so you can edit it yourself, then support after launch.</p>
+            <p class="label flow-meta"><span class="pip" aria-hidden="true"></span>Then 7, 14 or 30 days of support</p>
+          </div>
+          <div class="flow-demo demo-launch" aria-hidden="true">
+            <div class="ui">
+              <div class="ui-head"><p class="ui-title">Launch checklist</p><span class="label swap status"><span>Pre-launch</span><span>Live</span></span></div>
+              <ul class="checks">
+                <li style="--t:0.06"><span class="tick"></span><span>Domain connected</span><span class="label url">yourbrand.com</span></li>
+                <li style="--t:0.18"><span class="tick"></span><span>SEO · titles, meta, sitemap</span></li>
+                <li style="--t:0.3"><span class="tick"></span><span>Analytics tracking</span></li>
+                <li style="--t:0.42"><span class="tick"></span><span>Handover video</span><span class="label">Edit it yourself</span></li>
+                <li style="--t:0.54"><span class="tick"></span><span>Support after launch</span><span class="label">7–30 days</span></li>
+              </ul>
+            </div>
+            <div class="ui ui-window live">
+              <div class="win-bar"><span class="win-dots"><i></i><i></i><i></i></span><span class="label url">yourbrand.com</span><span class="label live-count"><span data-live-count>4,218px</span> ↓</span></div>
+              <div class="mini-view">
+                <div class="mini-page">
+                  <div class="mini-hero"><b></b><b></b><s></s><em></em></div>
+                  <div class="mini-row" style="--t:0.18"><span></span><span></span><span></span></div>
+                  <div class="mini-arch" style="--t:0.38"></div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
         <ul class="timelines" data-reveal>
           <li class="card"><p class="label">Launch</p><p>7–10 days</p></li>
@@ -606,7 +701,7 @@
       </div>
     </section>
 
-    <!-- 06 Contact: Ember light behind a glass form. -->
+    <!-- 06 Contact: Ember light behind the brief. -->
     <section class="section contact" id="contact" data-surface="ink">
       <div class="contact-glow" aria-hidden="true"></div>
       <div class="container">

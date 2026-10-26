@@ -170,6 +170,8 @@ function menu() {
   const panel = $("#menu");
   if (!button || !panel) return;
   let closeTimer = 0;
+  // While the menu is open, the page behind it can't be reached by Tab or a screen reader.
+  const behind = [$("main"), footer];
 
   const open = () => {
     clearTimeout(closeTimer);
@@ -177,12 +179,14 @@ function menu() {
     requestAnimationFrame(() => panel.classList.add("is-open"));
     root.classList.add("menu-open", "is-locked");
     button.setAttribute("aria-expanded", "true");
+    for (const el of behind) el.inert = true;
     $("a", panel)?.focus({ preventScroll: true });
   };
   const close = (refocus) => {
     panel.classList.remove("is-open");
     root.classList.remove("menu-open", "is-locked");
     button.setAttribute("aria-expanded", "false");
+    for (const el of behind) el.inert = false;
     closeTimer = setTimeout(() => (panel.hidden = true), 450);
     if (refocus) button.focus();
   };
@@ -270,6 +274,9 @@ function heroStage(stage) {
   const label = $(".hero-label", stage);
   let w = 0, h = 0, dpr = 1, raf = 0, shown = false, last = "";
   let mx = 0, my = 0, px = 0, py = 0, textRight = 0, labelTop = 0;
+  // The pointer in screen pixels, how firmly the thumb is following it (0 → 1), where it is following it to, and
+  // where the mark was last drawn (for hit-testing the pointer against it).
+  let cx = -1, cy = -1, grab = 0, fy = 12, shownY = 12, settling = false, geo = null;
 
   function resize() {
     w = canvas.clientWidth;
@@ -311,7 +318,7 @@ function heroStage(stage) {
     if (!shown || calm) return;
     const t = (performance.now() - START) / 1000;
     const cycle = t < 2.6 ? -1 : (t - 2.6) % 5;
-    const moving = t < 2.7 || (cycle >= 0 && cycle < 1.7) || Math.abs(mx - px) > 0.002 || Math.abs(my - py) > 0.002;
+    const moving = t < 2.7 || (cycle >= 0 && cycle < 1.7) || settling || Math.abs(mx - px) > 0.002 || Math.abs(my - py) > 0.002;
     clearTimeout(timer);
     if (moving) raf = requestAnimationFrame(tick);
     else timer = setTimeout(wake, (cycle < 0 ? 2.6 - t : 5 - cycle) * 1000);
@@ -331,7 +338,18 @@ function heroStage(stage) {
     py += (my - py) * 0.08;
     const thumb = thumbAt(t);
     const rest = 1 - clamp(p / 0.05);
-    const thumbY = 12 + (thumb.y - 12) * rest;
+    // With a mouse over the mark, the thumb leaves its loop and follows the pointer up and down its track, never
+    // sideways; once the pointer leaves, it eases back into the loop.
+    const over = !!geo && rest > 0.5 && thumb.arrive === 1 && Math.abs(cx - geo.sx) < geo.k * 24 &&
+      cy > geo.sy - geo.ay * geo.k - 24 && cy < geo.sy + (64 - geo.ay) * geo.k;
+    const target = over ? clamp((cy - geo.sy) / geo.k + geo.ay - 9.5, 8, 38) : fy;
+    if (over && grab < 0.05) fy = shownY; // pick the thumb up where it is
+    fy += (target - fy) * 0.2;
+    grab += ((over ? 1 : 0) - grab) * 0.12;
+    if (grab < 0.001) grab = 0;
+    settling = Math.abs((over ? 1 : 0) - grab) > 0.002 || Math.abs(target - fy) > 0.01;
+    shownY = thumb.y + (fy - thumb.y) * grab;
+    const thumbY = 12 + (shownY - 12) * rest;
     const draw = calm ? 1 : ease(clamp((t - 0.1) / 0.8));
 
     const key = [p, thumbY, thumb.arrive, draw, px, py, w, h].map((v) => v.toFixed(3)).join();
@@ -342,19 +360,17 @@ function heroStage(stage) {
     stage.style.setProperty("--say", say.toFixed(3));
     stage.classList.toggle("is-out", out > 0.6);
 
-    // Where the mark sits: right of the headline on wide screens, top right on phones.
+    // Where the mark sits: right of the headline on wide screens; on phones, centred above the centred words.
     const wide = w >= 900;
     const edge = Math.min(80, Math.max(20, w * 0.056)); // the page margin
     const k1 = (h * 0.74) / 64;
-    // Phones: the mark stands right-aligned in the band between the header and the words. A phone too short for that
+    // Phones: the mark stands in the band between the header and the words, clear of both. A phone too short for that
     // band doesn't show it at rest; it fades in at the centre as the words dissolve.
-    const bandTop = 84, bandBottom = labelTop - 32;
+    const bandTop = 100, bandBottom = labelTop - 28;
     const roomy = wide || bandBottom - bandTop >= 100;
     const k0 = wide ? Math.min(h * 0.58, 600) / 64 : roomy ? Math.min(bandBottom - bandTop, h * 0.34, 280) / 64 : k1 * 0.8;
     const half = 20 * k0; // half the mark's width
-    const x0 = wide
-      ? Math.min(w - edge - half, Math.max((textRight + w - edge) / 2, textRight + half + 32))
-      : roomy ? w - edge - half : w / 2;
+    const x0 = wide ? Math.min(w - edge - half, Math.max((textRight + w - edge) / 2, textRight + half + 32)) : w / 2;
     const y0 = wide ? h * 0.53 : roomy ? (bandTop + bandBottom) / 2 : h / 2;
     const presence = roomy ? 1 : ease(clamp(out * 1.25));
     const kEnd = 1.3 * Math.max(w / 7.5, h / 11.5);
@@ -368,6 +384,7 @@ function heroStage(stage) {
       ay = 32 + (thumbY + 9.5 - 32) * ease(clamp(dive * 1.8));
     }
     const at = (ux, uy) => [sx + (ux - 20) * k, sy + (uy - ay) * k];
+    geo = { sx, sy, k, ay };
 
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -425,8 +442,8 @@ function heroStage(stage) {
     }
   }
 
-  // Inside the thumb, a page in the style of the brand book's Ember chapter openers: flat Ember, the pill grid in
-  // white, and the mark in its on-Ember version (all white), drawing itself in on the right as the line arrives.
+  // Inside the thumb, a page in the style of the brand book's Ember chapter openers: flat Ember and the pill grid in
+  // white, with the promise centred over it (in the markup).
   function emberPage(say) {
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     const base = ctx.createLinearGradient(0, 0, w, h);
@@ -450,36 +467,6 @@ function heroStage(stage) {
       ctx.stroke();
       ctx.globalAlpha = 1;
     }
-
-    const wide = w >= 900;
-    const k = (wide ? h * 1.05 : Math.min(h * 0.4, w * 0.9)) / 64;
-    const cx = wide ? w * 0.77 : w * 0.74;
-    const top = wide ? h * 0.12 : h * 0.1;
-    const draw = ease(clamp(say * 1.25));
-    const arrive = ease(clamp((say - 0.45) / 0.45));
-    ctx.setTransform(dpr * k, 0, 0, dpr * k, dpr * (cx - 20 * k), dpr * top);
-    const fade = ctx.createLinearGradient(0, 0, 0, 64);
-    fade.addColorStop(0.35, "rgba(255, 255, 255, 1)");
-    fade.addColorStop(0.95, "rgba(255, 255, 255, 0)");
-    ctx.strokeStyle = fade;
-    ctx.lineWidth = 5.2;
-    ctx.lineCap = "butt";
-    ctx.setLineDash([TRACK_LEN * draw, TRACK_LEN]);
-    ctx.beginPath();
-    ctx.moveTo(6, 64);
-    ctx.lineTo(6, 17);
-    ctx.arc(20, 17, 14, Math.PI, 0);
-    ctx.lineTo(34, 64);
-    ctx.stroke();
-    ctx.setLineDash([]);
-    if (arrive > 0) {
-      ctx.globalAlpha = arrive;
-      ctx.fillStyle = "#fff";
-      ctx.beginPath();
-      ctx.roundRect(16.25, 4 + 8 * arrive, 7.5, 19, 3.75);
-      ctx.fill();
-      ctx.globalAlpha = 1;
-    }
   }
 
   new ResizeObserver(resize).observe(canvas);
@@ -493,8 +480,14 @@ function heroStage(stage) {
     addEventListener("pointermove", (e) => {
       mx = (e.clientX / innerWidth - 0.5) * 2;
       my = (e.clientY / innerHeight - 0.5) * 2;
+      cx = e.clientX;
+      cy = e.clientY;
       wake();
     }, { passive: true });
+    document.documentElement.addEventListener("pointerleave", () => {
+      cx = cy = -1;
+      wake();
+    });
   }
 }
 
@@ -774,27 +767,60 @@ function pillars() {
   });
 }
 
-/* ---------- 04 Process: the thumb travels the track, each step lights as it passes ---------- */
+/* ---------- 04 How Scroldev works ----------
+   Each step has a small demo of that part of the work, driven by --p (0 → 1): it plays as the step is read and runs
+   back if you scroll back up. On desktop the demos share one pinned stage, which shows the step being read; on
+   phones each demo sits under its step and plays as it rises up the screen. With reduced motion every demo is
+   shown finished. */
 
-function processTrack() {
-  const wrap = $(".steps-wrap");
-  if (!wrap || calm) return;
-  const track = $(".steps-track", wrap);
-  const thumb = $(".steps-thumb", wrap);
-  const steps = $$(".step", wrap);
+const staged = matchMedia("(min-width: 1000px) and (min-height: 640px)");
+
+function flow() {
+  const wrap = $(".flow");
+  if (!wrap) return;
+  const steps = $$(".flow-step", wrap);
+  const demos = $$(".flow-demo", wrap);
+  const stageEl = $(".flow-stage", wrap);
+  const index = $("[data-flow-index]", wrap);
+  const meter = $(".flow-meter", wrap);
+  const typed = $("[data-type]", wrap);
+  const text = typed.textContent;
+  const count = $("[data-live-count]", wrap);
+  const played = demos.map(() => -1);
+  let current = -1;
+
+  function play(i, p) {
+    if (p === played[i]) return;
+    played[i] = p;
+    const demo = demos[i];
+    demo.style.setProperty("--p", p);
+    // The brief types over the first half; the live site's scroll count runs over the last part.
+    if (demo.contains(typed)) typed.textContent = text.slice(0, Math.round(clamp(p / 0.5) * text.length));
+    if (demo.contains(count)) count.textContent = `${Math.round(ease(clamp((p - 0.7) / 0.3)) * 4218).toLocaleString("en-US")}px`;
+  }
+
+  function show(i) {
+    if (i === current) return;
+    current = i;
+    steps.forEach((s, j) => s.classList.toggle("is-on", j === i));
+    demos.forEach((d, j) => d.classList.toggle("is-on", j === i));
+    index.textContent = String(i + 1).padStart(2, "0");
+    meter.style.setProperty("--step", i);
+  }
+
   whileVisible(wrap, (vh) => {
-    const r = wrap.getBoundingClientRect();
-    const p = ease(clamp((vh * 0.78 - r.top) / (r.height + vh * 0.3)));
-    if (wide.matches) {
-      const max = track.offsetWidth - thumb.offsetWidth;
-      thumb.style.setProperty("--tx", `${(p * max).toFixed(1)}px`);
-      steps.forEach((s, i) => s.classList.toggle("is-on", p * steps.length > i + 0.02 || p > 0.98));
-    } else {
-      const max = track.offsetHeight - thumb.offsetHeight;
-      const at = p * max;
-      thumb.style.setProperty("--ty", `${at.toFixed(1)}px`);
-      steps.forEach((s) => s.classList.toggle("is-on", s.offsetTop <= at + thumb.offsetHeight));
-    }
+    const stage = staged.matches;
+    // Where the stage pins: centred on the screen, a little below the header (matches the CSS).
+    const pin = stage ? (vh - stageEl.offsetHeight) / 2 + 28 : 0;
+    const rects = (stage ? steps : demos).map((el) => el.getBoundingClientRect());
+    let lead = 0;
+    rects.forEach((r, i) => {
+      if (stage ? r.top < pin + r.height * 0.35 : r.top < vh * 0.55) lead = i;
+      // On the stage a demo plays as its step's words pass the middle; under a step, as it rises up the screen.
+      const p = calm ? 1 : stage ? clamp((pin + r.height * 0.2 - r.top) / (r.height * 0.5)) : clamp((vh * 0.92 - r.top) / (vh * 0.55));
+      play(i, Math.round(p * 1000) / 1000);
+    });
+    show(lead);
   });
 }
 
@@ -866,7 +892,7 @@ function footerLogo() {
 }
 
 /* ---------- Light and pull ----------
-   With a mouse, glass catches the light: an Ember glint follows the pointer across a card's edge and surface. Buttons
+   With a mouse, cards catch the light: an Ember glint follows the pointer across a card's edge and surface. Buttons
    lean toward the pointer and their labels lean a little further, then settle back when it leaves. */
 
 function pointerCraft() {
@@ -990,7 +1016,7 @@ heroStage($(".hero-stage"));
 pillField($(".pills"));
 manifesto();
 pillars();
-processTrack();
+flow();
 sheet();
 pointerCraft();
 footerLogo();
