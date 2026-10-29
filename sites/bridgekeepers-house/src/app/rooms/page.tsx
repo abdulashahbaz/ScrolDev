@@ -17,7 +17,7 @@ export default function RoomsPage() {
       <PageHero
         eyebrow="Rooms & suites"
         title="Twenty-one rooms, one river."
-        intro="Limestone walls, oak floors and linen, arranged around a fig-tree courtyard and the Neretva. Breakfast and the hammam come with every stay."
+        intro="Limestone walls, oak floors and linen, arranged around a fig-tree courtyard and the Neretva. Breakfast on the terrace comes with every stay."
         photo={photos.roomRiver}
         alt="A River Room in warm timber with a low king bed"
       />

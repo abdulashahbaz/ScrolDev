@@ -15,7 +15,7 @@ export function SiteFooter() {
             <em>We&apos;ll keep the light on.</em>
           </h2>
           <div className="footer-contact">
-            <p>Rooms from €180 a night, breakfast on the terrace and the hammam included. Our team replies to every enquiry within a day.</p>
+            <p>Rooms from €180 a night, breakfast on the terrace included. Our team replies to every enquiry within a day.</p>
             <div>
               <Link href="/book" className="button button-copper">
                 Check availability
@@ -48,9 +48,6 @@ export function SiteFooter() {
             <ul>
               <li>
                 <Link href="/dining">Terrace &amp; Kitchen</Link>
-              </li>
-              <li>
-                <Link href="/spa">The Cellar Hammam</Link>
               </li>
               <li>
                 <Link href="/story">Our story</Link>

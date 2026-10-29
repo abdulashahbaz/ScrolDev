@@ -194,7 +194,7 @@ export function Cinema({ cards }: { cards: HouseCard[] }) {
           </p>
           <ul className="hero-tags" aria-label="The house at a glance">
             <li>21 rooms &amp; suites</li>
-            <li>Hammam in the old cellars</li>
+            <li>Four minutes to Stari Most</li>
             <li>Terrace on the river</li>
           </ul>
         </section>

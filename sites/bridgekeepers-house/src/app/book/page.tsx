@@ -7,7 +7,7 @@ import { rooms } from "@/content/rooms";
 
 export const metadata: Metadata = {
   title: "Book a stay",
-  description: "Choose your dates and room at The Bridgekeepers' House in Mostar. Breakfast and the hammam are included in every stay.",
+  description: "Choose your dates and room at The Bridgekeepers' House in Mostar. Breakfast is included in every stay.",
 };
 
 export default function BookPage() {
@@ -17,7 +17,7 @@ export default function BookPage() {
         compact
         eyebrow="Book a stay"
         title="Choose your dates."
-        intro="Breakfast on the terrace and the hammam are included in every stay. We confirm every request personally, usually within a few hours."
+        intro="Breakfast on the terrace is included in every stay. We confirm every request personally, usually within a few hours."
         photo={photos.mostarDuskArch}
         alt="Stari Most at dusk between its two stone towers"
       />

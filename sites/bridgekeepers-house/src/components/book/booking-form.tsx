@@ -8,7 +8,7 @@ type RoomOption = { slug: string; name: string; from: number; sleeps: number };
 
 const extras = [
   { id: "transfer", label: "Airport or station transfer", price: 35 },
-  { id: "ritual", label: "Hammam ritual on arrival", price: 85 },
+  { id: "walk", label: "Guided walk through the old town", price: 40 },
   { id: "dinner", label: "Dinner on the terrace, first night", price: 90 },
 ];
 
@@ -153,7 +153,7 @@ export function BookingForm({ rooms }: { rooms: RoomOption[] }) {
           <span>Estimated total</span>
           <strong>{nights ? formatEuro(total) : "—"}</strong>
         </p>
-        <p className="fine-print">Breakfast and the hammam are included. Nothing is charged until we confirm.</p>
+        <p className="fine-print">Breakfast is included. Nothing is charged until we confirm.</p>
         <button type="submit" className="button button-copper button-wide">
           Request this stay
         </button>

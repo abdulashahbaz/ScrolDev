@@ -87,7 +87,7 @@ export const rooms: Room[] = [
     summary: "Our only suite with a private terrace facing Stari Most. Watch the divers by day and the lit arch by night, from your own chair.",
     body: [
       "The suite takes the whole top floor on the river side. Its terrace looks straight at the Old Bridge, close enough to hear the divers' audience counting down.",
-      "Inside, a freestanding stone bath sits by the window, and a private dinner can be served on the terrace any evening of your stay.",
+      "Inside, a reading chair sits by the window, and a private dinner can be served on the terrace any evening of your stay.",
     ],
     size: 62,
     sleeps: 2,
@@ -95,16 +95,16 @@ export const rooms: Room[] = [
     view: "Stari Most",
     count: 1,
     from: 520,
-    features: ["Private terrace facing the bridge", "Freestanding stone bath", "Private terrace dinner", "Daily hammam ritual for two"],
+    features: ["Private terrace facing the bridge", "The whole top floor", "Private terrace dinner", "Breakfast served on your terrace"],
     photo: photos.mostarArch,
     alt: "Stari Most framed by its two stone towers above the emerald Neretva",
-    gallery: [{ photo: photos.roomBath, alt: "A freestanding bath against a textured stone wall" }],
+    gallery: [{ photo: photos.mostarDuskArch, alt: "Stari Most at dusk between its two stone towers" }],
   },
 ];
 
 export const amenities = [
   "Breakfast on the river terrace",
-  "Hammam access for every guest",
+  "Housekeeping twice a day",
   "Concierge who grew up in the old town",
   "Airport and station transfers",
   "Fast Wi-Fi in every room",

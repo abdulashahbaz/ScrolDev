@@ -9,7 +9,6 @@ import { rooms } from "@/content/rooms";
 
 const cards: HouseCard[] = [
   { kicker: "Rooms & suites", title: "River Rooms", body: "Arched windows over the Neretva, limestone walls, linen and oak.", href: "/rooms/river-room", icon: "icon1" },
-  { kicker: "Hammam", title: "The Cellar Hammam", body: "Warm marble, domed light and rituals drawn from the old bathhouses.", href: "/spa", icon: "icon2" },
   { kicker: "At dusk", title: "The Bridge Divers", body: "Watch the divers leap from Stari Most into the river below.", href: "/experiences#divers", icon: "icon3" },
   { kicker: "Dining", title: "Terrace & Kitchen", body: "Herzegovinian produce, river trout and Žilavka by the glass.", href: "/dining", icon: "icon2" },
   { kicker: "Day trip", title: "Blagaj Tekke", body: "A dervish house at the spring of the Buna, a short drive south.", href: "/experiences#blagaj", icon: "icon1" },
@@ -19,7 +18,7 @@ const cards: HouseCard[] = [
 const numbers = [
   { figure: "21", label: "rooms and suites" },
   { figure: "4", label: "minutes' walk to Stari Most" },
-  { figure: "1", label: "hammam in the old cellars" },
+  { figure: "1", label: "terrace facing the arch" },
   { figure: "2", label: "native grapes on the wine list" },
 ];
 
@@ -35,7 +34,7 @@ export default function HomePage() {
           <div data-reveal>
             <p className="eyebrow">Welcome</p>
             <p className="welcome-lead">
-              Twenty-one rooms in a restored stone house on the river side of the old town, a hammam in the vaulted cellars and a terrace that looks straight at the
+              Twenty-one rooms in a restored stone house on the river side of the old town, with a terrace that looks straight at the
               arch. <em>Close enough to hear the divers&apos; crowd; far enough to sleep.</em>
             </p>
           </div>
@@ -93,19 +92,6 @@ export default function HomePage() {
             </p>
             <Link href="/dining" className="button button-dark">
               See the kitchen
-            </Link>
-          </div>
-        </div>
-        <div className="wrap feature feature-reverse" data-reveal>
-          <div className="feature-photo">
-            <Image src={photos.spaOil} alt="Hands warming a drop of oil before a massage" fill placeholder="blur" sizes="(max-width: 900px) 100vw, 55vw" />
-          </div>
-          <div className="feature-copy">
-            <p className="eyebrow">The Cellar Hammam</p>
-            <h2 className="display">Steam under stone vaults.</h2>
-            <p>In the vaulted cellars below the house: warm marble, a black-soap scrub and rose oil, in the tradition of the Ottoman bathhouses. Every guest has access.</p>
-            <Link href="/spa" className="button button-dark">
-              See the rituals
             </Link>
           </div>
         </div>
